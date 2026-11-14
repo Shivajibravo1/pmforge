@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* PMForge brand palette. Contrast (WCAG 2.1 AA): white on black 21.0, lime on black 17.75,
+   white on violet 5.62, lime on violet 4.75. Lime on white is never used for text or icons. */
+:root {
+  --pm-black: #000000;
+  --pm-violet: #7e3bed;
+  --pm-white: #ffffff;
+  --pm-lime: #c6ff34;
+  --pm-surface: #0d0d12;
+  --pm-surface-2: #16161d;
+  --pm-border: #2a2a35;
+  --pm-muted: #b4b4c0;
+}
+
+@theme inline {
+  --color-black: var(--pm-black);
+  --color-violet: var(--pm-violet);
+  --color-lime: var(--pm-lime);
+  --color-surface: var(--pm-surface);
+  --color-surface2: var(--pm-surface-2);
+  --color-line: var(--pm-border);
+  --color-muted: var(--pm-muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html { color-scheme: dark; }
+body { background: var(--pm-black); color: var(--pm-white); font-family: var(--font-geist-sans), system-ui, sans-serif; }
+:focus-visible { outline: 2px solid var(--pm-lime); outline-offset: 2px; }
+
+.prose-pm h1, .prose-pm h2, .prose-pm h3 { font-weight: 700; margin: 1.4em 0 .5em; }
+.prose-pm h2 { font-size: 1.25rem; }
+.prose-pm h3 { font-size: 1.05rem; }
+.prose-pm p, .prose-pm li { color: #e6e6ee; line-height: 1.7; }
+.prose-pm p { margin: .8em 0; }
+.prose-pm ul { list-style: disc; padding-left: 1.4em; }
+.prose-pm ol { list-style: decimal; padding-left: 1.4em; }
+.prose-pm a { text-decoration: underline; }
+.prose-pm table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: .9rem; }
+.prose-pm th, .prose-pm td { border: 1px solid var(--pm-border); padding: .5em .7em; text-align: left; }
+.prose-pm code { background: var(--pm-surface-2); padding: .1em .35em; border-radius: 4px; }
