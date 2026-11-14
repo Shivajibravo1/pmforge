@@ -7,6 +7,8 @@ These requirements apply to every lesson, every day, without being repeated in a
 3. **Stay in IT project management.** Follow the curriculum in `curriculum.json`. Do not drift into general software engineering, data science or unrelated topics. AI appears as a project, governance and delivery topic.
 4. **AI security.** Any OpenAI instructions or code follow NIST, CIS and OWASP. See `docs/AI_SECURITY.md`. No exceptions.
 
+5. **Storytelling standard.** Lessons are lived, not explained. The reader is the project manager on a live, connected case (Project Lighthouse, fictional, Days 1 to 10), told in second person. Rules: (a) hook in the first screen with a `chat` scene or a dated moment, no definitions first; (b) concepts are explained through what happens next in the project, then named; (c) at least one `decision` block per lesson where each option shows its consequence and a senior PM take; (d) use a `timeline` to show how a problem builds over weeks and a `rag` block for project health; (e) named characters with roles, consistent across days; (f) each lesson ends with a link to tomorrow; (g) at least 700 words and a visible AI scenario. Real cases (for example Healthcare.gov) are framed as "you are the advisor", caveated, with no invented dates, figures or quotes.
+
 Also: plain English, no em dashes, no invented statistics or quotes, mark illustrative scenarios as illustrative, verify figures for real cases, and never use real client names.
 
 ## Lesson format
@@ -23,6 +25,10 @@ One `## ` heading is one screen (6 to 12 screens). Blocks are fenced code blocks
 | `checklist` | one item per line | interactive |
 | `quiz` | `? question`, `- wrong`, `+ right`, `= why` | exactly one right answer |
 | `accordion` | `Title \| text` | expandable |
+| `chat` | `# Where and when`, then `Name \| role \| message` | story scene, avatars are generated |
+| `timeline` | `When \| What happened \| ok/warn/bad/info` | how events unfold |
+| `rag` | `Area \| R or A or G \| note` | project health tiles |
+| `decision` | `? situation`, `- option \| result`, `+ best option \| result`, `= senior PM take` | exactly one `+`; every option states its consequence |
 | `tip` `note` `warn` `key` `ai` | free text | callouts; `ai` is the AI lens |
 | `journal` | prompt text | learner writes, optional AI feedback |
 

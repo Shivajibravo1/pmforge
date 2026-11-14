@@ -83,3 +83,15 @@ def test_story_blocks_are_well_formed():
                 assert len(opts) >= 2 and sum(o.startswith("+") for o in opts) == 1, f"day {n}: decision needs exactly one best option"
                 assert all("|" in o for o in opts), f"day {n}: each decision option needs a consequence"
                 assert any(x.startswith("=") for x in ls), f"day {n}: decision needs a senior PM take"
+
+
+def test_lessons_one_to_ten_are_immersive():
+    """Storytelling standard: a scene, a decision with consequences, and enough depth."""
+    for n in range(1, 11):
+        kinds = [k for k, _ in blocks(n)]
+        words = len((lesson_body(n) or "").split())
+        assert "chat" in kinds, f"day {n}: open with a chat scene"
+        assert words >= 700, f"day {n}: only {words} words, expected a fuller lesson"
+        assert "decision" in kinds, f"day {n}: add a decision with consequences"
+        first = (lesson_body(n) or "").split("\n## ")[0] + "\n## "
+        assert "```chat" in first or "```chat" in (lesson_body(n) or "").split("\n## ")[1], f"day {n}: hook within first screen"
