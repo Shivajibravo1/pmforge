@@ -29,7 +29,8 @@ class Verifier(Protocol):
 class JwksVerifier:
     def __init__(self, settings: Settings):
         self._s = settings
-        self._client = jwt.PyJWKClient(settings.jwks_url, cache_keys=True) if settings.jwks_url else None
+        headers = {"x-vercel-protection-bypass": settings.vercel_bypass_secret} if settings.vercel_bypass_secret else None
+        self._client = jwt.PyJWKClient(settings.jwks_url, cache_keys=True, headers=headers) if settings.jwks_url else None
 
     def verify(self, token: str) -> dict:
         if self._client is None:

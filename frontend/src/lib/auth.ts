@@ -9,7 +9,8 @@ function required(name: string): string {
   return v;
 }
 
-const isProd = process.env.VERCEL_ENV === "production" || process.env.PMFORGE_LIVE === "true";
+// Vercel "production" is only the validation environment in Phase A, so liveness is its own flag.
+const isProd = process.env.PMFORGE_LIVE === "true";
 
 /** Phase A: no email provider yet. OTPs are logged server-side for allowlisted testers only. */
 async function deliverOtp(email: string, otp: string): Promise<void> {

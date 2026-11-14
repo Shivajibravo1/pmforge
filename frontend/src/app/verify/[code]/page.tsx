@@ -5,7 +5,12 @@ type Cert = { valid: boolean; level: number; level_title: string; issued_at: str
 export default async function Verify({ params }: PageProps<"/verify/[code]">) {
   const { code } = await params;
   const api = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  const res = await fetch(`${api}/public/certificates/${encodeURIComponent(code)}`, { cache: "no-store" });
+  const res = await fetch(`${api}/public/certificates/${encodeURIComponent(code)}`, {
+    cache: "no-store",
+    headers: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? { "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET }
+      : undefined,
+  });
   const cert: Cert | null = res.ok ? await res.json() : null;
   return (
     <main className="mx-auto w-full max-w-md flex-1 px-5 py-12">

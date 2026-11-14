@@ -5,7 +5,12 @@ type Pub = { items: { day: number; title: string; score: number; content: string
 export default async function PublicPortfolio({ params }: PageProps<"/p/[slug]">) {
   const { slug } = await params;
   const api = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  const res = await fetch(`${api}/public/portfolio/${encodeURIComponent(slug)}`, { cache: "no-store" });
+  const res = await fetch(`${api}/public/portfolio/${encodeURIComponent(slug)}`, {
+    cache: "no-store",
+    headers: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? { "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET }
+      : undefined,
+  });
   const data: Pub | null = res.ok ? await res.json() : null;
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-4 px-5 py-10">

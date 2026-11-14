@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     jwt_audience: str = ""
     jwt_algorithms: str = "EdDSA,RS256,ES256"
     admin_emails: str = ""
+    # Set automatically by Vercel when Protection Bypass for Automation is enabled.
+    vercel_bypass_secret: str = Field(default="", validation_alias="VERCEL_AUTOMATION_BYPASS_SECRET", repr=False)
 
     # AI (model names are configuration, never hard-coded in logic).
     openai_api_key: str = Field(default="", repr=False)

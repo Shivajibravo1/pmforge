@@ -10,7 +10,8 @@
     "auth:migrate": "node --experimental-strip-types scripts/migrate-auth.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "vercel-build": "npm run auth:migrate && next build"
   },
   "dependencies": {
     "better-auth": "1.7.23",
