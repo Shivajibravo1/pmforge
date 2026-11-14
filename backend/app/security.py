@@ -30,9 +30,13 @@ class JwksVerifier:
     def __init__(self, settings: Settings):
         self._s = settings
         secret = settings.vercel_bypass_secret
-        headers = {"x-vercel-protection-bypass": secret} if secret else None
+        headers = {"User-Agent": "pmforge-api/0.1"}
+        if secret:
+            headers["x-vercel-protection-bypass"] = secret
         self._client = (
-            jwt.PyJWKClient(settings.jwks_url, cache_keys=True, headers=headers) if settings.jwks_url else None
+            jwt.PyJWKClient(settings.jwks_url, cache_keys=True, headers=headers, timeout=5)
+            if settings.jwks_url
+            else None
         )
 
     def verify(self, token: str) -> dict:
@@ -70,7 +74,9 @@ def current_user(
         raise _unauthorized()
     try:
         claims = verifier.verify(creds.credentials)
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as exc:
+        # The message never contains the token. It names the real cause (for example a failed JWKS fetch).
+        log.warning("Token rejected: %s: %s", type(exc).__name__, exc)
         raise _unauthorized() from None
     except Exception:  # JWKS fetch failures must fail closed
         log.exception("Token verification error")
