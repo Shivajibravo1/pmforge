@@ -55,6 +55,7 @@ body { background: var(--pm-black); color: var(--pm-white); font-family: var(--f
 @keyframes pm-flap { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.92); } }
 @keyframes pm-orbit { to { transform: rotate(360deg); } }
 @keyframes pm-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes pm-slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes pm-pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
 .pm-float { animation: pm-float 3.4s ease-in-out infinite; }
 .pm-aura { animation: pm-aura 2.6s ease-in-out infinite; }
@@ -64,6 +65,7 @@ body { background: var(--pm-black); color: var(--pm-white); font-family: var(--f
 .pm-orbit { animation: pm-orbit 18s linear infinite; }
 .pm-shimmer { background-image: linear-gradient(90deg, #7e3bed 0%, #c6ff34 50%, #7e3bed 100%); background-size: 200% 100%; animation: pm-shimmer 3s linear infinite; }
 .pm-pop { animation: pm-pop .5s ease-out both; }
+.pm-slide { animation: pm-slide .45s ease-out both; }
 @media (prefers-reduced-motion: reduce) {
-  .pm-float, .pm-aura, .pm-spin, .pm-twinkle, .pm-flap, .pm-orbit, .pm-shimmer, .pm-pop { animation: none !important; }
+  .pm-float, .pm-aura, .pm-spin, .pm-twinkle, .pm-flap, .pm-orbit, .pm-shimmer, .pm-pop, .pm-slide { animation: none !important; }
 }

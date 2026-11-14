@@ -11,17 +11,17 @@ afterEach(cleanup);
 describe("LessonPlayer", () => {
   it("shows one screen at a time with progress and no Listen button", () => {
     render(<LessonPlayer day={1} body={day1} finale={<p>finale</p>} />);
-    expect(screen.getByText("A real Tuesday")).toBeTruthy();
+    expect(screen.getByText("Tuesday, 9:47 AM")).toBeTruthy();
     expect(screen.queryByText("Listen")).toBeNull();
     expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("1");
-    expect(screen.queryByText("What an IT PM actually does")).toBeNull();
+    expect(screen.queryByText("The one sentence that defines your job")).toBeNull();
   });
   it("advances with Continue, goes back, and reaches the journal and finale", () => {
     render(<LessonPlayer day={1} body={day1} finale={<p>finale</p>} />);
     fireEvent.click(screen.getByText("Continue"));
-    expect(screen.getByText("What an IT PM actually does")).toBeTruthy();
+    expect(screen.getByText("The one sentence that defines your job")).toBeTruthy();
     fireEvent.click(screen.getByLabelText("Previous screen"));
-    expect(screen.getByText("A real Tuesday")).toBeTruthy();
+    expect(screen.getByText("Tuesday, 9:47 AM")).toBeTruthy();
     const total = Number(screen.getByRole("progressbar").getAttribute("aria-valuemax"));
     for (let k = 1; k < total; k++) {
       const next = screen.queryByText("Continue") ?? screen.queryByText("Skip feedback and continue");

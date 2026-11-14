@@ -15,13 +15,13 @@ describe("LessonBody", () => {
     expect(container.querySelectorAll("table").length).toBe(1);
     expect(container.textContent).not.toContain("| --- |");
     expect(screen.getAllByLabelText("Process").length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("checkbox").length).toBe(5);
+    expect(screen.getAllByRole("checkbox").length).toBe(6);
     expect(screen.getByText("Quick check")).toBeTruthy();
   });
   it("checklist progress and quiz feedback respond to clicks", () => {
     render(<LessonBody body={day1} />);
     fireEvent.click(screen.getAllByRole("checkbox")[0]);
-    expect(screen.getByText("1/5")).toBeTruthy();
+    expect(screen.getByText("1/6")).toBeTruthy();
     fireEvent.click(screen.getByText(/Is this a test copy or production/));
     expect(screen.getByText("Correct.")).toBeTruthy();
   });
@@ -43,5 +43,14 @@ describe("rich blocks", () => {
     expect(screen.getByLabelText("Portal")).toBeTruthy();
     expect(screen.getByText("Web app")).toBeTruthy();
     expect(screen.getByText("SSO")).toBeTruthy();
+  });
+  it("renders story blocks: chat, timeline, RAG and an interactive decision", () => {
+    const { container } = render(<LessonBody body={day1} />);
+    expect(screen.getByLabelText("Team chat, Tuesday, 9:47 AM")).toBeTruthy();
+    expect(screen.getByLabelText("Timeline")).toBeTruthy();
+    expect(screen.getByLabelText("Project health").children.length).toBe(4);
+    fireEvent.click(screen.getByText(/Triage: ask Priya/));
+    expect(screen.getByText("Good call")).toBeTruthy();
+    expect(container.textContent).toContain("Senior PMs triage before they act");
   });
 });

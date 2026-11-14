@@ -2,13 +2,13 @@
 import {
   AlertTriangle, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2, ChevronDown, Cloud, Code2, DollarSign, Database, Eye, FileText,
   Flag, GitBranch, Layers, Lightbulb, Link2, Lock, type LucideIcon, Map as MapIcon, Rocket, Search, Server, Settings, ShieldCheck,
-  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info,
+  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info, MessageCircle,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -204,8 +204,106 @@ function Arch({ src }: { src: string }) {
   );
 }
 
+const AVATAR = ["bg-violet text-white", "bg-lime text-black", "bg-[#4b1fa6] text-white", "bg-white text-black", "bg-[#2a2a35] text-white"];
+const initials = (n: string) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+const avatarFor = (n: string) => AVATAR[[...n].reduce((a, c) => a + c.charCodeAt(0), 0) % AVATAR.length];
+
+function Chat({ src }: { src: string }) {
+  const { title, messages } = parseChat(src);
+  return (
+    <figure className="my-6 overflow-hidden rounded-2xl border border-line bg-black/60" aria-label={title || "Conversation"}>
+      <figcaption className="flex items-center gap-2 border-b border-line bg-surface2 px-4 py-2 text-xs font-semibold text-muted"><MessageCircle aria-hidden className="h-4 w-4 text-lime" />{title || "Conversation"}</figcaption>
+      <div className="space-y-4 p-4">
+        {messages.map((m, i) => (
+          <div key={i} className="pm-slide flex gap-3" style={{ animationDelay: `${i * 90}ms` }}>
+            <span aria-hidden className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${avatarFor(m.name)}`}>{initials(m.name)}</span>
+            <div className="min-w-0">
+              <p className="text-sm"><span className="font-semibold text-white">{m.name}</span>{m.role && <span className="text-muted"> · {m.role}</span>}</p>
+              <p className="mt-1 rounded-2xl rounded-tl-sm bg-surface2 px-3 py-2 text-sm leading-relaxed text-white">{m.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+const TONE: Record<Tone, string> = { ok: "bg-lime", warn: "bg-[#ffb020]", bad: "bg-[#ff6b6b]", info: "bg-violet" };
+const TONE_LABEL: Record<Tone, string> = { ok: "On track", warn: "Warning", bad: "Problem", info: "Event" };
+
+function Timeline({ src }: { src: string }) {
+  const events = parseTimeline(src);
+  return (
+    <ol className="my-6 border-l-2 border-line pl-5" style={{ listStyle: "none" }} aria-label="Timeline">
+      {events.map((e, i) => (
+        <li key={i} className="pm-slide relative pb-5 last:pb-0" style={{ animationDelay: `${i * 90}ms` }}>
+          <span aria-hidden className={`absolute -left-[27px] top-1 h-3.5 w-3.5 rounded-full ring-4 ring-black ${TONE[e.tone]}`} />
+          <p className="text-xs font-semibold uppercase tracking-wide text-lime">{e.when}<span className="sr-only"> ({TONE_LABEL[e.tone]})</span></p>
+          <p className="mt-0.5 text-sm leading-relaxed text-white">{e.text}</p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+const RAG_STYLE = { R: "border-[#ff6b6b] bg-[#ff6b6b]/10", A: "border-[#ffb020] bg-[#ffb020]/10", G: "border-lime bg-lime/10" } as const;
+const RAG_DOT = { R: "bg-[#ff6b6b]", A: "bg-[#ffb020]", G: "bg-lime" } as const;
+const RAG_NAME = { R: "Red", A: "Amber", G: "Green" } as const;
+
+function Rag({ src }: { src: string }) {
+  return (
+    <div className="my-6 grid gap-3 sm:grid-cols-2" role="list" aria-label="Project health">
+      {parseRag(src).map((r, i) => (
+        <div key={i} role="listitem" className={`rounded-2xl border p-3 ${RAG_STYLE[r.code]}`}>
+          <p className="flex items-center gap-2 text-sm font-semibold text-white"><span aria-hidden className={`h-3 w-3 rounded-full ${RAG_DOT[r.code]}`} />{r.area}<span className="ml-auto rounded-full bg-black/50 px-2 py-0.5 text-xs">{RAG_NAME[r.code]}</span></p>
+          <p className="mt-1 text-sm text-muted">{r.note}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DecisionBlock({ src }: { src: string }) {
+  const d = parseDecision(src);
+  const [pick, setPick] = useState<number | null>(null);
+  if (!d) return null;
+  return (
+    <div className="my-6 rounded-2xl border border-lime/60 bg-surface2 p-4">
+      <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Flag aria-hidden className="h-4 w-4" />Your call</p>
+      <p className="mb-3 font-semibold leading-relaxed text-white">{d.situation}</p>
+      <div className="space-y-2" role="group" aria-label="Your options">
+        {d.options.map((o, i) => {
+          const shown = pick !== null;
+          const chosen = pick === i;
+          const state = !shown ? "border-line hover:border-violet" : o.best ? "border-lime bg-lime/10" : chosen ? "border-violet bg-violet/20" : "border-line opacity-80";
+          return (
+            <button key={i} type="button" disabled={shown} onClick={() => setPick(i)} className={`block min-h-11 w-full rounded-xl border p-3 text-left text-sm text-white transition ${state}`}>
+              <span className="flex items-start gap-2">
+                {shown && (o.best ? <CheckCircle2 aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-lime" /> : chosen ? <XCircle aria-hidden className="mt-0.5 h-5 w-5 shrink-0" /> : <span className="h-5 w-5 shrink-0" />)}
+                <span className="font-medium">{o.text}</span>
+              </span>
+              {shown && <span className="pm-slide mt-2 block pl-7 text-muted">{chosen ? "You chose this. " : ""}{o.result}</span>}
+            </button>
+          );
+        })}
+      </div>
+      {pick !== null && (
+        <div className="pm-slide mt-3 rounded-xl border border-violet bg-violet/20 p-3" aria-live="polite">
+          <p className="text-xs font-semibold uppercase tracking-wide text-lime">{d.options[pick].best ? "Good call" : "Senior PM take"}</p>
+          <p className="mt-1 text-sm text-white">{d.take}</p>
+          <button type="button" onClick={() => setPick(null)} className="mt-2 text-xs text-muted underline">Try a different choice</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function renderBlock(kind: BlockKind, src: string): ReactNode {
   switch (kind) {
+    case "chat": return <Chat src={src} />;
+    case "timeline": return <Timeline src={src} />;
+    case "rag": return <Rag src={src} />;
+    case "decision": return <DecisionBlock src={src} />;
     case "arch": return <Arch src={src} />;
     case "quote": return <Quote src={src} />;
     case "flow": return <Flow src={src} />;

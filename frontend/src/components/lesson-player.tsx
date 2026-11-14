@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui";
 import { LessonBody } from "@/components/lesson-body";
 import { ApiError, type ReviewOut, api, friendly } from "@/lib/api";
-import { extractJournal, splitSteps } from "@/lib/blocks";
+import { extractJournal, readMinutes, splitSteps } from "@/lib/blocks";
 
 function Journal({ day, index, prompt, onDone }: { day: number; index: number; prompt: string; onDone: () => void }) {
   const key = `pmforge:journal:${day}:${index}`;
@@ -80,6 +80,18 @@ export function LessonPlayer({ day, body, finale }: { day: number; body: string;
   }, [i]);
 
   const go = (n: number) => setI(Math.min(Math.max(n, 0), steps.length - 1));
+  const total = steps.length;
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT" || t.isContentEditable)) return;
+      if (e.key === "ArrowRight") setI((n) => Math.min(n + 1, total - 1));
+      if (e.key === "ArrowLeft") setI((n) => Math.max(n - 1, 0));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [total]);
 
   return (
     <div>
@@ -97,7 +109,8 @@ export function LessonPlayer({ day, body, finale }: { day: number; body: string;
         <span className="w-12 text-right font-mono text-xs text-muted">{i + 1}/{steps.length}</span>
       </div>
 
-      <section className="mt-4" aria-live="polite">
+      <p className="mt-3 text-xs text-muted">About {readMinutes(step.body)} min on this screen. Use the left and right arrow keys to move.</p>
+      <section key={i} className="pm-slide mt-4" aria-live="polite">
         {step.title && <h2 className="text-3xl font-bold leading-tight text-white">{step.title}</h2>}
         <div className="mt-4"><LessonBody body={rest} /></div>
         {prompt && <div className="mt-6"><Journal key={i} day={day} index={i} prompt={prompt} onDone={() => go(i + 1)} /></div>}

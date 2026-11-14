@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseCards, parseChecklist, parseFlow, parseQuiz, parseStats } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseStats } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
@@ -45,5 +45,29 @@ describe("architecture blocks", () => {
     expect(a.title).toBe("Portal");
     expect(a.rows[0].items).toEqual(["Web", "Mobile"]);
     expect(a.rows[1].cross).toBe(true);
+  });
+});
+
+describe("story blocks", () => {
+  it("parses a chat scene", () => {
+    const c = parseChat("# Slack, 9:47 AM\nSlack | Data lead | Model is flagging twice as many");
+    expect(c.title).toBe("Slack, 9:47 AM");
+    expect(c.messages[0]).toEqual({ name: "Slack", role: "Data lead", text: "Model is flagging twice as many" });
+  });
+  it("parses a timeline with tones and defaults unknown tones to info", () => {
+    const t = parseTimeline("Week 1 | Kickoff | ok\nWeek 2 | Slip | bad\nWeek 3 | Note | odd");
+    expect(t.map((x) => x.tone)).toEqual(["ok", "bad", "info"]);
+  });
+  it("parses RAG tiles", () => {
+    expect(parseRag("Schedule | amber | two weeks behind")[0]).toEqual({ area: "Schedule", code: "A", note: "two weeks behind" });
+  });
+  it("parses a decision and rejects one without exactly one best option", () => {
+    expect(parseDecision("? S\n- a | ra\n+ b | rb\n= take")?.options[1].best).toBe(true);
+    expect(parseDecision("? S\n- a | ra\n- b | rb")).toBeNull();
+    expect(parseDecision("? S\n- a\n+ b | rb")).toBeNull();
+  });
+  it("estimates reading time", () => {
+    expect(readMinutes("word ".repeat(360))).toBe(2);
+    expect(readMinutes("")).toBe(1);
   });
 });

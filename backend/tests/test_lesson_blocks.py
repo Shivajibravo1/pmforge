@@ -3,7 +3,7 @@ import re
 
 from app.content import days, lesson_body
 
-KINDS = {"arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
+KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -60,3 +60,26 @@ def test_every_lesson_has_an_ai_lens_or_ai_cards_and_risk_highlights():
         cards = [src for kind, src in blocks(n) if kind == "cards"]
         risky = [line for src in cards for line in src.splitlines() if line.count("|") >= 3]
         assert risky, f"day {n}: cards should state what goes wrong"
+
+
+def test_story_blocks_are_well_formed():
+    for n in days():
+        for kind, src in blocks(n):
+            ls = [x.strip() for x in src.splitlines() if x.strip()]
+            if kind == "chat":
+                body = [x for x in ls if not x.startswith("#")]
+                assert body, f"day {n}: chat has no messages"
+                for x in body:
+                    assert x.count("|") >= 2, f"day {n}: chat line needs Name | role | message: {x}"
+            elif kind in {"timeline", "rag"}:
+                for x in ls:
+                    assert "|" in x, f"day {n}: {kind} line missing pipe: {x}"
+                if kind == "rag":
+                    for x in ls:
+                        assert x.split("|")[1].strip().upper()[:1] in "RAG", f"day {n}: bad RAG status: {x}"
+            elif kind == "decision":
+                assert sum(x.startswith("?") for x in ls) == 1, f"day {n}: decision needs one situation"
+                opts = [x for x in ls if x[0] in "+-"]
+                assert len(opts) >= 2 and sum(o.startswith("+") for o in opts) == 1, f"day {n}: decision needs exactly one best option"
+                assert all("|" in o for o in opts), f"day {n}: each decision option needs a consequence"
+                assert any(x.startswith("=") for x in ls), f"day {n}: decision needs a senior PM take"

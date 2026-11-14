@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key";
-export const BLOCK_KINDS: BlockKind[] = ["arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"];
+export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key";
+export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -100,3 +100,47 @@ export function parseArch(src: string) {
   });
   return { title, rows };
 }
+
+/** Chat scene. Optional first line `# Where and when`. Each message is `Name | role | message`. */
+export function parseChat(src: string) {
+  const ls = lines(src);
+  const title = ls[0]?.startsWith("#") ? ls.shift()!.replace(/^#\s*/, "") : "";
+  return { title, messages: ls.map((l) => { const [name, role = "", ...rest] = cells(l); return { name, role, text: rest.join(" | ") }; }) };
+}
+
+export type Tone = "ok" | "warn" | "bad" | "info";
+const TONES: Tone[] = ["ok", "warn", "bad", "info"];
+
+/** Timeline. Each event is `When | What happened | tone` (tone optional: ok, warn, bad, info). */
+export function parseTimeline(src: string) {
+  return lines(src).map((l) => {
+    const [when, text = "", tone = "info"] = cells(l);
+    return { when, text, tone: (TONES.includes(tone as Tone) ? tone : "info") as Tone };
+  });
+}
+
+/** RAG status tiles. Each tile is `Area | R or A or G | note`. */
+export function parseRag(src: string) {
+  return lines(src).map((l) => {
+    const [area, status = "G", ...rest] = cells(l);
+    const code = status.toUpperCase().startsWith("R") ? "R" : status.toUpperCase().startsWith("A") ? "A" : "G";
+    return { area, code: code as "R" | "A" | "G", note: rest.join(" | ") };
+  });
+}
+
+export type Decision = { situation: string; options: { text: string; result: string; best: boolean }[]; take: string };
+
+/** `? situation`, `- option | what happens`, `+ best option | what happens`, `= senior PM take`. Exactly one best option. */
+export function parseDecision(src: string): Decision | null {
+  const ls = lines(src);
+  const situation = ls.find((l) => l.startsWith("?"))?.slice(1).trim();
+  const options = ls.filter((l) => l.startsWith("-") || l.startsWith("+")).map((l) => {
+    const [text, ...rest] = cells(l.slice(1));
+    return { text, result: rest.join(" | "), best: l.startsWith("+") };
+  });
+  const take = ls.find((l) => l.startsWith("="))?.slice(1).trim() ?? "";
+  if (!situation || options.length < 2 || options.filter((o) => o.best).length !== 1 || options.some((o) => !o.result)) return null;
+  return { situation, options, take };
+}
+
+export const readMinutes = (text: string) => Math.max(1, Math.round(text.split(/\s+/).filter(Boolean).length / 180));
