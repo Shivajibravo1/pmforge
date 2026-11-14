@@ -219,3 +219,13 @@ def test_mentor_unconfigured_returns_503():
         assert r.status_code == 503
     finally:
         app.dependency_overrides.clear()
+
+
+def test_published_lessons_load_and_have_no_em_dashes(client):
+    h = auth()
+    published = sorted(p.name for p in (content._DIR / "lessons").glob("day-*.md"))
+    assert published, "no lessons published"
+    for name in published:
+        text = (content._DIR / "lessons" / name).read_text(encoding="utf-8")
+        assert "—" not in text and len(text.split()) > 150, name
+    assert client.get("/api/v1/lessons/1", headers=h).json()["body"].startswith("## ")
