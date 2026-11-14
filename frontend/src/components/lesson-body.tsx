@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseCards, parseChecklist, parseFlow, parseQuiz, parseStats,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseCards, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -154,8 +154,19 @@ function Accordion({ src }: { src: string }) {
   );
 }
 
+function Quote({ src }: { src: string }) {
+  return (
+    <div className="my-6 space-y-3 border-l-4 border-lime bg-surface2 p-4" role="group" aria-label="Workplace messages">
+      {parseQuote(src).map((q, i) => (
+        <p key={i} className="text-sm italic leading-relaxed text-white">&ldquo;{q.text}&rdquo;{q.who && <span className="not-italic text-muted">, {q.who}</span>}</p>
+      ))}
+    </div>
+  );
+}
+
 function renderBlock(kind: BlockKind, src: string): ReactNode {
   switch (kind) {
+    case "quote": return <Quote src={src} />;
     case "flow": return <Flow src={src} />;
     case "cards": return <Cards src={src} />;
     case "stats": return <Stats src={src} />;
@@ -179,8 +190,7 @@ export function LessonBody({ body }: { body: string }) {
             return <code className={className}>{children}</code>;
           },
           table: ({ children }) => <div className="my-6 overflow-x-auto rounded-2xl border border-line"><table>{children}</table></div>,
-          h2: ({ children }) => <h2 className="flex items-center gap-3"><span aria-hidden className="h-6 w-1.5 rounded-full bg-violet" />{children}</h2>,
-        }}
+                  }}
       >
         {body}
       </Markdown>

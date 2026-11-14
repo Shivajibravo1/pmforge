@@ -22,3 +22,18 @@ describe("lesson block parsers", () => {
     expect(parseQuiz("? Q\n+ a\n+ b")).toBeNull();
   });
 });
+
+import { extractJournal, splitSteps } from "./blocks";
+
+describe("lesson steps", () => {
+  it("splits on level-two headings and ignores headings inside code fences", () => {
+    const steps = splitSteps("Intro\n\n## One\nbody\n```tip\n## not a heading\n```\n## Two\nmore");
+    expect(steps.map((s) => s.title)).toEqual(["", "One", "Two"]);
+    expect(steps[1].body).toContain("## not a heading");
+  });
+  it("extracts a journal prompt", () => {
+    const { prompt, rest } = extractJournal("Text\n```journal\nWrite here\n```");
+    expect(prompt).toBe("Write here");
+    expect(rest).toBe("Text");
+  });
+});

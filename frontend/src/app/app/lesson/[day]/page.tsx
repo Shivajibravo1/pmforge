@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { LessonBody } from "@/components/lesson-body";
+import { LessonPlayer } from "@/components/lesson-player";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
 
@@ -67,20 +67,8 @@ export default function LessonPage() {
     }
   }
 
-  return (
-    <article className="space-y-5">
-      <div className="flex items-center gap-2"><Badge tone="violet">Day {lesson.day}</Badge><Badge>{TYPE_LABEL[lesson.type]}</Badge></div>
-      <h1 className="text-2xl font-bold">{lesson.title}</h1>
-      <p className="text-sm text-muted">{lesson.phase}</p>
-
-      <Card>
-        {lesson.body ? (
-          <LessonBody body={lesson.body} />
-        ) : (
-          <p className="text-sm text-muted">The content for this lesson has not been published yet.</p>
-        )}
-      </Card>
-
+  const finale = (
+    <div className="space-y-5">
       {takesArtifact && (
         <Card className="space-y-3">
           <h2 className="font-semibold">Your artifact</h2>
@@ -99,13 +87,26 @@ export default function LessonPage() {
           )}
         </Card>
       )}
-
       {msg && <Notice>{msg}</Notice>}
       <div className="flex flex-wrap gap-3">
         <Button variant="lime" onClick={complete} disabled={busy || completed}>{completed ? "Completed" : "Mark complete"}</Button>
         {completed && <LinkButton href={`/app/lesson/${n + 1}`} variant="ghost">Next lesson</LinkButton>}
         <Link href="/app/mentor" className="inline-flex min-h-11 items-center px-3 text-sm underline">Ask the mentor</Link>
       </div>
+    </div>
+  );
+
+  return (
+    <article className="space-y-5">
+      <div className="flex items-center gap-2"><Badge tone="violet">Day {lesson.day}</Badge><Badge>{TYPE_LABEL[lesson.type]}</Badge></div>
+      <h1 className="text-2xl font-bold">{lesson.title}</h1>
+      <p className="text-sm text-muted">{lesson.phase}</p>
+
+      {lesson.body ? (
+        <LessonPlayer day={lesson.day} body={lesson.body} finale={finale} />
+      ) : (
+        <Card><p className="text-sm text-muted">The content for this lesson has not been published yet.</p></Card>
+      )}
     </article>
   );
 }
