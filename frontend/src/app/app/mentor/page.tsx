@@ -42,6 +42,7 @@ export default function Mentor() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Mentor</h1>
       <p className="text-sm text-muted">Context: Day {current.day}, {current.title}</p>
+      <p className="text-xs text-muted">Do not share passwords, personal data or confidential client information. The mentor is an AI and can be wrong, so verify important answers.</p>
       <div className="space-y-3" aria-live="polite">
         {turns.map((t, i) => (
           <Card key={i} className={t.role === "you" ? "bg-surface2" : ""}>

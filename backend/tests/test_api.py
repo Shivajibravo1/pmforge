@@ -97,7 +97,18 @@ def test_review_ownership_is_enforced(client):
     assert client.post(f"/api/v1/artifacts/{aid}/review", headers=other).status_code == 404
 
 
-def test_artifact_rejected_for_concept_lesson(client):
+def test_concept_lesson_with_journal_accepts_answer_and_reviews_it(client, fake_ai):
+    h = auth()
+    r = client.post("/api/v1/lessons/1/artifact", json={"content": LONG}, headers=h)
+    assert r.status_code == 201
+    rv = client.post(f"/api/v1/artifacts/{r.json()['artifact_id']}/review", headers=h)
+    assert rv.status_code == 200
+    assert "The learner was asked:" in fake_ai.calls[0]["input"]  # prompt comes from our content, not the client
+
+
+def test_lesson_without_journal_or_artifact_type_is_rejected(client, monkeypatch):
+    from app import content
+    monkeypatch.setattr(content, "journal_prompt", lambda day: None)
     assert client.post("/api/v1/lessons/1/artifact", json={"content": LONG}, headers=auth()).status_code == 422
 
 
@@ -134,7 +145,9 @@ def test_artifact_cannot_break_out_of_delimiters(client, fake_ai):
     aid = client.post("/api/v1/lessons/5/artifact", json={"content": evil}, headers=h).json()["artifact_id"]
     client.post(f"/api/v1/artifacts/{aid}/review", headers=h)
     sent = fake_ai.calls[0]["input"]
-    assert sent.count("</artifact>") == 1 and sent.count("<artifact>") == 1
+    assert "</artifact>" not in sent and "<artifact>" not in sent
+    import re
+    assert len(re.findall(r"</artifact-[0-9a-f]{16}>", sent)) == 1
 
 
 def test_chat_and_validation(client, fake_ai):

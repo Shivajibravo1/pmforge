@@ -26,3 +26,22 @@ describe("LessonBody", () => {
     expect(screen.getByText("Correct.")).toBeTruthy();
   });
 });
+
+describe("rich blocks", () => {
+  it("highlights what goes wrong on a card", () => {
+    render(<LessonBody body={"```cards\ncode | App | text here | Scope keeps growing\n```"} />);
+    expect(screen.getByText("What goes wrong")).toBeTruthy();
+    expect(screen.getByText("Scope keeps growing")).toBeTruthy();
+  });
+  it("renders flow steps without browser list numbers", () => {
+    render(<LessonBody body={"```flow\nA | one\nB | two\n```"} />);
+    const ol = screen.getByLabelText("Process") as HTMLElement;
+    expect(ol.style.listStyleType === "none" || ol.style.listStyle === "none").toBe(true);
+  });
+  it("renders an architecture diagram with a cross-cutting band", () => {
+    render(<LessonBody body={"```arch\n# Portal\nExperience | Web app, Mobile app\n~Security | SSO\n```"} />);
+    expect(screen.getByLabelText("Portal")).toBeTruthy();
+    expect(screen.getByText("Web app")).toBeTruthy();
+    expect(screen.getByText("SSO")).toBeTruthy();
+  });
+});

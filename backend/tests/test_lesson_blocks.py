@@ -3,7 +3,7 @@ import re
 
 from app.content import days, lesson_body
 
-KINDS = {"quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
+KINDS = {"arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -49,3 +49,14 @@ def test_each_lesson_has_several_screens_and_no_em_dash_in_titles():
         body = lesson_body(n) or ""
         screens = [line for line in body.splitlines() if line.startswith("## ")]
         assert 6 <= len(screens) <= 12, f"day {n}: {len(screens)} screens, expected 6 to 12"
+
+
+def test_every_lesson_has_an_ai_lens_or_ai_cards_and_risk_highlights():
+    for n in range(1, 11):
+        body = lesson_body(n) or ""
+        assert "```ai" in body, f"day {n}: add an AI lens block"
+    # at least the foundations lessons carry 'what goes wrong' on cards (4th field)
+    for n in (1, 2, 3, 4, 8, 9, 10):
+        cards = [src for kind, src in blocks(n) if kind == "cards"]
+        risky = [line for src in cards for line in src.splitlines() if line.count("|") >= 3]
+        assert risky, f"day {n}: cards should state what goes wrong"

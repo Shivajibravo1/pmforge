@@ -30,3 +30,16 @@ describe("LessonPlayer", () => {
     expect(screen.getByText("finale")).toBeTruthy();
   });
 });
+
+describe("LessonPlayer navigation across days", () => {
+  it("offers a link back to the previous day from the first screen", () => {
+    render(<LessonPlayer day={2} body={"## One\nHello\n\n## Two\nWorld"} finale={<p>f</p>} />);
+    const link = screen.getByLabelText("Previous day, Day 1") as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toBe("/app/lesson/1");
+  });
+  it("moves within the lesson after the first screen", () => {
+    render(<LessonPlayer day={2} body={"## One\nHello\n\n## Two\nWorld"} finale={<p>f</p>} />);
+    fireEvent.click(screen.getByText("Continue"));
+    expect(screen.getByLabelText("Previous screen")).toBeTruthy();
+  });
+});

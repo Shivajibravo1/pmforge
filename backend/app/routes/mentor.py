@@ -40,6 +40,14 @@ def record_usage(db: Session, user: User, kind: str, cost: float) -> None:
     db.add(UsageLog(user_id=user.id, kind=kind, day=date.today(), cost_usd=cost))
 
 
+JOURNAL_RUBRIC = [
+    "Answers the question that was asked, in the learner's own words",
+    "Is specific to a real or realistic organisation, with named roles or systems",
+    "Uses the ideas from the lesson correctly",
+    "Names evidence, owners or next actions rather than general statements",
+]
+
+
 class ArtifactIn(BaseModel):
     content: str = Field(min_length=20, max_length=8000)
 
@@ -48,7 +56,7 @@ class ArtifactIn(BaseModel):
 def submit_artifact(day: int, body: ArtifactIn, user: User = Depends(current_user),
                     db: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
     meta = require_access(day, user, completed_days(db, user.id), settings)
-    if meta["type"] not in ("B", "S", "K", "P", "A"):
+    if meta["type"] not in ("B", "S", "K", "P", "A") and not content.journal_prompt(day):
         raise HTTPException(422, "This lesson does not take an artifact")
     art = Artifact(user_id=user.id, day=day, content=body.content)
     db.add(art)
@@ -63,12 +71,14 @@ def review(artifact_id: str, user: User = Depends(current_user), db: Session = D
     if art is None or art.user_id != user.id:  # ownership check: same answer for missing and foreign
         raise HTTPException(404, "Artifact not found")
     meta = content.get_day(art.day) or {}
-    if not meta.get("rubric"):
-        raise HTTPException(422, "No rubric for this lesson")
+    prompt = content.journal_prompt(art.day)
+    rubric = meta.get("rubric") or JOURNAL_RUBRIC
     enforce_limits(db, user, "review", settings)
     try:
-        result, cost = ai.review_artifact(client, settings, user_id=user.id, rubric=meta["rubric"],
-                                          lesson_title=meta["title"], content=art.content)
+        result, cost, redacted = ai.review_artifact(client, settings, user_id=user.id, rubric=rubric,
+                                                    lesson_title=meta["title"], content=art.content, prompt=prompt)
+    except ai.AIRefused:
+        raise HTTPException(422, "content_not_allowed") from None
     except ai.AIError:
         log.exception("review failed")
         raise HTTPException(502, "Review is unavailable, please retry") from None
@@ -76,7 +86,7 @@ def review(artifact_id: str, user: User = Depends(current_user), db: Session = D
     row = Review(artifact_id=art.id, user_id=user.id, score=result.score, feedback=result.model_dump())
     db.add(row)
     db.commit()
-    return {"review_id": row.id, **result.model_dump()}
+    return {"review_id": row.id, **result.model_dump(), "redacted": redacted}
 
 
 class ChatIn(BaseModel):
@@ -90,10 +100,13 @@ def mentor_chat(body: ChatIn, user: User = Depends(current_user), db: Session = 
     meta = require_access(body.day, user, completed_days(db, user.id), settings)
     enforce_limits(db, user, "chat", settings)
     try:
-        reply, cost = ai.chat(client, settings, user_id=user.id, lesson_title=meta["title"], message=body.message)
+        reply, cost, redacted = ai.chat(
+            client, settings, user_id=user.id, lesson_title=meta["title"], message=body.message)
+    except ai.AIRefused:
+        raise HTTPException(422, "content_not_allowed") from None
     except ai.AIError:
         log.exception("chat failed")
         raise HTTPException(502, "Mentor is unavailable, please retry") from None
     record_usage(db, user, "chat", cost)
     db.commit()
-    return {"reply": reply}
+    return {"reply": reply, "redacted": redacted}

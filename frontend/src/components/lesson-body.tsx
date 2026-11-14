@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseCards, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -22,7 +22,7 @@ const iconFor = (name: string): LucideIcon => ICONS[name.toLowerCase()] ?? Spark
 function Flow({ src }: { src: string }) {
   const steps = parseFlow(src);
   return (
-    <ol className="my-6 grid gap-3 md:auto-cols-fr md:grid-flow-col" aria-label="Process">
+    <ol className="my-6 grid gap-3 md:auto-cols-fr md:grid-flow-col" style={{ listStyle: "none", paddingLeft: 0 }} aria-label="Process">
       {steps.map((s, i) => (
         <li key={i} className="relative rounded-2xl border border-line bg-surface2 p-4">
           <span className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-violet text-sm font-bold text-white">{i + 1}</span>
@@ -46,6 +46,12 @@ function Cards({ src }: { src: string }) {
             <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-violet/20 text-lime"><Icon aria-hidden className="h-5 w-5" /></span>
             <p className="font-semibold text-white">{c.title}</p>
             <p className="mt-1 text-sm text-muted">{c.text}</p>
+            {c.risk && (
+              <div className="mt-3 flex gap-2 rounded-xl border border-violet bg-violet/20 p-3">
+                <AlertTriangle aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-lime" />
+                <p className="text-sm text-white"><span className="block text-xs font-semibold uppercase tracking-wide text-lime">What goes wrong</span>{c.risk}</p>
+              </div>
+            )}
           </div>
         );
       })}
@@ -68,6 +74,7 @@ function Stats({ src }: { src: string }) {
 
 const CALLOUT: Record<string, { Icon: LucideIcon; label: string; cls: string }> = {
   tip: { Icon: Lightbulb, label: "Tip", cls: "border-lime/60 bg-lime/10" },
+  ai: { Icon: Sparkles, label: "AI lens", cls: "border-violet bg-gradient-to-r from-violet/30 to-lime/10" },
   note: { Icon: Info, label: "Note", cls: "border-line bg-surface2" },
   warn: { Icon: AlertTriangle, label: "Watch out", cls: "border-violet bg-violet/15" },
   key: { Icon: Target, label: "Key idea", cls: "border-violet bg-violet/25" },
@@ -93,7 +100,7 @@ function Checklist({ src }: { src: string }) {
       <div className="mb-4 h-2 overflow-hidden rounded-full bg-black" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={count}>
         <div className="h-full bg-lime transition-all" style={{ width: `${(count / items.length) * 100}%` }} />
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-2" style={{ listStyle: "none", paddingLeft: 0 }}>
         {items.map((t, i) => (
           <li key={i}>
             <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl p-2 text-sm hover:bg-black/40">
@@ -164,8 +171,42 @@ function Quote({ src }: { src: string }) {
   );
 }
 
+function Arch({ src }: { src: string }) {
+  const { title, rows } = parseArch(src);
+  const layers = rows.filter((r) => !r.cross);
+  const cross = rows.filter((r) => r.cross);
+  return (
+    <figure className="my-6 rounded-2xl border border-line bg-surface2 p-4" aria-label={title || "Architecture diagram"}>
+      {title && <figcaption className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Layers aria-hidden className="h-4 w-4" />{title}</figcaption>}
+      <div className="flex gap-3">
+        <div className="min-w-0 flex-1">
+          {layers.map((r, i) => (
+            <div key={i}>
+              <div className="rounded-xl border border-line bg-black/60 p-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-violet" style={{ color: "#b79cff" }}>{r.name}</p>
+                <div className="flex flex-wrap gap-2">
+                  {r.items.map((it) => <span key={it} className="rounded-lg border border-violet/60 bg-violet/20 px-2.5 py-1 text-xs text-white">{it}</span>)}
+                </div>
+              </div>
+              {i < layers.length - 1 && <div className="flex justify-center py-1"><ArrowRight aria-hidden className="h-4 w-4 rotate-90 text-lime" /></div>}
+            </div>
+          ))}
+        </div>
+        {cross.map((r, i) => (
+          <div key={i} className="flex w-20 shrink-0 flex-col items-center rounded-xl border border-lime/70 bg-lime/10 p-2 text-center">
+            <ShieldCheck aria-hidden className="h-5 w-5 text-lime" />
+            <p className="mt-1 text-xs font-semibold text-lime">{r.name}</p>
+            <ul className="mt-2 space-y-1 text-[10px] leading-tight text-white" style={{ listStyle: "none", paddingLeft: 0 }}>{r.items.map((it) => <li key={it}>{it}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
 function renderBlock(kind: BlockKind, src: string): ReactNode {
   switch (kind) {
+    case "arch": return <Arch src={src} />;
     case "quote": return <Quote src={src} />;
     case "flow": return <Flow src={src} />;
     case "cards": return <Cards src={src} />;

@@ -31,10 +31,16 @@ class FakeAI:
         self.text = '{"score": 82, "strengths": ["clear"], "gaps": ["no dates"], "next_steps": ["add owners"]}'
         self.tokens_in, self.tokens_out = 1000, 300
         self.calls = []
+        self.flag = False
+        self.moderated = []
 
-    def complete(self, *, model, instructions, user_input, max_output_tokens, user_id):
-        self.calls.append({"model": model, "instructions": instructions, "input": user_input})
+    def complete(self, *, model, instructions, user_input, max_output_tokens, user_id, json_schema=None):
+        self.calls.append({"model": model, "instructions": instructions, "input": user_input, "schema": json_schema})
         return ai.Completion(self.text, self.tokens_in, self.tokens_out)
+
+    def moderate(self, text, *, model):
+        self.moderated.append(text)
+        return self.flag
 
 
 @pytest.fixture(autouse=True)

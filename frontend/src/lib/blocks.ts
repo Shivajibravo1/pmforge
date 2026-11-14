@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key";
-export const BLOCK_KINDS: BlockKind[] = ["quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"];
+export type BlockKind = "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key";
+export const BLOCK_KINDS: BlockKind[] = ["arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -13,10 +13,11 @@ export function parseFlow(src: string) {
   });
 }
 
+/** `icon | Title | text | what goes wrong` (the last field is optional). */
 export function parseCards(src: string) {
   return lines(src).map((l) => {
-    const [icon, title, ...rest] = cells(l);
-    return { icon, title, text: rest.join(" | ") };
+    const [icon, title, text = "", ...risk] = cells(l);
+    return { icon, title, text, risk: risk.join(" | ") };
   });
 }
 
@@ -84,4 +85,18 @@ export function extractJournal(body: string): { prompt: string | null; rest: str
   const m = /```journal\n([\s\S]*?)```/.exec(body);
   if (!m) return { prompt: null, rest: body };
   return { prompt: m[1].trim(), rest: body.replace(m[0], "").trim() };
+}
+
+/**
+ * Layered architecture diagram. Optional first line `# Title`. Each row is `Layer | item, item, item`.
+ * A layer name starting with `~` is a cross-cutting band (for example security) drawn across all layers.
+ */
+export function parseArch(src: string) {
+  const ls = lines(src);
+  const title = ls[0]?.startsWith("#") ? ls.shift()!.replace(/^#\s*/, "") : "";
+  const rows = ls.map((l) => {
+    const [name, ...rest] = cells(l);
+    return { name: name.replace(/^~/, ""), cross: name.startsWith("~"), items: rest.join(" | ").split(",").map((x) => x.trim()).filter(Boolean) };
+  });
+  return { title, rows };
 }

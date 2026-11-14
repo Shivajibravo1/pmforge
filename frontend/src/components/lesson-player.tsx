@@ -1,5 +1,6 @@
 "use client";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui";
 import { LessonBody } from "@/components/lesson-body";
@@ -42,6 +43,7 @@ function Journal({ day, index, prompt, onDone }: { day: number; index: number; p
         <textarea id={key} rows={8} maxLength={8000} value={text} onChange={(e) => change(e.target.value)}
           className="mt-3 w-full rounded-xl border border-line bg-black p-3 text-sm text-white" placeholder="Write in your own words. Rough is fine." />
         <div className="mt-2 flex justify-between text-xs text-muted"><span>{text.length} characters</span><span>Saves automatically on this device</span></div>
+        <p className="mt-2 text-xs text-muted">Do not enter passwords, personal data or confidential client information. AI feedback can be wrong, so treat it as a second opinion.</p>
       </div>
       {review && (
         <div className="space-y-3 rounded-2xl border border-violet bg-surface2 p-4" aria-live="polite">
@@ -50,6 +52,9 @@ function Journal({ day, index, prompt, onDone }: { day: number; index: number; p
             <div key={h}><h3 className="text-sm font-semibold text-white">{h}</h3><ul className="list-disc pl-5 text-sm text-muted">{items.map((i) => <li key={i}>{i}</li>)}</ul></div>
           ))}
         </div>
+      )}
+      {review?.redacted && review.redacted.length > 0 && (
+        <p className="rounded-xl border border-line bg-surface2 p-3 text-xs text-white">We removed sensitive details before review ({review.redacted.join(", ")}). Please avoid including them next time.</p>
       )}
       {msg && <p role="alert" className="rounded-xl border border-line bg-surface2 p-3 text-sm text-white">{msg}</p>}
       <button type="button" onClick={feedback} disabled={busy || text.trim().length < 20}
@@ -79,8 +84,13 @@ export function LessonPlayer({ day, body, finale }: { day: number; body: string;
   return (
     <div>
       <div className="flex items-center gap-3">
-        <button type="button" aria-label="Previous screen" onClick={() => go(i - 1)} disabled={i === 0}
-          className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:text-white disabled:opacity-30"><ArrowLeft aria-hidden className="h-5 w-5" /></button>
+        {i === 0 && day > 1 ? (
+          <Link href={`/app/lesson/${day - 1}`} aria-label={`Previous day, Day ${day - 1}`} title={`Back to Day ${day - 1}`}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:text-white"><ArrowLeft aria-hidden className="h-5 w-5" /></Link>
+        ) : (
+          <button type="button" aria-label="Previous screen" onClick={() => go(i - 1)} disabled={i === 0}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:text-white disabled:opacity-30"><ArrowLeft aria-hidden className="h-5 w-5" /></button>
+        )}
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface2" role="progressbar" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={i + 1} aria-label="Lesson progress">
           <div className="h-full rounded-full bg-gradient-to-r from-violet to-lime transition-all" style={{ width: `${((i + 1) / steps.length) * 100}%` }} />
         </div>

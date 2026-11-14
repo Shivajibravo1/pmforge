@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseCards, parseChecklist, parseFlow, parseQuiz, parseStats } from "./blocks";
+import { parseArch, parseCards, parseChecklist, parseFlow, parseQuiz, parseStats } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
     expect(parseFlow("Plan | Scope\nBuild | Deliver")).toEqual([{ title: "Plan", text: "Scope" }, { title: "Build", text: "Deliver" }]);
   });
-  it("parses cards with icon and keeps extra pipes in text", () => {
-    expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a | b" });
+  it("parses cards with icon, text and an optional risk", () => {
+    expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a", risk: "b" });
+    expect(parseCards("code | App | only text")[0].risk).toBe("");
   });
   it("parses stats and checklist", () => {
     expect(parseStats("35% | ROI")).toEqual([{ value: "35%", label: "ROI" }]);
@@ -35,5 +36,14 @@ describe("lesson steps", () => {
     const { prompt, rest } = extractJournal("Text\n```journal\nWrite here\n```");
     expect(prompt).toBe("Write here");
     expect(rest).toBe("Text");
+  });
+});
+
+describe("architecture blocks", () => {
+  it("parses a title, layers and a cross-cutting band", () => {
+    const a = parseArch("# Portal\nExperience | Web, Mobile\n~Security | SSO, Logging");
+    expect(a.title).toBe("Portal");
+    expect(a.rows[0].items).toEqual(["Web", "Mobile"]);
+    expect(a.rows[1].cross).toBe(true);
   });
 });

@@ -73,7 +73,7 @@ export type Curriculum = { free_lessons: number; levels: Level[] };
 export type Progress = { completed: number[]; total_xp: number; streak: number };
 export type Me = { id: string; email: string; role: string; tier: string };
 export type Lesson = { day: number; type: string; title: string; phase: string; level: number; rubric: string[]; body: string | null };
-export type ReviewOut = { review_id: string; score: number; strengths: string[]; gaps: string[]; next_steps: string[] };
+export type ReviewOut = { review_id: string; score: number; strengths: string[]; gaps: string[]; next_steps: string[]; redacted?: string[] };
 
 export const TYPE_LABEL: Record<string, string> = {
   C: "Concept", B: "Build", S: "Simulation", K: "Critique", P: "Portfolio", A: "Assessment", R: "Buffer",
@@ -87,6 +87,7 @@ export function friendly(e: ApiError | null): string {
     previous_lesson_incomplete: "Complete the previous lesson first.",
     upgrade_required: "This lesson is part of the full program.",
     level_incomplete: "Finish every lesson in this level first.",
+    content_not_allowed: "That text cannot be reviewed. Please rephrase it without sensitive or inappropriate content.",
   };
   return map[e.code] ?? "Something went wrong. Please try again.";
 }

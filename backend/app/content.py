@@ -34,3 +34,11 @@ def lesson_body(day: int) -> str | None:
 
 def level_days(level: int) -> list[int]:
     return [n for n, d in days().items() if d["level"] == level]
+
+
+def journal_prompt(day: int) -> str | None:
+    """The learner-facing journal prompt of a lesson, read from our own content (never from the client)."""
+    import re
+    body = lesson_body(day) or ""
+    m = re.search(r"```journal\n(.*?)```", body, re.S)
+    return m.group(1).strip() if m else None

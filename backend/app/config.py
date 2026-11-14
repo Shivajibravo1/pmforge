@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(default="", repr=False)
     model_review: str = "gpt-6.1-terra"
     model_chat: str = "gpt-6-luna"
+    model_moderation: str = "omni-moderation-latest"
+    ai_moderation: bool = True
     review_price_in_per_m: float = 1.00
     review_price_out_per_m: float = 5.00
     chat_price_in_per_m: float = 0.10
@@ -36,6 +38,7 @@ class Settings(BaseSettings):
     monthly_ai_budget_usd: float = 3.0
     max_artifact_chars: int = 8000
     max_chat_chars: int = 1500
+    max_output_chars: int = 2000
 
     # Product rules (Requirement Baseline v1.1).
     free_lessons: int = 10
