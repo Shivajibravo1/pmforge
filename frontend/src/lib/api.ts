@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { authClient } from "./auth-client";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Same-origin by default: Vercel routes /api/v1/* to the backend. Set NEXT_PUBLIC_API_URL only for local dev.
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string) {
