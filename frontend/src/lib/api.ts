@@ -22,6 +22,7 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     method: init.method ?? "GET",
     headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
+    signal: AbortSignal.timeout(20000), // never leave the screen loading forever
   });
   if (!res.ok) {
     let code = "request_failed";

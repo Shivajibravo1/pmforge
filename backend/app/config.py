@@ -14,6 +14,8 @@ class Settings(BaseSettings):
 
     # Auth: JWTs issued by Better Auth, verified against its JWKS endpoint.
     jwks_url: str = ""
+    # Optional: the public JWKS document pasted as JSON. Verifies tokens with no network call.
+    jwks_json: str = ""
     jwt_issuer: str = ""
     jwt_audience: str = ""
     jwt_algorithms: str = "EdDSA,RS256,ES256"
