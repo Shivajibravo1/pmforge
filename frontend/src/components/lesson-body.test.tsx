@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { resolve } from "node:path";
+import { cleanup, render, screen, fireEvent } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { LessonBody } from "./lesson-body";
 
-const day1 = readFileSync(new URL("../../../backend/app/content/lessons/day-001.md", import.meta.url), "utf-8");
+const day1 = readFileSync(resolve(process.cwd(), "../backend/app/content/lessons/day-001.md"), "utf-8");
+
+afterEach(cleanup);
 
 describe("LessonBody", () => {
   it("renders tables, flow, cards, checklist and quiz for Day 1", () => {
