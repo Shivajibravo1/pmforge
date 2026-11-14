@@ -1,0 +1,1140 @@
+{
+ "levels": [
+  {
+   "id": 1,
+   "title": "IT Delivery Foundations",
+   "days": [
+    {
+     "day": 1,
+     "type": "C",
+     "title": "Day 1 as an enterprise IT PM",
+     "phase": "1. The IT project landscape"
+    },
+    {
+     "day": 2,
+     "type": "C",
+     "title": "IT project types (app, infra, data, security, AI)",
+     "phase": "1. The IT project landscape"
+    },
+    {
+     "day": 3,
+     "type": "C",
+     "title": "Predictive, agile and hybrid lifecycles",
+     "phase": "1. The IT project landscape"
+    },
+    {
+     "day": 4,
+     "type": "C",
+     "title": "Technical literacy for IT PMs (SDLC, environments, APIs, cloud basics)",
+     "phase": "1. The IT project landscape"
+    },
+    {
+     "day": 5,
+     "type": "B",
+     "title": "Write a project charter for a website migration",
+     "phase": "1. The IT project landscape",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 6,
+     "type": "K",
+     "title": "Healthcare.gov launch (2013)",
+     "phase": "1. The IT project landscape",
+     "rubric": [
+      "Identifies root causes, not only symptoms",
+      "Maps causes to specific project management practices",
+      "Separates facts from assumptions",
+      "Lists specific preventive actions",
+      "Applies the lessons to the learner's own capstone"
+     ]
+    },
+    {
+     "day": 7,
+     "type": "P",
+     "title": "Pick your capstone IT initiative",
+     "phase": "1. The IT project landscape",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 8,
+     "type": "C",
+     "title": "Stakeholders in IT orgs (CIO, CISO, ops, vendors)",
+     "phase": "2. Initiation and stakeholders"
+    },
+    {
+     "day": 9,
+     "type": "C",
+     "title": "Business case and ROI basics",
+     "phase": "2. Initiation and stakeholders"
+    },
+    {
+     "day": 10,
+     "type": "C",
+     "title": "BRD vs FRD vs user stories",
+     "phase": "2. Initiation and stakeholders"
+    },
+    {
+     "day": 11,
+     "type": "B",
+     "title": "Stakeholder register + RACI",
+     "phase": "2. Initiation and stakeholders",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 12,
+     "type": "S",
+     "title": "Kickoff with a sceptical sponsor",
+     "phase": "2. Initiation and stakeholders",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 13,
+     "type": "K",
+     "title": "TSB bank IT migration (2018)",
+     "phase": "2. Initiation and stakeholders",
+     "rubric": [
+      "Identifies root causes, not only symptoms",
+      "Maps causes to specific project management practices",
+      "Separates facts from assumptions",
+      "Lists specific preventive actions",
+      "Applies the lessons to the learner's own capstone"
+     ]
+    },
+    {
+     "day": 14,
+     "type": "P",
+     "title": "Charter v2 + RACI",
+     "phase": "2. Initiation and stakeholders",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 15,
+     "type": "C",
+     "title": "Scope and WBS",
+     "phase": "3. Planning"
+    },
+    {
+     "day": 16,
+     "type": "C",
+     "title": "Estimation (analogous, three-point, story points)",
+     "phase": "3. Planning"
+    },
+    {
+     "day": 17,
+     "type": "C",
+     "title": "Scheduling and critical path",
+     "phase": "3. Planning"
+    },
+    {
+     "day": 18,
+     "type": "B",
+     "title": "WBS + schedule in Jira, Azure DevOps or Gantt",
+     "phase": "3. Planning",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 19,
+     "type": "C",
+     "title": "Budget and cost baseline",
+     "phase": "3. Planning"
+    },
+    {
+     "day": 20,
+     "type": "S",
+     "title": "Sponsor cuts budget by 20%",
+     "phase": "3. Planning",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 21,
+     "type": "P",
+     "title": "Integrated plan",
+     "phase": "3. Planning",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 22,
+     "type": "C",
+     "title": "Risk management and the RAID log",
+     "phase": "4. Risk, quality and communication"
+    },
+    {
+     "day": 23,
+     "type": "C",
+     "title": "Quality planning and acceptance criteria",
+     "phase": "4. Risk, quality and communication"
+    },
+    {
+     "day": 24,
+     "type": "C",
+     "title": "Communication plan and RAG status reporting",
+     "phase": "4. Risk, quality and communication"
+    },
+    {
+     "day": 25,
+     "type": "B",
+     "title": "RAID log for your capstone",
+     "phase": "4. Risk, quality and communication",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 26,
+     "type": "C",
+     "title": "Change control and CAB",
+     "phase": "4. Risk, quality and communication"
+    },
+    {
+     "day": 27,
+     "type": "S",
+     "title": "Steering committee review of a red project",
+     "phase": "4. Risk, quality and communication",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 28,
+     "type": "P",
+     "title": "RAID + status report",
+     "phase": "4. Risk, quality and communication",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 29,
+     "type": "R",
+     "title": "Buffer: catch-up",
+     "phase": "Close"
+    },
+    {
+     "day": 30,
+     "type": "A",
+     "title": "Level 1 assessment + certificate",
+     "phase": "Close",
+     "rubric": [
+      "Covers the key competencies of the level",
+      "Applies the concepts to the capstone with evidence",
+      "Uses terminology accurately",
+      "Is realistic and actionable",
+      "Prioritises correctly"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "title": "Agile and Hybrid Delivery",
+   "days": [
+    {
+     "day": 31,
+     "type": "C",
+     "title": "Scrum framework and roles",
+     "phase": "5. Scrum for IT PMs"
+    },
+    {
+     "day": 32,
+     "type": "C",
+     "title": "Backlog, user stories, INVEST, acceptance criteria",
+     "phase": "5. Scrum for IT PMs"
+    },
+    {
+     "day": 33,
+     "type": "C",
+     "title": "Sprint planning and estimation",
+     "phase": "5. Scrum for IT PMs"
+    },
+    {
+     "day": 34,
+     "type": "B",
+     "title": "Build a 20-story backlog in Jira or Azure DevOps",
+     "phase": "5. Scrum for IT PMs",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 35,
+     "type": "C",
+     "title": "Ceremonies that work",
+     "phase": "5. Scrum for IT PMs"
+    },
+    {
+     "day": 36,
+     "type": "S",
+     "title": "Product Owner vs dev team conflict",
+     "phase": "5. Scrum for IT PMs",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 37,
+     "type": "P",
+     "title": "Sprint 1 plan",
+     "phase": "5. Scrum for IT PMs",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 38,
+     "type": "C",
+     "title": "Velocity, burndown, cumulative flow",
+     "phase": "6. Flow, metrics and hybrid"
+    },
+    {
+     "day": 39,
+     "type": "C",
+     "title": "Kanban, WIP limits, cycle time",
+     "phase": "6. Flow, metrics and hybrid"
+    },
+    {
+     "day": 40,
+     "type": "B",
+     "title": "Configure a Jira / Azure DevOps delivery dashboard",
+     "phase": "6. Flow, metrics and hybrid",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 41,
+     "type": "C",
+     "title": "Agile delivery inside waterfall governance",
+     "phase": "6. Flow, metrics and hybrid"
+    },
+    {
+     "day": 42,
+     "type": "S",
+     "title": "Executive demands fixed date and fixed scope",
+     "phase": "6. Flow, metrics and hybrid",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 43,
+     "type": "K",
+     "title": "An agile transformation that failed (anonymised)",
+     "phase": "6. Flow, metrics and hybrid",
+     "rubric": [
+      "Identifies root causes, not only symptoms",
+      "Maps causes to specific project management practices",
+      "Separates facts from assumptions",
+      "Lists specific preventive actions",
+      "Applies the lessons to the learner's own capstone"
+     ]
+    },
+    {
+     "day": 44,
+     "type": "P",
+     "title": "Hybrid delivery model",
+     "phase": "6. Flow, metrics and hybrid",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 45,
+     "type": "C",
+     "title": "SAFe essentials (ART, PI planning)",
+     "phase": "7. Scale and vendors"
+    },
+    {
+     "day": 46,
+     "type": "C",
+     "title": "Cross-team dependencies",
+     "phase": "7. Scale and vendors"
+    },
+    {
+     "day": 47,
+     "type": "C",
+     "title": "Vendor contracts (T&M vs fixed price, SLAs)",
+     "phase": "7. Scale and vendors"
+    },
+    {
+     "day": 48,
+     "type": "B",
+     "title": "PI planning board + dependency map",
+     "phase": "7. Scale and vendors",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 49,
+     "type": "C",
+     "title": "Onsite / offshore delivery models",
+     "phase": "7. Scale and vendors"
+    },
+    {
+     "day": 50,
+     "type": "S",
+     "title": "Vendor misses an SLA: escalation call",
+     "phase": "7. Scale and vendors",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 51,
+     "type": "P",
+     "title": "Vendor governance pack",
+     "phase": "7. Scale and vendors",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 52,
+     "type": "C",
+     "title": "Leading without authority",
+     "phase": "8. Leading people"
+    },
+    {
+     "day": 53,
+     "type": "C",
+     "title": "Conflict and negotiation",
+     "phase": "8. Leading people"
+    },
+    {
+     "day": 54,
+     "type": "C",
+     "title": "Distributed teams",
+     "phase": "8. Leading people"
+    },
+    {
+     "day": 55,
+     "type": "B",
+     "title": "Team charter + working agreements",
+     "phase": "8. Leading people",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 56,
+     "type": "C",
+     "title": "Escalation paths",
+     "phase": "8. Leading people"
+    },
+    {
+     "day": 57,
+     "type": "S",
+     "title": "Key engineer resigns mid-release",
+     "phase": "8. Leading people",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 58,
+     "type": "P",
+     "title": "Escalation playbook",
+     "phase": "8. Leading people",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 59,
+     "type": "R",
+     "title": "Buffer",
+     "phase": "Close"
+    },
+    {
+     "day": 60,
+     "type": "A",
+     "title": "Level 2 assessment + certificate",
+     "phase": "Close",
+     "rubric": [
+      "Covers the key competencies of the level",
+      "Applies the concepts to the capstone with evidence",
+      "Uses terminology accurately",
+      "Is realistic and actionable",
+      "Prioritises correctly"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "title": "Cloud, DevSecOps and Service Delivery",
+   "days": [
+    {
+     "day": 61,
+     "type": "C",
+     "title": "Cloud models and shared responsibility",
+     "phase": "9. Cloud projects"
+    },
+    {
+     "day": 62,
+     "type": "C",
+     "title": "Migration strategies (the 7 Rs)",
+     "phase": "9. Cloud projects"
+    },
+    {
+     "day": 63,
+     "type": "C",
+     "title": "Landing zones and Well-Architected",
+     "phase": "9. Cloud projects"
+    },
+    {
+     "day": 64,
+     "type": "C",
+     "title": "FinOps for PMs",
+     "phase": "9. Cloud projects"
+    },
+    {
+     "day": 65,
+     "type": "B",
+     "title": "Migration plan for a 3-tier app",
+     "phase": "9. Cloud projects",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 66,
+     "type": "K",
+     "title": "A major cloud or vendor outage (e.g. CrowdStrike, July 2024)",
+     "phase": "9. Cloud projects",
+     "rubric": [
+      "Identifies root causes, not only symptoms",
+      "Maps causes to specific project management practices",
+      "Separates facts from assumptions",
+      "Lists specific preventive actions",
+      "Applies the lessons to the learner's own capstone"
+     ]
+    },
+    {
+     "day": 67,
+     "type": "P",
+     "title": "Migration plan + cost estimate",
+     "phase": "9. Cloud projects",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 68,
+     "type": "C",
+     "title": "DevOps principles and DORA metrics",
+     "phase": "10. DevOps and release"
+    },
+    {
+     "day": 69,
+     "type": "C",
+     "title": "CI/CD pipeline anatomy",
+     "phase": "10. DevOps and release"
+    },
+    {
+     "day": 70,
+     "type": "C",
+     "title": "Release strategies (blue/green, canary, feature flags)",
+     "phase": "10. DevOps and release"
+    },
+    {
+     "day": 71,
+     "type": "B",
+     "title": "Release plan + pipeline walkthrough in Azure DevOps",
+     "phase": "10. DevOps and release",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 72,
+     "type": "C",
+     "title": "Docker, Kubernetes and IaC for PMs",
+     "phase": "10. DevOps and release"
+    },
+    {
+     "day": 73,
+     "type": "S",
+     "title": "Failed production deployment: rollback decision",
+     "phase": "10. DevOps and release",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 74,
+     "type": "P",
+     "title": "Release and cutover plan",
+     "phase": "10. DevOps and release",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 75,
+     "type": "C",
+     "title": "Shift-left DevSecOps (SAST, DAST, SCA, secrets)",
+     "phase": "11. Security by design"
+    },
+    {
+     "day": 76,
+     "type": "C",
+     "title": "Zero trust basics",
+     "phase": "11. Security by design"
+    },
+    {
+     "day": 77,
+     "type": "C",
+     "title": "Compliance (ISO 27001, SOC 2, India DPDP Act 2023, GDPR)",
+     "phase": "11. Security by design"
+    },
+    {
+     "day": 78,
+     "type": "B",
+     "title": "Threat model (STRIDE) + security requirements",
+     "phase": "11. Security by design",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 79,
+     "type": "C",
+     "title": "Vulnerability management and pen-test coordination",
+     "phase": "11. Security by design"
+    },
+    {
+     "day": 80,
+     "type": "S",
+     "title": "Critical CVE found 2 days before go-live",
+     "phase": "11. Security by design",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 81,
+     "type": "P",
+     "title": "Security plan",
+     "phase": "11. Security by design",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 82,
+     "type": "C",
+     "title": "ITIL 4 service value system",
+     "phase": "12. Service transition (ITIL 4)"
+    },
+    {
+     "day": 83,
+     "type": "C",
+     "title": "Transition and hypercare",
+     "phase": "12. Service transition (ITIL 4)"
+    },
+    {
+     "day": 84,
+     "type": "C",
+     "title": "Incident, problem and change",
+     "phase": "12. Service transition (ITIL 4)"
+    },
+    {
+     "day": 85,
+     "type": "B",
+     "title": "Go-live runbook + hypercare plan",
+     "phase": "12. Service transition (ITIL 4)",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 86,
+     "type": "C",
+     "title": "SLAs, SLOs and observability",
+     "phase": "12. Service transition (ITIL 4)"
+    },
+    {
+     "day": 87,
+     "type": "S",
+     "title": "P1 incident bridge call",
+     "phase": "12. Service transition (ITIL 4)",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 88,
+     "type": "P",
+     "title": "Runbook + SLO sheet",
+     "phase": "12. Service transition (ITIL 4)",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 89,
+     "type": "R",
+     "title": "Buffer",
+     "phase": "Close"
+    },
+    {
+     "day": 90,
+     "type": "A",
+     "title": "Level 3 assessment + certificate",
+     "phase": "Close",
+     "rubric": [
+      "Covers the key competencies of the level",
+      "Applies the concepts to the capstone with evidence",
+      "Uses terminology accurately",
+      "Is realistic and actionable",
+      "Prioritises correctly"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "title": "AI-enabled IT Programs",
+   "days": [
+    {
+     "day": 91,
+     "type": "C",
+     "title": "How AI projects differ (probabilistic, data-dependent)",
+     "phase": "13. AI project fundamentals"
+    },
+    {
+     "day": 92,
+     "type": "C",
+     "title": "AI solution types (ML, GenAI, RAG, agents)",
+     "phase": "13. AI project fundamentals"
+    },
+    {
+     "day": 93,
+     "type": "C",
+     "title": "Use-case discovery and feasibility scoring",
+     "phase": "13. AI project fundamentals"
+    },
+    {
+     "day": 94,
+     "type": "B",
+     "title": "AI use-case canvas + business case",
+     "phase": "13. AI project fundamentals",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 95,
+     "type": "C",
+     "title": "Data readiness assessment",
+     "phase": "13. AI project fundamentals"
+    },
+    {
+     "day": 96,
+     "type": "K",
+     "title": "Air Canada chatbot tribunal ruling (2024)",
+     "phase": "13. AI project fundamentals",
+     "rubric": [
+      "Identifies root causes, not only symptoms",
+      "Maps causes to specific project management practices",
+      "Separates facts from assumptions",
+      "Lists specific preventive actions",
+      "Applies the lessons to the learner's own capstone"
+     ]
+    },
+    {
+     "day": 97,
+     "type": "P",
+     "title": "AI business case",
+     "phase": "13. AI project fundamentals",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 98,
+     "type": "C",
+     "title": "AI delivery lifecycle (MLOps / LLMOps)",
+     "phase": "14. Delivering AI"
+    },
+    {
+     "day": 99,
+     "type": "C",
+     "title": "Prompting and evals for PMs",
+     "phase": "14. Delivering AI"
+    },
+    {
+     "day": 100,
+     "type": "B",
+     "title": "20-row eval set run against the OpenAI API",
+     "phase": "14. Delivering AI",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 101,
+     "type": "C",
+     "title": "Token economics, cost and latency",
+     "phase": "14. Delivering AI"
+    },
+    {
+     "day": 102,
+     "type": "B",
+     "title": "AI cost model",
+     "phase": "14. Delivering AI",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 103,
+     "type": "S",
+     "title": "Model hits 80% against a 95% target; sponsor wants launch",
+     "phase": "14. Delivering AI",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 104,
+     "type": "P",
+     "title": "Eval suite + cost model",
+     "phase": "14. Delivering AI",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 105,
+     "type": "C",
+     "title": "NIST AI RMF",
+     "phase": "15. AI governance and security"
+    },
+    {
+     "day": 106,
+     "type": "C",
+     "title": "ISO/IEC 42001",
+     "phase": "15. AI governance and security"
+    },
+    {
+     "day": 107,
+     "type": "C",
+     "title": "EU AI Act risk tiers",
+     "phase": "15. AI governance and security"
+    },
+    {
+     "day": 108,
+     "type": "C",
+     "title": "LLM security (prompt injection, data leakage)",
+     "phase": "15. AI governance and security"
+    },
+    {
+     "day": 109,
+     "type": "B",
+     "title": "AI risk register + model card",
+     "phase": "15. AI governance and security",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 110,
+     "type": "S",
+     "title": "Legal and CISO block the launch",
+     "phase": "15. AI governance and security",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 111,
+     "type": "P",
+     "title": "AI governance pack",
+     "phase": "15. AI governance and security",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 112,
+     "type": "C",
+     "title": "AI roadmaps and portfolio management",
+     "phase": "16. Program leadership + capstone"
+    },
+    {
+     "day": 113,
+     "type": "C",
+     "title": "Change management and adoption (ADKAR)",
+     "phase": "16. Program leadership + capstone"
+    },
+    {
+     "day": 114,
+     "type": "C",
+     "title": "Monitoring, drift, human-in-the-loop",
+     "phase": "16. Program leadership + capstone"
+    },
+    {
+     "day": 115,
+     "type": "B",
+     "title": "Capstone program plan",
+     "phase": "16. Program leadership + capstone",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 116,
+     "type": "S",
+     "title": "Mock interview: AI-enabled program scenario (AI-graded)",
+     "phase": "16. Program leadership + capstone",
+     "rubric": [
+      "States the decision or position clearly",
+      "Gives reasoning with business and delivery impact",
+      "Anticipates the stakeholder's likely objections",
+      "Proposes concrete next actions with owners",
+      "Keeps a professional tone under pressure"
+     ]
+    },
+    {
+     "day": 117,
+     "type": "B",
+     "title": "Capstone presentation",
+     "phase": "16. Program leadership + capstone",
+     "rubric": [
+      "Delivers the specific artifact named in the lesson title",
+      "Uses concrete, realistic detail instead of generic statements",
+      "Defines owners, dates or measures where relevant",
+      "Identifies key risks or assumptions",
+      "Is clear enough for a sponsor to act on"
+     ]
+    },
+    {
+     "day": 118,
+     "type": "P",
+     "title": "Capstone deck",
+     "phase": "16. Program leadership + capstone",
+     "rubric": [
+      "Consolidates earlier work into one coherent artifact",
+      "Stays consistent with the chosen capstone initiative",
+      "Is complete and presentable to an executive",
+      "Shows measurable outcomes and stated assumptions",
+      "Avoids unexplained jargon"
+     ]
+    },
+    {
+     "day": 119,
+     "type": "R",
+     "title": "Buffer + portfolio polish",
+     "phase": "Close"
+    },
+    {
+     "day": 120,
+     "type": "A",
+     "title": "Capstone submission + final certificate",
+     "phase": "Close",
+     "rubric": [
+      "Covers the key competencies of the level",
+      "Applies the concepts to the capstone with evidence",
+      "Uses terminology accurately",
+      "Is realistic and actionable",
+      "Prioritises correctly"
+     ]
+    }
+   ]
+  }
+ ]
+}
