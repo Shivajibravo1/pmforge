@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
-import { Badge, Card, Spinner } from "@/components/ui";
+import { Badge, Card, LoadError, Spinner } from "@/components/ui";
 import { type Curriculum, type Progress, TYPE_LABEL, useApi } from "@/lib/api";
 
 export default function Course() {
   const cur = useApi<Curriculum>("/api/v1/curriculum");
   const prog = useApi<Progress>("/api/v1/progress");
+  const failed = cur.error ?? prog.error;
+  if (failed) return <LoadError status={failed.status} onRetry={() => { cur.reload(); prog.reload(); }} />;
   if (!cur.data || !prog.data) return <Spinner />;
   const done = new Set(prog.data.completed);
 

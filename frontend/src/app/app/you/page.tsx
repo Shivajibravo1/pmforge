@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Card, Notice, Spinner } from "@/components/ui";
+import { Button, Card, LoadError, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Curriculum, type Me, type Progress, api, friendly, useApi } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
@@ -13,6 +13,8 @@ export default function You() {
   const cur = useApi<Curriculum>("/api/v1/curriculum");
   const [codes, setCodes] = useState<Record<number, string>>({});
   const [msg, setMsg] = useState("");
+  const failed = me.error ?? prog.error ?? cur.error;
+  if (failed) return <LoadError status={failed.status} onRetry={() => { me.reload(); prog.reload(); cur.reload(); }} />;
   if (!me.data || !prog.data || !cur.data) return <Spinner />;
 
   const done = new Set(prog.data.completed);

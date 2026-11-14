@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
-import { Badge, Button, Card, Spinner } from "@/components/ui";
+import { Badge, Button, Card, LoadError, Spinner } from "@/components/ui";
 import { api, useApi } from "@/lib/api";
 
 type Portfolio = { public: boolean; slug: string | null; items: { day: number; title: string; score: number; content: string }[] };
 
 export default function PortfolioPage() {
-  const { data, reload } = useApi<Portfolio>("/api/v1/portfolio");
+  const { data, error, reload } = useApi<Portfolio>("/api/v1/portfolio");
   const [busy, setBusy] = useState(false);
+  if (error) return <LoadError status={error.status} onRetry={reload} />;
   if (!data) return <Spinner />;
 
   async function toggle() {

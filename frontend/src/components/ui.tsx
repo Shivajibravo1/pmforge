@@ -37,3 +37,17 @@ export function Notice({ children }: { children: ReactNode }) {
 export function Spinner() {
   return <p className="p-6 text-sm text-muted" role="status">Loading</p>;
 }
+
+/** Shown when an API call fails, so a screen never hangs on "Loading". */
+export function LoadError({ status, onRetry }: { status: number; onRetry: () => void }) {
+  const text =
+    status === 401
+      ? "We could not verify your sign-in (error 401). Sign out and sign in again."
+      : `Could not load this page (${status ? `error ${status}` : "network error or timeout"}).`;
+  return (
+    <div className="space-y-3">
+      <Notice>{text}</Notice>
+      <Button variant="ghost" onClick={onRetry}>Try again</Button>
+    </div>
+  );
+}

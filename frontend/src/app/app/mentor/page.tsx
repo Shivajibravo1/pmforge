@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button, Card, Notice, Spinner } from "@/components/ui";
+import { Button, Card, Notice, LoadError, Spinner } from "@/components/ui";
 import { type Curriculum, type Progress, api, friendly, useApi, ApiError } from "@/lib/api";
 
 type Turn = { role: "you" | "mentor"; text: string };
@@ -12,6 +12,8 @@ export default function Mentor() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const failed = prog.error ?? cur.error;
+  if (failed) return <LoadError status={failed.status} onRetry={() => { prog.reload(); cur.reload(); }} />;
   if (!prog.data || !cur.data) return <Spinner />;
 
   const done = new Set(prog.data.completed);
