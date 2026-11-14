@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import Markdown from "react-markdown";
+import { LessonBody } from "@/components/lesson-body";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
 
@@ -75,7 +75,7 @@ export default function LessonPage() {
 
       <Card>
         {lesson.body ? (
-          <div className="prose-pm"><Markdown>{lesson.body}</Markdown></div>
+          <LessonBody body={lesson.body} />
         ) : (
           <p className="text-sm text-muted">The content for this lesson has not been published yet.</p>
         )}

@@ -16,11 +16,13 @@
   "dependencies": {
     "better-auth": "1.7.23",
     "geist": "1.9.2",
+    "lucide-react": "1.73.0",
     "next": "16.4.6",
     "pg": "8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
     "zod": "4.6.7"
   },
   "devDependencies": {

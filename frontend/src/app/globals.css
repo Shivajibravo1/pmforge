@@ -38,5 +38,11 @@ body { background: var(--pm-black); color: var(--pm-white); font-family: var(--f
 .prose-pm ol { list-style: decimal; padding-left: 1.4em; }
 .prose-pm a { text-decoration: underline; }
 .prose-pm table { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: .9rem; }
-.prose-pm th, .prose-pm td { border: 1px solid var(--pm-border); padding: .5em .7em; text-align: left; }
+.prose-pm table { margin: 0; min-width: 32rem; }
+.prose-pm th { background: rgba(126,59,237,.25); color: #fff; font-weight: 600; padding: .7em .9em; text-align: left; border-bottom: 1px solid var(--pm-border); }
+.prose-pm td { padding: .7em .9em; text-align: left; border-bottom: 1px solid var(--pm-border); color: #e6e6ee; vertical-align: top; }
+.prose-pm tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
+.prose-pm tbody tr:last-child td { border-bottom: 0; }
+.prose-pm tbody tr:hover { background: rgba(198,255,52,.06); }
+.prose-pm strong { color: #fff; }
 .prose-pm code { background: var(--pm-surface-2); padding: .1em .35em; border-radius: 4px; }
