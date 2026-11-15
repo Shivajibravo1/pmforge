@@ -9,6 +9,8 @@ These requirements apply to every lesson, every day, without being repeated in a
 
 5. **Storytelling standard.** Lessons are lived, not explained. The reader is the project manager on a live, connected case (Project Lighthouse, fictional, Days 1 to 10), told in second person. Rules: (a) hook in the first screen with a `chat` scene or a dated moment, no definitions first; (b) concepts are explained through what happens next in the project, then named; (c) at least one `decision` block per lesson where each option shows its consequence and a senior PM take; (d) use a `timeline` to show how a problem builds over weeks and a `rag` block for project health; (e) named characters with roles, consistent across days; (f) each lesson ends with a link to tomorrow; (g) at least 700 words and a visible AI scenario. Real cases (for example Healthcare.gov) are framed as "you are the advisor", caveated, with no invented dates, figures or quotes.
 
+6. **Framework references.** Every lesson has at least one `ref` card on the screens where it helps, pointing to PMI (PMBOK Guide, Agile Practice Guide), ITIL 4, NIST (CSF 2.0, AI RMF, SP 800 series), CIS Controls v8, OWASP, ISO/IEC and similar sources, with a note on how to use it at work or in an interview. Names and topics only: no links, no quotes, no clause numbers or figures unless certain, and sources must be on the allowed list in `test_lesson_blocks.py`. The card footer tells readers to check the current edition.
+
 Also: plain English, no em dashes, no invented statistics or quotes, mark illustrative scenarios as illustrative, verify figures for real cases, and never use real client names.
 
 ## Lesson format
@@ -31,5 +33,6 @@ One `## ` heading is one screen (6 to 12 screens). Blocks are fenced code blocks
 | `decision` | `? situation`, `- option \| result`, `+ best option \| result`, `= senior PM take` | exactly one `+`; every option states its consequence |
 | `tip` `note` `warn` `key` `ai` | free text | callouts; `ai` is the AI lens |
 | `journal` | prompt text | learner writes, optional AI feedback |
+| `ref` | `Source \| where to look \| how to use it` | framework reference and interview prep; 3 fields per line |
 
 Tables use normal Markdown. Tests in `backend/tests/test_lesson_blocks.py` enforce the format.

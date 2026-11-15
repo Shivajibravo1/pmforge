@@ -115,7 +115,7 @@ def test_lesson_shape_matches_lesson_type():
 
 
 REF_SOURCES = {"PMI", "ITIL", "NIST", "CIS", "OWASP", "ISO", "Scrum", "Agile", "DORA", "SAFe", "PRINCE2", "COBIT",
-               "Azure", "AWS", "SRE", "EU", "IIBA", "Kanban", "ISTQB", "FinOps", "CISA", "AICPA", "India", "MITRE", "FIRST"}
+               "Azure", "AWS", "SRE", "EU", "IIBA", "Kanban", "ISTQB", "FinOps", "CISA", "AICPA", "India", "MITRE", "FIRST", "Prosci", "DAMA"}
 
 
 def test_reference_cards_cite_known_sources_by_name_only():
@@ -132,3 +132,9 @@ def test_reference_cards_cite_known_sources_by_name_only():
                 assert "http" not in line and "www." not in line, f"day {n}: no links in references"
                 assert "\u2014" not in line and "\u2013" not in line, f"day {n}: no em or en dashes"
                 assert '"' not in line and "\u201c" not in line, f"day {n}: do not quote sources"
+
+
+def test_every_lesson_has_a_reference_card():
+    """Standing requirement: each lesson carries framework references and interview tips."""
+    for n in written():
+        assert any(k == "ref" for k, _ in blocks(n)), f"day {n}: add a ref block with PMI, ITIL, NIST, CIS, OWASP or ISO pointers"
