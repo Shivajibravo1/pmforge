@@ -61,7 +61,8 @@ def get_lesson(day: int, user: User = Depends(current_user), db: Session = Depen
                settings: Settings = Depends(get_settings)):
     meta = require_access(day, user, completed_days(db, user.id), settings)
     return {**{k: meta[k] for k in ("day", "type", "title", "phase", "level")},
-            "rubric": meta.get("rubric", []), "body": content.lesson_body(day)}
+            "rubric": meta.get("rubric", []), "body": content.lesson_body(day),
+            "completed": day in completed_days(db, user.id)}
 
 
 class CompleteOut(BaseModel):
@@ -69,6 +70,7 @@ class CompleteOut(BaseModel):
     xp_awarded: int
     total_xp: int
     streak: int
+    newly_completed: bool = False
 
 
 @router.post("/lessons/{day}/complete", response_model=CompleteOut)
@@ -76,14 +78,16 @@ def complete_lesson(day: int, user: User = Depends(current_user), db: Session = 
                     settings: Settings = Depends(get_settings)):
     done = completed_days(db, user.id)
     meta = require_access(day, user, done, settings)
-    if day not in done:
+    newly = day not in done
+    if newly:
         db.add(Progress(user_id=user.id, day=day, xp=content.XP.get(meta["type"], 10),
                         completed_on=date.today()))
         db.commit()
     rows = db.scalars(select(Progress).where(Progress.user_id == user.id)).all()
     mine = next(r for r in rows if r.day == day)
     return CompleteOut(day=day, xp_awarded=mine.xp, total_xp=sum(r.xp for r in rows),
-                       streak=streak({r.completed_on for r in rows}, date.today()))
+                       streak=streak({r.completed_on for r in rows}, date.today()),
+                       newly_completed=newly)
 
 
 @router.get("/progress")

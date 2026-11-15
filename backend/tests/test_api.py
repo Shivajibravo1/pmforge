@@ -55,9 +55,10 @@ def test_phase_gating_and_xp(client):
     h = auth()
     assert client.get("/api/v1/lessons/2", headers=h).status_code == 409
     r = client.post("/api/v1/lessons/1/complete", headers=h).json()
-    assert r["xp_awarded"] == 10 and r["streak"] == 1
+    assert r["xp_awarded"] == 10 and r["streak"] == 1 and r["newly_completed"] is True
+    assert client.get("/api/v1/lessons/1", headers=h).json()["completed"] is True
     again = client.post("/api/v1/lessons/1/complete", headers=h).json()
-    assert again["total_xp"] == 10  # idempotent
+    assert again["total_xp"] == 10 and again["newly_completed"] is False  # idempotent
     assert client.get("/api/v1/lessons/2", headers=h).status_code == 200
 
 

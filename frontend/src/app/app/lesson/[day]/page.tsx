@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { EarlierNotes } from "@/components/earlier-notes";
 import { LessonPlayer } from "@/components/lesson-player";
+import { XpToast, type XpGain } from "@/components/xp-toast";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
-import { ApiError, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
+import { ApiError, type CompleteOut, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
 
 const ARTIFACT_TYPES = ["B", "S", "K", "P", "A"];
 
@@ -17,6 +19,7 @@ export default function LessonPage() {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [gain, setGain] = useState<XpGain | null>(null);
 
   if (loading) return <Spinner />;
   if (error?.status === 402) {
@@ -38,6 +41,7 @@ export default function LessonPage() {
     );
   }
 
+  const done = completed || lesson.completed === true;
   const takesArtifact = ARTIFACT_TYPES.includes(lesson.type);
 
   async function submitAndReview() {
@@ -57,8 +61,9 @@ export default function LessonPage() {
     setBusy(true);
     setMsg("");
     try {
-      await api(`/api/v1/lessons/${n}/complete`, { method: "POST" });
+      const r = await api<CompleteOut>(`/api/v1/lessons/${n}/complete`, { method: "POST" });
       setCompleted(true);
+      if (r.newly_completed) setGain({ xp: r.xp_awarded, total: r.total_xp, streak: r.streak });
       void reload();
     } catch (e) {
       setMsg(friendly(e as ApiError));
@@ -89,8 +94,8 @@ export default function LessonPage() {
       )}
       {msg && <Notice>{msg}</Notice>}
       <div className="flex flex-wrap gap-3">
-        <Button variant="lime" onClick={complete} disabled={busy || completed}>{completed ? "Completed" : "Mark complete"}</Button>
-        {completed && <LinkButton href={`/app/lesson/${n + 1}`} variant="ghost">Next lesson</LinkButton>}
+        <Button variant="lime" onClick={complete} disabled={busy || done}>{done ? "Completed" : "Mark complete"}</Button>
+        {done && <LinkButton href={`/app/lesson/${n + 1}`} variant="ghost">Next lesson</LinkButton>}
         <Link href="/app/mentor" className="inline-flex min-h-11 items-center px-3 text-sm underline">Ask the mentor</Link>
       </div>
     </div>
@@ -98,15 +103,17 @@ export default function LessonPage() {
 
   return (
     <article className="space-y-5">
-      <div className="flex items-center gap-2"><Badge tone="violet">Day {lesson.day}</Badge><Badge>{TYPE_LABEL[lesson.type]}</Badge></div>
+      <div className="flex items-center gap-2"><Badge tone="violet">Day {lesson.day}</Badge><Badge>{TYPE_LABEL[lesson.type]}</Badge>{done && <Badge tone="lime">Completed, reviewing</Badge>}</div>
       <h1 className="text-2xl font-bold">{lesson.title}</h1>
       <p className="text-sm text-muted">{lesson.phase}</p>
+      <EarlierNotes day={lesson.day} />
 
       {lesson.body ? (
         <LessonPlayer day={lesson.day} body={lesson.body} finale={finale} />
       ) : (
         <Card><p className="text-sm text-muted">The content for this lesson has not been published yet.</p></Card>
       )}
+      {gain && <XpToast gain={gain} onClose={() => setGain(null)} />}
     </article>
   );
 }
