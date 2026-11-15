@@ -1,10 +1,15 @@
 """Every rich block in every lesson must be well formed, so a typo cannot break a live lesson."""
 import re
 
-from app.content import days, lesson_body
+from app.content import days, get_day, lesson_body
 
 KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
+
+
+def written() -> list[int]:
+    """Every lesson that has a body file. The standards apply to all of them."""
+    return [n for n in sorted(days()) if lesson_body(n)]
 
 
 def blocks(day: int):
@@ -39,24 +44,24 @@ def test_cards_and_flow_lines_are_pipe_separated():
 
 
 def test_lessons_one_to_ten_have_rich_content():
-    for n in range(1, 11):
+    for n in written():
         assert len(blocks(n)) >= 3, f"day {n} should use at least three rich blocks"
         assert "—" not in (lesson_body(n) or ""), f"day {n}: no em dashes"
 
 
 def test_each_lesson_has_several_screens_and_no_em_dash_in_titles():
-    for n in range(1, 11):
+    for n in written():
         body = lesson_body(n) or ""
         screens = [line for line in body.splitlines() if line.startswith("## ")]
         assert 6 <= len(screens) <= 12, f"day {n}: {len(screens)} screens, expected 6 to 12"
 
 
 def test_every_lesson_has_an_ai_lens_or_ai_cards_and_risk_highlights():
-    for n in range(1, 11):
+    for n in written():
         body = lesson_body(n) or ""
         assert "```ai" in body, f"day {n}: add an AI lens block"
     # at least the foundations lessons carry 'what goes wrong' on cards (4th field)
-    for n in (1, 2, 3, 4, 8, 9, 10):
+    for n in [x for x in written() if get_day(x)["type"] == "C"]:
         cards = [src for kind, src in blocks(n) if kind == "cards"]
         risky = [line for src in cards for line in src.splitlines() if line.count("|") >= 3]
         assert risky, f"day {n}: cards should state what goes wrong"
@@ -87,11 +92,23 @@ def test_story_blocks_are_well_formed():
 
 def test_lessons_one_to_ten_are_immersive():
     """Storytelling standard: a scene, a decision with consequences, and enough depth."""
-    for n in range(1, 11):
+    for n in written():
         kinds = [k for k, _ in blocks(n)]
         words = len((lesson_body(n) or "").split())
         assert "chat" in kinds, f"day {n}: open with a chat scene"
-        assert words >= 700, f"day {n}: only {words} words, expected a fuller lesson"
+        assert words >= (350 if get_day(n)["type"] == "R" else 700), f"day {n}: only {words} words, expected a fuller lesson"
         assert "decision" in kinds, f"day {n}: add a decision with consequences"
         first = (lesson_body(n) or "").split("\n## ")[0] + "\n## "
         assert "```chat" in first or "```chat" in (lesson_body(n) or "").split("\n## ")[1], f"day {n}: hook within first screen"
+
+
+def test_lesson_shape_matches_lesson_type():
+    """Concept lessons end with a journal. Artifact lessons end with a task and have no journal."""
+    for n in written():
+        body = lesson_body(n) or ""
+        kind = get_day(n)["type"]
+        if kind in {"B", "S", "K", "P", "A"}:
+            assert "## Your task" in body, f"day {n}: artifact lessons need a Your task section"
+            assert "```journal" not in body, f"day {n}: artifact lessons must not have a journal"
+        elif kind == "C":
+            assert "```journal" in body, f"day {n}: concept lessons need a journal"
