@@ -68,3 +68,7 @@ Manual before launch: run a prompt injection set (role override, instruction lea
 ## 9. Monitoring strategy
 
 Alert on: spikes in 429 or 502, moderation blocks per user, "possible prompt injection" and "prompt leakage" log lines, daily cost against budget. Review weekly during beta.
+
+## Model answer in reviews
+
+Reviews also return `model_answer`, a professional rewrite of the learner's own work. It follows the same controls as other review text: strict JSON schema (field required), pydantic length cap of 2500 characters, sanitised for HTML, links, images and control characters, checked for system prompt leakage, and rendered as plain text. The prompt forbids invented figures, names or sources and requires unknown facts to be marked "Assumption (confirm)". It is a style reference, not an answer key.

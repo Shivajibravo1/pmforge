@@ -28,7 +28,7 @@ class FakeVerifier:
 
 class FakeAI:
     def __init__(self):
-        self.text = '{"score": 82, "strengths": ["clear"], "gaps": ["no dates"], "next_steps": ["add owners"]}'
+        self.text = '{"score": 82, "strengths": ["clear"], "gaps": ["no dates"], "next_steps": ["add owners"], "model_answer": "Problem: slow reporting. Owner: PMO."}'
         self.tokens_in, self.tokens_out = 1000, 300
         self.calls = []
         self.flag = False

@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { EarlierNotes } from "@/components/earlier-notes";
 import { LessonPlayer } from "@/components/lesson-player";
+import { ReviewPanel } from "@/components/review-panel";
 import { XpToast, type XpGain } from "@/components/xp-toast";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
 import { ApiError, type CompleteOut, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
@@ -82,14 +83,7 @@ export default function LessonPage() {
           <textarea id="artifact" rows={9} maxLength={8000} value={text} onChange={(e) => setText(e.target.value)}
             className="w-full rounded-xl border border-line bg-black p-3 text-sm text-white" />
           <Button onClick={submitAndReview} disabled={busy || text.trim().length < 20}>Get mentor review</Button>
-          {review && (
-            <div className="space-y-3 rounded-xl border border-line p-4" aria-live="polite">
-              <p className="text-lg font-bold text-lime">Score {review.score}/100</p>
-              {([["Strengths", review.strengths], ["Gaps", review.gaps], ["Next steps", review.next_steps]] as const).map(([h, items]) => (
-                <div key={h}><h3 className="text-sm font-semibold">{h}</h3><ul className="list-disc pl-5 text-sm text-muted">{items.map((i) => <li key={i}>{i}</li>)}</ul></div>
-              ))}
-            </div>
-          )}
+          {review && <ReviewPanel review={review} />}
         </Card>
       )}
       {msg && <Notice>{msg}</Notice>}
