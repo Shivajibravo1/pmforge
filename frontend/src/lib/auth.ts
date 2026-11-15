@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
 import { jwt } from "better-auth/plugins/jwt";
 import { Pool } from "pg";
+import { normalizeDatabaseUrl } from "./db-url.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -54,7 +55,7 @@ async function deliverOtp(email: string, otp: string): Promise<void> {
 export const auth = betterAuth({
   baseURL: required("BETTER_AUTH_URL"),
   secret: required("BETTER_AUTH_SECRET"),
-  database: new Pool({ connectionString: required("DATABASE_URL") }),
+  database: new Pool({ connectionString: normalizeDatabaseUrl(required("DATABASE_URL")) }),
   trustedOrigins: (process.env.TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
   plugins: [
     emailOTP({
