@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui";
 import { LessonBody } from "@/components/lesson-body";
-import { ReviewPanel } from "@/components/review-panel";
 import { ApiError, type ReviewOut, api, friendly } from "@/lib/api";
 import { extractJournal, readMinutes, splitSteps } from "@/lib/blocks";
 
@@ -46,7 +45,14 @@ function Journal({ day, index, prompt, onDone }: { day: number; index: number; p
         <div className="mt-2 flex justify-between text-xs text-muted"><span>{text.length} characters</span><span>Saves automatically on this device</span></div>
         <p className="mt-2 text-xs text-muted">Do not enter passwords, personal data or confidential client information. AI feedback can be wrong, so treat it as a second opinion.</p>
       </div>
-      {review && <ReviewPanel review={review} title="Coach score" />}
+      {review && (
+        <div className="space-y-3 rounded-2xl border border-violet bg-surface2 p-4" aria-live="polite">
+          <p className="text-lg font-bold text-lime">Coach score {review.score}/100</p>
+          {([["Strengths", review.strengths], ["Gaps", review.gaps], ["Next steps", review.next_steps]] as const).map(([h, items]) => (
+            <div key={h}><h3 className="text-sm font-semibold text-white">{h}</h3><ul className="list-disc pl-5 text-sm text-muted">{items.map((i) => <li key={i}>{i}</li>)}</ul></div>
+          ))}
+        </div>
+      )}
       {review?.redacted && review.redacted.length > 0 && (
         <p className="rounded-xl border border-line bg-surface2 p-3 text-xs text-white">We removed sensitive details before review ({review.redacted.join(", ")}). Please avoid including them next time.</p>
       )}

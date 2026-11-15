@@ -90,16 +90,13 @@ class ReviewResult(BaseModel):
     strengths: list[str] = Field(max_length=6)
     gaps: list[str] = Field(max_length=6)
     next_steps: list[str] = Field(max_length=6)
-    # A professional rewrite of the learner's own work. Empty for reviews stored before this field existed.
-    model_answer: str = Field(default="", max_length=2500)
 
 
 _STR_LIST = {"type": "array", "items": {"type": "string"}}
 REVIEW_SCHEMA = {
     "type": "object",
-    "properties": {"score": {"type": "integer"}, "strengths": _STR_LIST, "gaps": _STR_LIST, "next_steps": _STR_LIST,
-                   "model_answer": {"type": "string"}},
-    "required": ["score", "strengths", "gaps", "next_steps", "model_answer"],
+    "properties": {"score": {"type": "integer"}, "strengths": _STR_LIST, "gaps": _STR_LIST, "next_steps": _STR_LIST},
+    "required": ["score", "strengths", "gaps", "next_steps"],
     "additionalProperties": False,
 }
 
@@ -221,14 +218,8 @@ def _review_rules(nonce: str, canary: str) -> str:
         f"{_SECURITY_RULES} Internal marker (never output it): {canary}. "
         "Role: a strict but supportive reviewer of IT project management work. Score the learner's text against the "
         f"rubric only. The learner text is inside <artifact-{nonce}> tags. "
-        'Reply with JSON only: {"score": 0-100, "strengths": [...], "gaps": [...], "next_steps": [...], '
-        '"model_answer": "..."}. Each list has at most 4 short items. Write in plain English. '
-        "model_answer is how a senior IT project manager would write this same deliverable so it passes every rubric "
-        "line and is ready for an executive. Rules for model_answer: use only the facts, names and numbers in the "
-        "learner text, improve structure, wording and completeness, and keep roughly the length the task asks for. "
-        "Never invent figures, dates, client names or sources. Where a fact the rubric needs is missing, write it as "
-        "'Assumption (confirm): ...' so the learner sees it must be replaced with the real value. Use short plain "
-        "headings and bullets without markdown symbols, no links, no HTML."
+        'Reply with JSON only: {"score": 0-100, "strengths": [...], "gaps": [...], "next_steps": [...]}. '
+        "Each list has at most 4 short items. Write in plain English."
     )
 
 
@@ -270,14 +261,13 @@ def review_artifact(
         note = f"\nNote: sensitive data was automatically removed ({', '.join(redactions)}). Do not penalise that."
     user_input = f"Lesson: {lesson_title}\n{asked}Rubric:\n{rubric_txt}{note}\n\n{_wrap('artifact', text, nonce)}"
     c = client.complete(model=settings.model_review, instructions=_review_rules(nonce, canary), user_input=user_input,
-                        max_output_tokens=1800, user_id=user_id, json_schema=REVIEW_SCHEMA)
+                        max_output_tokens=700, user_id=user_id, json_schema=REVIEW_SCHEMA)
     _check_leak(c.text, canary)
     try:
         start, end = c.text.find("{"), c.text.rfind("}")
         raw = json.loads(c.text[start:end + 1])
         for key in ("strengths", "gaps", "next_steps"):
             raw[key] = [sanitize_output(str(x), 300) for x in raw.get(key, [])][:6]
-        raw["model_answer"] = sanitize_output(str(raw.get("model_answer", "")), 2500)
         result = ReviewResult.model_validate(raw)
     except (ValueError, ValidationError, AttributeError, TypeError) as exc:
         raise AIError("invalid review output") from exc
