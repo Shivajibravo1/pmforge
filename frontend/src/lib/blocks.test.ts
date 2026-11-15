@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseStats } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
     expect(parseFlow("Plan | Scope\nBuild | Deliver")).toEqual([{ title: "Plan", text: "Scope" }, { title: "Build", text: "Deliver" }]);
+  });
+  it("parses reference rows, keeping extra pipes in the last field", () => {
+    expect(parseRef("NIST | CSF 2.0, Govern | Say it | twice")).toEqual([{ framework: "NIST", where: "CSF 2.0, Govern", use: "Say it | twice" }]);
+    expect(parseRef("PMI | PMBOK Guide")[0].use).toBe("");
   });
   it("parses cards with icon, text and an optional risk", () => {
     expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a", risk: "b" });

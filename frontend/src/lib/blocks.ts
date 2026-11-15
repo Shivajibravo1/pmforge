@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key";
-export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"];
+export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref";
+export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -36,6 +36,14 @@ export function parseAccordion(src: string) {
   return lines(src).map((l) => {
     const [title, ...rest] = cells(l);
     return { title, text: rest.join(" | ") };
+  });
+}
+
+/** Reference card. Each line is `Framework | Where to look | How to use it at work or in an interview`. */
+export function parseRef(src: string) {
+  return lines(src).map((l) => {
+    const [framework, where = "", ...rest] = cells(l);
+    return { framework, where, use: rest.join(" | ") };
   });
 }
 

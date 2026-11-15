@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseStats,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -158,6 +158,26 @@ function Accordion({ src }: { src: string }) {
         </details>
       ))}
     </div>
+  );
+}
+
+function Ref({ src }: { src: string }) {
+  const rows = parseRef(src);
+  return (
+    <aside className="my-6 rounded-2xl border border-violet/60 bg-surface2 p-4" aria-label="Reference and interview prep">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime">
+        <BookOpen aria-hidden className="h-4 w-4" />Reference and interview prep
+      </p>
+      <ul className="mt-3 space-y-3" style={{ listStyle: "none", paddingLeft: 0 }}>
+        {rows.map((r, i) => (
+          <li key={i} className="rounded-xl border border-line bg-black p-3">
+            <p className="text-sm font-semibold text-white"><span className="mr-2 rounded-md bg-violet px-2 py-0.5 text-xs">{r.framework}</span>{r.where}</p>
+            {r.use && <p className="mt-1 text-sm text-muted">{r.use}</p>}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-xs text-muted">Names and topics only. Check the current edition before you quote one in an interview or a document.</p>
+    </aside>
   );
 }
 
@@ -312,6 +332,7 @@ function renderBlock(kind: BlockKind, src: string): ReactNode {
     case "checklist": return <Checklist src={src} />;
     case "quiz": return <Quiz src={src} />;
     case "accordion": return <Accordion src={src} />;
+    case "ref": return <Ref src={src} />;
     default: return <Callout kind={kind} src={src} />;
   }
 }

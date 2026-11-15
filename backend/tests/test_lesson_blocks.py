@@ -3,7 +3,7 @@ import re
 
 from app.content import days, get_day, lesson_body
 
-KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key"}
+KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -112,3 +112,23 @@ def test_lesson_shape_matches_lesson_type():
             assert "```journal" not in body, f"day {n}: artifact lessons must not have a journal"
         elif kind == "C":
             assert "```journal" in body, f"day {n}: concept lessons need a journal"
+
+
+REF_SOURCES = {"PMI", "ITIL", "NIST", "CIS", "OWASP", "ISO", "Scrum", "Agile", "DORA", "SAFe", "PRINCE2", "COBIT",
+               "Azure", "AWS", "SRE", "EU", "IIBA", "Kanban", "ISTQB"}
+
+
+def test_reference_cards_cite_known_sources_by_name_only():
+    """Reference rows are `Source | where to look | how to use it`. Names and topics only: no links, no quotes."""
+    for n in written():
+        for kind, src in blocks(n):
+            if kind != "ref":
+                continue
+            for line in filter(None, (x.strip() for x in src.splitlines())):
+                cells = [c.strip() for c in line.split("|")]
+                assert len(cells) == 3 and all(cells), f"day {n}: ref line needs 3 filled fields: {line}"
+                assert cells[0] in REF_SOURCES, f"day {n}: unknown reference source {cells[0]}"
+                assert len(cells[2]) >= 25, f"day {n}: say how to use it: {line}"
+                assert "http" not in line and "www." not in line, f"day {n}: no links in references"
+                assert "\u2014" not in line and "\u2013" not in line, f"day {n}: no em or en dashes"
+                assert '"' not in line and "\u201c" not in line, f"day {n}: do not quote sources"

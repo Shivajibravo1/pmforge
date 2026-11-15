@@ -53,4 +53,10 @@ describe("rich blocks", () => {
     expect(screen.getByText("Good call")).toBeTruthy();
     expect(container.textContent).toContain("Senior PMs triage before they act");
   });
+  it("renders a reference card with framework, location and use", () => {
+    render(<LessonBody body={"```ref\nNIST | CSF 2.0, Govern function | Use it to frame accountability.\n```"} />);
+    expect(screen.getByLabelText("Reference and interview prep")).toBeTruthy();
+    expect(screen.getByText("NIST")).toBeTruthy();
+    expect(screen.getByText(/Use it to frame accountability/)).toBeTruthy();
+  });
 });
