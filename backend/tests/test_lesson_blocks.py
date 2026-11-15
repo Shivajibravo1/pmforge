@@ -115,7 +115,7 @@ def test_lesson_shape_matches_lesson_type():
 
 
 REF_SOURCES = {"PMI", "ITIL", "NIST", "CIS", "OWASP", "ISO", "Scrum", "Agile", "DORA", "SAFe", "PRINCE2", "COBIT",
-               "Azure", "AWS", "SRE", "EU", "IIBA", "Kanban", "ISTQB"}
+               "Azure", "AWS", "SRE", "EU", "IIBA", "Kanban", "ISTQB", "FinOps", "CISA", "AICPA", "India", "MITRE", "FIRST"}
 
 
 def test_reference_cards_cite_known_sources_by_name_only():
