@@ -16,7 +16,9 @@ export default function SignIn() {
     e.preventDefault();
     setBusy(true);
     setMsg("");
-    const { error } = await authClient.emailOtp.sendVerificationOtp({ email, type: "sign-in" });
+    const clean = email.trim().toLowerCase();
+    setEmail(clean);
+    const { error } = await authClient.emailOtp.sendVerificationOtp({ email: clean, type: "sign-in" });
     setBusy(false);
     if (error) setMsg("We could not send a code. Please try again.");
     else setStep("code");
@@ -40,7 +42,7 @@ export default function SignIn() {
         {step === "email" ? (
           <form onSubmit={sendCode} className="space-y-4">
             <label className="block text-sm" htmlFor="email">Work or personal email</label>
-            <input id="email" type="email" required autoComplete="email" className={input} value={email}
+            <input id="email" type="email" required maxLength={254} autoComplete="email" className={input} value={email}
               onChange={(e) => setEmail(e.target.value)} />
             <Button type="submit" variant="lime" disabled={busy} className="w-full">Email me a code</Button>
           </form>
@@ -48,7 +50,7 @@ export default function SignIn() {
           <form onSubmit={verify} className="space-y-4">
             <label className="block text-sm" htmlFor="otp">Enter the 6-digit code sent to {email}</label>
             <input id="otp" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required autoComplete="one-time-code"
-              className={input} value={otp} onChange={(e) => setOtp(e.target.value)} />
+              className={input} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} />
             <Button type="submit" variant="lime" disabled={busy} className="w-full">Verify and continue</Button>
             <Button type="button" variant="ghost" className="w-full" onClick={() => setStep("email")}>Use a different email</Button>
           </form>

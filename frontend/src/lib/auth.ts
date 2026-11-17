@@ -57,11 +57,17 @@ export const auth = betterAuth({
   secret: required("BETTER_AUTH_SECRET"),
   database: new Pool({ connectionString: normalizeDatabaseUrl(required("DATABASE_URL")) }),
   trustedOrigins: (process.env.TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+  // Explicit so rate limiting cannot depend on the NODE_ENV default. Per-IP, in memory (one app instance).
+  rateLimit: { enabled: true, window: 60, max: 60 },
   plugins: [
     emailOTP({
       otpLength: 6,
       expiresIn: 300,
       allowedAttempts: 3,
+      // Store only a hash of each code, so a database read does not reveal valid codes.
+      storeOTP: "hashed",
+      // Code requests per address per window. Matches the library default, stated so it is reviewed.
+      rateLimit: { window: 60, max: 3 },
       sendVerificationOTP: async ({ email, otp }) => {
         await deliverOtp(email, otp);
       },
