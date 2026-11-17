@@ -9,6 +9,15 @@ Stack: Caddy (automatic HTTPS) -> Next.js frontend + FastAPI backend -> Postgres
 - Restrict the VPS firewall to TCP 22, 80 and 443.
 - Backend verifies JWTs against the frontend JWKS at `http://frontend:3000/api/auth/jwks` (internal), issuer `https://<DOMAIN>`, audience `pmforge-api`.
 
+## Cloudflare in front (needed for automatic INR or USD)
+The landing page picks the price currency from the `cf-ipcountry` header that Cloudflare adds. Without Cloudflare everyone sees USD first (the toggle still works). Caddy passes the header through unchanged.
+1. Add `pmforge.pm` to a Cloudflare account and switch the registrar nameservers to the two Cloudflare gives you.
+2. DNS records `A pmforge.pm` and `CNAME www` stay as in Prerequisites, with the orange cloud (Proxied) on.
+3. SSL/TLS mode: **Full (strict)**. Caddy keeps its own certificate, so the origin stays encrypted.
+4. Firewall: in the Hostinger VPS firewall allow TCP 80 and 443 only from Cloudflare's published ranges (lists at `https://www.cloudflare.com/ips/`), plus 22 from your own address. This matters for security: the app trusts `cf-connecting-ip` for rate limiting and `cf-ipcountry` for currency, and anyone who can reach the VPS directly could forge them. Re-check the ranges every few months.
+5. Check: open `https://pmforge.pm` from India and from another country (or a VPN). The currency toggle should start on INR in India and USD elsewhere.
+6. Do not turn on Cloudflare "Always Use HTTPS" caching rules for `/api/*`, `/sign-in` or `/app`. Leave caching at the default (dynamic pages are not cached).
+
 ## Prerequisites
 1. DNS: `A pmforge.pm -> 189.72.156.9`, `CNAME www -> pmforge.pm`. Wait for propagation.
 2. Resend: domain verified, `EMAIL_FROM` on that domain, a fresh API key.

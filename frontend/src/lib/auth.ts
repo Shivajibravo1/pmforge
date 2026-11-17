@@ -61,6 +61,9 @@ export const auth = betterAuth({
   trustedOrigins: (process.env.TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
   // Explicit so rate limiting cannot depend on the NODE_ENV default. Per-IP, in memory (one app instance).
   rateLimit: { enabled: true, window: 60, max: 60 },
+  // Behind Cloudflare the real visitor address is in cf-connecting-ip. Trusted only because the VPS firewall
+  // accepts web traffic from Cloudflare alone (docs/DEPLOY_VPS.md). Falls back to x-forwarded-for without it.
+  advanced: { ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] } },
   // Mobile number collected at enrollment. Stored in E.164. The server validates it, whatever the browser sent.
   user: { additionalFields: { phone: { type: "string", required: false, input: true } } },
   databaseHooks: {
