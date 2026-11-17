@@ -1,0 +1,129 @@
+# PMForge on a single VPS: Caddy (HTTPS) -> frontend + backend -> Postgres.
+# Only Caddy publishes ports. Secrets come from the project environment set in hPanel, never from this file.
+name: pmforge
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pmforge
+      POSTGRES_DB: pmforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD (hex, no special characters)}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pmforge -d pmforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  backend-migrate:
+    build:
+      context: https://github.com/Shivajibravo1/pmforge.git#main:backend
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql://pmforge:${POSTGRES_PASSWORD}@postgres:5432/pmforge?sslmode=disable
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+    networks: [internal]
+
+  auth-migrate:
+    build:
+      context: https://github.com/Shivajibravo1/pmforge.git#main:frontend
+      target: builder
+    environment: &auth_env
+      BETTER_AUTH_URL: https://${DOMAIN:-pmforge.pm}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET (32+ random characters)}
+      DATABASE_URL: postgresql://pmforge:${POSTGRES_PASSWORD}@postgres:5432/pmforge?sslmode=disable
+      TRUSTED_ORIGINS: https://${DOMAIN:-pmforge.pm}
+      RESEND_API_KEY: ${RESEND_API_KEY:?set RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
+      AUTH_TEST_EMAILS: ${AUTH_TEST_EMAILS:-}
+      PMFORGE_LIVE: ${PMFORGE_LIVE:-false}
+      NODE_ENV: production
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+    networks: [internal]
+
+  backend:
+    build:
+      context: https://github.com/Shivajibravo1/pmforge.git#main:backend
+    restart: unless-stopped
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql://pmforge:${POSTGRES_PASSWORD}@postgres:5432/pmforge?sslmode=disable
+      CORS_ORIGINS: https://${DOMAIN:-pmforge.pm}
+      JWKS_URL: http://frontend:3000/api/auth/jwks
+      JWT_ISSUER: https://${DOMAIN:-pmforge.pm}
+      JWT_AUDIENCE: pmforge-api
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-aishivajibravo@gmail.com}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?set OPENAI_API_KEY (with a billing limit)}
+      MODEL_REVIEW: ${MODEL_REVIEW:-gpt-6.1-terra}
+      MODEL_CHAT: ${MODEL_CHAT:-gpt-6-luna}
+    depends_on:
+      backend-migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks: [internal]
+
+  frontend:
+    build:
+      context: https://github.com/Shivajibravo1/pmforge.git#main:frontend
+      target: runner
+    restart: unless-stopped
+    environment:
+      <<: *auth_env
+      API_INTERNAL_URL: http://backend:8000
+    depends_on:
+      auth-migrate: { condition: service_completed_successfully }
+      backend: { condition: service_started }
+    networks: [internal]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-pmforge.pm}
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [frontend, backend]
+    networks: [internal]
+
+configs:
+  caddyfile:
+    content: |
+      www.{$$DOMAIN} {
+        redir https://{$$DOMAIN}{uri} permanent
+      }
+      {$$DOMAIN} {
+        encode zstd gzip
+        @api path /api/v1/* /public/* /health
+        handle @api {
+          reverse_proxy backend:8000
+        }
+        handle {
+          reverse_proxy frontend:3000
+        }
+      }
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:
