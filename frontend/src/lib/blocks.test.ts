@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
@@ -8,6 +8,19 @@ describe("lesson block parsers", () => {
   it("parses reference rows, keeping extra pipes in the last field", () => {
     expect(parseRef("NIST | CSF 2.0, Govern | Say it | twice")).toEqual([{ framework: "NIST", where: "CSF 2.0, Govern", use: "Say it | twice" }]);
     expect(parseRef("PMI | PMBOK Guide")[0].use).toBe("");
+  });
+  it("parses mind maps, flashcards, incidents and interview answers", () => {
+    expect(parseMindmap("# Agentic AI\nRoles | FDE, Harness engineer\nRisks | Excessive agency")).toEqual({
+      centre: "Agentic AI", branches: [{ name: "Roles", children: ["FDE", "Harness engineer"] }, { name: "Risks", children: ["Excessive agency"] }] });
+    expect(parseFlashcards("What is an FDE? | Engineer embedded with the customer")).toEqual([{ front: "What is an FDE?", back: "Engineer embedded with the customer" }]);
+    const inc = parseIncident("# Agent deleted data (illustrative)\nWhat happened | It ran a delete\nImpact | Outage\nRoot cause | Too much access\nResolution | Restore");
+    expect(inc.title).toContain("illustrative");
+    expect(inc.rows.map((r) => r.tone)).toEqual(["info", "bad", "warn", "ok"]);
+    const a = parseAnswer("? How do you govern an agent?\n- I trust it | no controls\n+ Least privilege and human approval.\n= For FDE roles, mention the customer site.");
+    expect(a?.weak[0]).toEqual({ text: "I trust it", why: "no controls" });
+    expect(a?.strong).toContain("Least privilege");
+    expect(a?.tips).toHaveLength(1);
+    expect(parseAnswer("? only a question")).toBeNull();
   });
   it("parses cards with icon, text and an optional risk", () => {
     expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a", risk: "b" });

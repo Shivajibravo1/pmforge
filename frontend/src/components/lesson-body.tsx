@@ -2,13 +2,13 @@
 import {
   AlertTriangle, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2, ChevronDown, Cloud, Code2, DollarSign, Database, Eye, FileText,
   Flag, GitBranch, Layers, Lightbulb, Link2, Lock, type LucideIcon, Map as MapIcon, Rocket, Search, Server, Settings, ShieldCheck,
-  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info, MessageCircle,
+  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info, MessageCircle, Bot, Network, KeyRound, Radar, Wrench, Siren, RotateCcw, Handshake, Cpu, Compass, Mic,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -16,6 +16,7 @@ const ICONS: Record<string, LucideIcon> = {
   alert: AlertTriangle, check: CheckCircle2, clock: Clock, money: DollarSign, layers: Layers, lock: Lock, workflow: Workflow,
   chart: BarChart3, rocket: Rocket, search: Search, file: FileText, link: Link2, settings: Settings, brain: Brain, zap: Zap,
   flag: Flag, eye: Eye, book: BookOpen, map: MapIcon, spark: Sparkles,
+  bot: Bot, network: Network, key: KeyRound, radar: Radar, wrench: Wrench, handshake: Handshake, cpu: Cpu, compass: Compass, mic: Mic,
 };
 const iconFor = (name: string): LucideIcon => ICONS[name.toLowerCase()] ?? Sparkles;
 
@@ -181,6 +182,115 @@ function Ref({ src }: { src: string }) {
   );
 }
 
+const BRANCH_TONES = ["border-lime", "border-violet", "border-white/60", "border-lime/60", "border-violet/60", "border-white/30"];
+
+function MindMap({ src }: { src: string }) {
+  const { centre, branches } = parseMindmap(src);
+  return (
+    <figure className="my-6 rounded-2xl border border-line bg-surface2 p-4" aria-label="Mind map">
+      {centre && <div className="mx-auto mb-4 w-fit max-w-full rounded-full border-2 border-lime bg-violet px-5 py-2 text-center text-sm font-bold text-white">{centre}</div>}
+      <ul className="grid gap-3 sm:grid-cols-2" style={{ listStyle: "none", paddingLeft: 0 }}>
+        {branches.map((b, i) => (
+          <li key={i} className={`rounded-xl border-l-4 bg-black p-3 ${BRANCH_TONES[i % BRANCH_TONES.length]}`}>
+            <p className="text-sm font-semibold text-white">{b.name}</p>
+            <ul className="mt-2 flex flex-wrap gap-2" style={{ listStyle: "none", paddingLeft: 0 }}>
+              {b.children.map((c, j) => <li key={j} className="rounded-full border border-line px-3 py-1 text-xs text-muted">{c}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </figure>
+  );
+}
+
+function Flashcards({ src }: { src: string }) {
+  const deck = parseFlashcards(src);
+  const [queue, setQueue] = useState(() => deck.map((_, i) => i));
+  const [flipped, setFlipped] = useState(false);
+  const [known, setKnown] = useState(0);
+  if (deck.length === 0) return null;
+  if (queue.length === 0) {
+    return (
+      <div className="my-6 rounded-2xl border border-lime/60 bg-surface2 p-4 text-center" role="status">
+        <p className="font-semibold text-white">Deck complete. You knew {known} of {deck.length} first time or after review.</p>
+        <button type="button" onClick={() => { setQueue(deck.map((_, i) => i)); setKnown(0); setFlipped(false); }}
+          className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 text-sm text-white"><RotateCcw aria-hidden className="h-4 w-4" />Restart deck</button>
+      </div>
+    );
+  }
+  const card = deck[queue[0]];
+  const next = (gotIt: boolean) => {
+    setFlipped(false);
+    setQueue((q) => (gotIt ? q.slice(1) : [...q.slice(1), q[0]]));
+    if (gotIt) setKnown((k) => k + 1);
+  };
+  return (
+    <section className="my-6 rounded-2xl border border-violet/60 bg-surface2 p-4" aria-label="Flashcards">
+      <p className="text-xs font-semibold uppercase tracking-wide text-lime">Flashcards, {queue.length} left</p>
+      <button type="button" onClick={() => setFlipped((f) => !f)} aria-pressed={flipped}
+        className="mt-3 flex min-h-32 w-full flex-col items-center justify-center rounded-xl border border-line bg-black p-4 text-center text-white">
+        <span className="text-xs uppercase tracking-wide text-muted">{flipped ? "Answer" : "Question, tap to flip"}</span>
+        <span className="mt-2 text-base font-semibold">{flipped ? card.back : card.front}</span>
+      </button>
+      {flipped && (
+        <div className="mt-3 flex gap-3">
+          <button type="button" onClick={() => next(true)} className="min-h-11 flex-1 rounded-xl bg-lime px-4 text-sm font-semibold text-black">Got it</button>
+          <button type="button" onClick={() => next(false)} className="min-h-11 flex-1 rounded-xl border border-line px-4 text-sm text-white">Review again</button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+const INCIDENT_TONE: Record<string, string> = {
+  info: "bg-white/10 text-white", bad: "bg-red-500/20 text-white", warn: "bg-amber-400/20 text-white", ok: "bg-lime/20 text-white",
+};
+
+function Incident({ src }: { src: string }) {
+  const { title, rows } = parseIncident(src);
+  return (
+    <section className="my-6 rounded-2xl border border-violet/60 bg-surface2 p-4" aria-label="Incident and resolution">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Siren aria-hidden className="h-4 w-4" />Incident and resolution</p>
+      {title && <p className="mt-1 text-base font-bold text-white">{title}</p>}
+      <dl className="mt-3 space-y-2">
+        {rows.map((r, i) => (
+          <div key={i} className={`rounded-xl p-3 ${INCIDENT_TONE[r.tone]}`}>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-lime">{r.label}</dt>
+            <dd className="mt-1 text-sm">{r.text}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function AnswerBlock({ src }: { src: string }) {
+  const a = parseAnswer(src);
+  if (!a) return null;
+  return (
+    <section className="my-6 space-y-3 rounded-2xl border border-lime/60 bg-surface2 p-4" aria-label="Interview answer">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Mic aria-hidden className="h-4 w-4" />Interview answer</p>
+      <p className="text-base font-semibold text-white">{a.question}</p>
+      {a.weak.map((w, i) => (
+        <div key={i} className="flex gap-2 rounded-xl border border-line bg-black p-3">
+          <XCircle aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+          <p className="text-sm text-white"><span className="block text-xs font-semibold uppercase tracking-wide text-muted">Weak answer</span>{w.text}{w.why && <span className="mt-1 block text-muted">Why it loses marks: {w.why}</span>}</p>
+        </div>
+      ))}
+      <div className="flex gap-2 rounded-xl border border-lime/60 bg-black p-3">
+        <CheckCircle2 aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-lime" />
+        <p className="text-sm text-white"><span className="block text-xs font-semibold uppercase tracking-wide text-lime">Strong answer</span>{a.strong}</p>
+      </div>
+      {a.tips.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-lime">Tailor it</p>
+          <ul className="mt-1 list-disc pl-5 text-sm text-muted">{a.tips.map((t, i) => <li key={i}>{t}</li>)}</ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function Quote({ src }: { src: string }) {
   return (
     <div className="my-6 space-y-3 border-l-4 border-lime bg-surface2 p-4" role="group" aria-label="Workplace messages">
@@ -333,6 +443,10 @@ function renderBlock(kind: BlockKind, src: string): ReactNode {
     case "quiz": return <Quiz src={src} />;
     case "accordion": return <Accordion src={src} />;
     case "ref": return <Ref src={src} />;
+    case "mindmap": return <MindMap src={src} />;
+    case "flashcards": return <Flashcards src={src} />;
+    case "incident": return <Incident src={src} />;
+    case "answer": return <AnswerBlock src={src} />;
     default: return <Callout kind={kind} src={src} />;
   }
 }

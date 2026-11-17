@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref";
-export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref"];
+export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref" | "mindmap" | "flashcards" | "incident" | "answer";
+export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -45,6 +45,56 @@ export function parseRef(src: string) {
     const [framework, where = "", ...rest] = cells(l);
     return { framework, where, use: rest.join(" | ") };
   });
+}
+
+/** Mind map. First line `# Centre`, then `Branch | child, child, child`. */
+export function parseMindmap(src: string) {
+  const ls = lines(src);
+  const centre = ls[0]?.startsWith("#") ? ls.shift()!.replace(/^#\s*/, "") : "";
+  const branches = ls.map((l) => {
+    const [name, ...rest] = cells(l);
+    return { name, children: rest.join(" | ").split(",").map((x) => x.trim()).filter(Boolean) };
+  });
+  return { centre, branches };
+}
+
+/** Flashcards. Each line is `Front | Back`. */
+export function parseFlashcards(src: string) {
+  return lines(src).map((l) => {
+    const [front, ...rest] = cells(l);
+    return { front, back: rest.join(" | ") };
+  });
+}
+
+export type IncidentTone = "info" | "bad" | "warn" | "ok";
+
+/** Incident write-up. First line `# Title (illustrative)`, then `Label | text` rows such as What happened, Impact, Root cause, Resolution, PM move. */
+export function parseIncident(src: string) {
+  const ls = lines(src);
+  const title = ls[0]?.startsWith("#") ? ls.shift()!.replace(/^#\s*/, "") : "";
+  const rows = ls.map((l) => {
+    const [label, ...rest] = cells(l);
+    const k = label.toLowerCase();
+    const tone: IncidentTone = k.startsWith("impact") ? "bad" : k.startsWith("root") || k.startsWith("signal") ? "warn" : k.startsWith("resol") || k.startsWith("pm") || k.startsWith("lesson") ? "ok" : "info";
+    return { label, text: rest.join(" | "), tone };
+  });
+  return { title, rows };
+}
+
+export type Answer = { question: string; weak: { text: string; why: string }[]; strong: string; tips: string[] };
+
+/** Interview answer. `? question`, `- weak answer | why it loses marks`, `+ strong answer`, `= tailoring tip` (repeatable). Needs a question and a strong answer. */
+export function parseAnswer(src: string): Answer | null {
+  const ls = lines(src);
+  const question = ls.find((l) => l.startsWith("?"))?.slice(1).trim();
+  const strong = ls.find((l) => l.startsWith("+"))?.slice(1).trim();
+  if (!question || !strong) return null;
+  const weak = ls.filter((l) => l.startsWith("-")).map((l) => {
+    const [text, ...rest] = cells(l.slice(1));
+    return { text, why: rest.join(" | ") };
+  });
+  const tips = ls.filter((l) => l.startsWith("=")).map((l) => l.slice(1).trim());
+  return { question, weak, strong, tips };
 }
 
 export type Quiz = { question: string; options: { text: string; correct: boolean }[]; explain: string };

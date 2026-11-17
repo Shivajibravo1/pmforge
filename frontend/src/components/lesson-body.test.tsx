@@ -59,4 +59,32 @@ describe("rich blocks", () => {
     expect(screen.getByText("NIST")).toBeTruthy();
     expect(screen.getByText(/Use it to frame accountability/)).toBeTruthy();
   });
+  it("renders mind map, incident and interview answer blocks", () => {
+    const body = [
+      "```mindmap\n# Agentic AI\nRoles | FDE, Harness engineer\n```",
+      "```incident\n# Agent deleted data (illustrative)\nWhat happened | It ran a delete\nResolution | Restore from backup\n```",
+      "```answer\n? How do you govern an agent?\n- I trust it | no controls\n+ Least privilege and human approval.\n= Mention the customer site for FDE roles.\n```",
+    ].join("\n\n");
+    render(<LessonBody body={body} />);
+    expect(screen.getByLabelText("Mind map")).toBeTruthy();
+    expect(screen.getByText("Harness engineer")).toBeTruthy();
+    expect(screen.getByText(/Agent deleted data/)).toBeTruthy();
+    expect(screen.getByText("Resolution")).toBeTruthy();
+    expect(screen.getByText(/Least privilege and human approval/)).toBeTruthy();
+    expect(screen.getByText(/Mention the customer site/)).toBeTruthy();
+  });
+  it("flashcards flip, repeat missed cards and finish", () => {
+    render(<LessonBody body={"```flashcards\nFront A | Back A\nFront B | Back B\n```"} />);
+    expect(screen.getByText("Front A")).toBeTruthy();
+    fireEvent.click(screen.getByText("Front A"));
+    expect(screen.getByText("Back A")).toBeTruthy();
+    fireEvent.click(screen.getByText("Review again"));
+    expect(screen.getByText("Front B")).toBeTruthy();
+    fireEvent.click(screen.getByText("Front B"));
+    fireEvent.click(screen.getByText("Got it"));
+    expect(screen.getByText("Front A")).toBeTruthy();
+    fireEvent.click(screen.getByText("Front A"));
+    fireEvent.click(screen.getByText("Got it"));
+    expect(screen.getByRole("status").textContent).toContain("Deck complete");
+  });
 });

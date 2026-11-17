@@ -3,7 +3,7 @@ import re
 
 from app.content import days, get_day, lesson_body
 
-KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref"}
+KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -138,3 +138,45 @@ def test_every_lesson_has_a_reference_card():
     """Standing requirement: each lesson carries framework references and interview tips."""
     for n in written():
         assert any(k == "ref" for k, _ in blocks(n)), f"day {n}: add a ref block with PMI, ITIL, NIST, CIS, OWASP or ISO pointers"
+
+
+PILOT_KIT_DAYS = [8, 47, 54, 68, 75, 91, 92, 98, 108, 114]
+
+
+def _lines(src: str) -> list[str]:
+    return [x.strip() for x in src.splitlines() if x.strip()]
+
+
+def test_modern_kit_blocks_are_well_formed():
+    for n in written():
+        for kind, src in blocks(n):
+            ls = _lines(src)
+            if kind == "mindmap":
+                assert ls[0].startswith("# "), f"day {n}: mindmap needs a centre line"
+                assert len(ls) >= 4, f"day {n}: mindmap needs three or more branches"
+                for row in ls[1:]:
+                    name, _, kids = row.partition("|")
+                    assert name.strip() and len([k for k in kids.split(",") if k.strip()]) >= 2, f"day {n}: mindmap branch: {row}"
+            if kind == "flashcards":
+                assert len(ls) >= 3, f"day {n}: flashcards need three or more cards"
+                assert all(row.count("|") >= 1 and all(c.strip() for c in row.split("|", 1)) for row in ls), f"day {n}: flashcard needs Front | Back"
+            if kind == "incident":
+                assert ls[0].startswith("# "), f"day {n}: incident needs a title"
+                title = ls[0].lower()
+                assert "illustrative" in title or title.startswith("# real case"), f"day {n}: label the incident illustrative or real case"
+                labels = [row.split("|")[0].strip().lower() for row in ls[1:]]
+                for need in ("what happened", "impact", "root cause", "resolution"):
+                    assert need in labels, f"day {n}: incident needs a {need} row"
+                assert any(x.startswith(("pm move", "lesson")) for x in labels), f"day {n}: incident needs a PM move or Lesson row"
+            if kind == "answer":
+                assert sum(row.startswith("?") for row in ls) == 1, f"day {n}: answer needs one question"
+                assert sum(row.startswith("+") for row in ls) == 1, f"day {n}: answer needs one strong answer"
+                assert any(row.startswith("-") and "|" in row for row in ls), f"day {n}: answer needs a weak answer with why"
+                assert any(row.startswith("=") for row in ls), f"day {n}: answer needs a tailoring tip"
+
+
+def test_pilot_lessons_carry_the_modern_team_kit():
+    for n in PILOT_KIT_DAYS:
+        kinds = {k for k, _ in blocks(n)}
+        missing = {"mindmap", "flashcards", "incident", "answer"} - kinds
+        assert not missing, f"day {n}: add {sorted(missing)}"
