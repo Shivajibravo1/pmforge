@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Card, Notice } from "@/components/ui";
@@ -45,6 +46,10 @@ export default function SignIn() {
             <input id="email" type="email" required maxLength={254} autoComplete="email" className={input} value={email}
               onChange={(e) => setEmail(e.target.value)} />
             <Button type="submit" variant="lime" disabled={busy} className="w-full">Email me a code</Button>
+            <p className="text-xs text-muted">
+              By continuing you agree to the <Link href="/terms" className="underline">Terms</Link> and the{" "}
+              <Link href="/privacy" className="underline">Privacy Policy</Link>.
+            </p>
           </form>
         ) : (
           <form onSubmit={verify} className="space-y-4">

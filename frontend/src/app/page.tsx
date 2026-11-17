@@ -6,6 +6,7 @@ import { MentorPreview } from "@/components/landing/mentor-preview";
 import { PhoneToday } from "@/components/landing/phone";
 import { Pricing } from "@/components/landing/pricing";
 import { Gates, Pressure, Reality, Segments } from "@/components/landing/sections";
+import { SiteFooter } from "@/components/landing/footer";
 import { FREE_DAYS, TOTAL_DAYS, countryFromHeaders, currencyForCountry } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -145,25 +146,31 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">07 · Founder&apos;s note</p>
-          <Card className="mt-3 max-w-3xl">
-            <p className="text-sm leading-relaxed text-muted">
-              I served in the Indian Navy from 2007 to 2022, where I started digital transformation projects and platform
-              enhancements, and I now manage IT projects in industry as a PMP-certified project manager. PMForge is the
-              course I wanted when I moved from one world to the other: build real artifacts, get honest review, and keep
-              proof of the work.
-            </p>
-            <p className="mt-3 text-sm font-semibold">Shivaji, founder</p>
-            <p className="mt-3 text-xs text-muted">
-              PMForge is new. There are no testimonials here yet, and we will not invent any.
-            </p>
-          </Card>
+          <p className="text-sm font-medium text-lime">07 · Our ambition</p>
+          <h2 className="mt-2 max-w-3xl text-3xl font-bold">Make every IT project manager AI-ready, with proof to show for it.</h2>
+          <p className="mt-4 max-w-3xl text-muted">
+            AI is now part of how IT projects are justified, funded, secured and audited. PMForge exists so that a project
+            manager can walk into that conversation with real artifacts, not just a certificate: a charter, a cost model, a
+            risk register, a governance pack. We are building the most practical, evidence-based path from basic IT delivery
+            to AI-enabled programs, and we hold ourselves to the standard we teach.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              ["Practical", "Every day ends in an artifact a sponsor would recognise, not a quiz score."],
+              ["Honest", "Cited numbers, labelled forecasts and no invented testimonials."],
+              ["Secure by design", "One-time email codes, rate limits and filtered AI inputs from day one."],
+            ].map(([t, d]) => (
+              <Card key={t}><h3 className="font-semibold">{t}</h3><p className="mt-2 text-sm text-muted">{d}</p></Card>
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-muted">Built by a practising, PMP-certified IT project manager.</p>
+          <p className="mt-1 text-xs text-muted">PMForge is new. There are no testimonials here yet, and we will not invent any.</p>
         </section>
 
         <section id="pricing" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
           <p className="text-sm font-medium text-lime">08 · Pricing</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Start free. Upgrade when you want all {TOTAL_DAYS} days.</h2>
-          <Pricing currency={currency} />
+          <Pricing initialCurrency={currency} />
         </section>
 
         <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-20 px-5 py-12">
@@ -191,12 +198,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-sm text-muted">
-          <span>PMForge</span>
-          <Link href="/sign-in" className="hover:text-white">Sign in</Link>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-black/95 p-3 backdrop-blur sm:hidden">
         <div className="flex items-center justify-between gap-3">
