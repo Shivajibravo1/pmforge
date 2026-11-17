@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import { Badge, Card, LoadError, Spinner } from "@/components/ui";
-import { type Curriculum, type Progress, TYPE_LABEL, useApi } from "@/lib/api";
+import { type Curriculum, type Me, type Progress, TYPE_LABEL, useApi } from "@/lib/api";
 
 export default function Course() {
   const cur = useApi<Curriculum>("/api/v1/curriculum");
   const prog = useApi<Progress>("/api/v1/progress");
+  const me = useApi<Me>("/api/v1/me");
   const failed = cur.error ?? prog.error;
   if (failed) return <LoadError status={failed.status} onRetry={() => { cur.reload(); prog.reload(); }} />;
   if (!cur.data || !prog.data) return <Spinner />;
@@ -29,7 +30,7 @@ export default function Course() {
                   <h3 className="mb-3 text-sm font-semibold text-lime">{ph}</h3>
                   <ul className="space-y-1">
                     {lv.days.filter((d) => d.phase === ph).map((d) => {
-                      const unlocked = d.day === 1 || done.has(d.day - 1) || done.has(d.day);
+                      const unlocked = me.data?.role === "admin" || d.day === 1 || done.has(d.day - 1) || done.has(d.day);
                       const free = d.day <= cur.data!.free_lessons;
                       return (
                         <li key={d.day}>

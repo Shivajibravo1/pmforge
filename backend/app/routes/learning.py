@@ -22,6 +22,8 @@ def require_access(day: int, user: User, done: set[int], settings: Settings) -> 
     meta = content.get_day(day)
     if meta is None:
         raise HTTPException(404, "Lesson not found")
+    if user.role == "admin":
+        return meta  # admins (set by ADMIN_EMAILS) can open any lesson to review the course
     if user.tier == "free" and day > settings.free_lessons:
         raise HTTPException(402, "upgrade_required")
     if day > 1 and (day - 1) not in done and day not in done:

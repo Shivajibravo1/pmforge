@@ -76,6 +76,13 @@ def test_free_tier_stops_after_free_lessons(client):
     assert client.get("/api/v1/lessons/11", headers=h).status_code == 200
 
 
+def test_admin_can_open_any_lesson_without_paying_or_finishing_earlier_days(client):
+    admin = auth("a2", "admin@example.com")
+    assert client.get("/api/v1/me", headers=admin).json()["role"] == "admin"
+    assert client.get("/api/v1/lessons/60", headers=admin).status_code == 200
+    assert client.get("/api/v1/lessons/60", headers=auth("u9", "learner@example.com")).status_code in (402, 409)
+
+
 # ---- mentor ----
 def _artifact(client, h, day=5):
     complete(client, h, day - 1)
