@@ -7,7 +7,7 @@ import { PhoneToday } from "@/components/landing/phone";
 import { Pricing } from "@/components/landing/pricing";
 import { Gates, Pressure, Reality, Segments } from "@/components/landing/sections";
 import { SiteFooter } from "@/components/landing/footer";
-import { FREE_DAYS, TOTAL_DAYS, countryFromHeaders, currencyForCountry } from "@/lib/pricing";
+import { FREE_DAYS, TOTAL_DAYS, countryFromHeaders, resolveCurrency } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "PMForge: build proof, not notes",
@@ -41,7 +41,7 @@ const faqs = [
 ];
 
 export default async function Home() {
-  const currency = currencyForCountry(countryFromHeaders(await headers()));
+  const currency = resolveCurrency(countryFromHeaders(await headers()));
 
   return (
     <div className="pb-24 sm:pb-0">

@@ -1,3 +1,4 @@
+import { FREE_DAYS } from "./pricing";
 /** Gamification rules. XP total across the 120-day curriculum is 2,650. */
 export type Form = { tier: number; name: string; title: string; minXp: number; blurb: string };
 
@@ -36,7 +37,7 @@ export function badges(p: { completed: number[]; streak: number; total_xp: numbe
   const range = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i).every((d) => done.has(d));
   return [
     { id: "first", label: "First step", hint: "Complete 1 lesson", icon: "flag", earned: done.size >= 1 },
-    { id: "free", label: "Free tier done", hint: "Complete Days 1 to 10", icon: "check", earned: range(1, 10) },
+    { id: "free", label: "Free tier done", hint: `Complete Days 1 to ${FREE_DAYS}`, icon: "check", earned: range(1, FREE_DAYS) },
     { id: "streak3", label: "3 day streak", hint: "Learn 3 days in a row", icon: "zap", earned: p.streak >= 3 },
     { id: "streak7", label: "7 day streak", hint: "Learn 7 days in a row", icon: "zap", earned: p.streak >= 7 },
     { id: "l1", label: "Foundations", hint: "Finish Level 1", icon: "book", earned: range(1, 30) },

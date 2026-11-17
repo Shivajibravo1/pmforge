@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { PLANS, countryFromHeaders, currencyForCountry, formatAmount } from "./pricing";
+import {
+  FREE_DAYS,
+  PLANS,
+  availableCurrencies,
+  countryFromHeaders,
+  currencyForCountry,
+  formatAmount,
+  resolveCurrency,
+  yearlySavingsPercent,
+  type Plan,
+} from "./pricing";
 
 const headers = (init: Record<string, string>) => new Headers(init);
 
@@ -17,25 +27,52 @@ describe("countryFromHeaders", () => {
   });
 });
 
-describe("currencyForCountry", () => {
-  it("uses rupees for India and dollars elsewhere or when unknown", () => {
+describe("currency choice", () => {
+  it("prefers rupees for India and dollars elsewhere or when unknown", () => {
     expect(currencyForCountry("IN")).toBe("INR");
     expect(currencyForCountry("US")).toBe("USD");
     expect(currencyForCountry(null)).toBe("USD");
   });
-});
-
-describe("formatAmount", () => {
-  it("formats each currency", () => {
-    expect(formatAmount(0, "USD")).toBe("$0");
-    expect(formatAmount(1499, "INR")).toContain("1,499");
+  it("offers only currencies where every plan has a price", () => {
+    expect(availableCurrencies()).toEqual(["INR", "USD"]);
+  });
+  it("resolves rupees for India and dollars elsewhere", () => {
+    expect(resolveCurrency("IN")).toBe("INR");
+    expect(resolveCurrency("US")).toBe("USD");
+    expect(resolveCurrency(null)).toBe("USD");
+  });
+  it("falls back to dollars when a currency has no complete price list", () => {
+    const noInr: Plan[] = PLANS.map((p) => ({ ...p, amounts: { INR: p.id === "free" ? 0 : null, USD: p.amounts.USD } }));
+    expect(resolveCurrency("IN", noInr)).toBe("USD");
   });
 });
 
-describe("plans", () => {
-  it("never shows an invented amount for paid plans", () => {
+describe("prices", () => {
+  it("matches the approved prices", () => {
+    const m = PLANS.find((p) => p.id === "monthly")!.amounts;
+    const y = PLANS.find((p) => p.id === "yearly")!.amounts;
+    expect([m.INR, y.INR]).toEqual([699, 3499]);
+    expect([m.USD, y.USD]).toEqual([7.49, 36.99]);
+  });
+  it("never holds a zero or negative paid amount", () => {
     for (const p of PLANS.filter((x) => x.id !== "free")) {
-      expect(p.amounts === null || (p.amounts.INR > 0 && p.amounts.USD > 0)).toBe(true);
+      for (const v of Object.values(p.amounts)) expect(v === null || v > 0).toBe(true);
     }
+  });
+  it("computes the yearly saving from the prices", () => {
+    expect(yearlySavingsPercent("INR")).toBe(58);
+    expect(yearlySavingsPercent("USD")).toBe(59);
+  });
+  it("formats amounts", () => {
+    expect(formatAmount(0, "USD")).toBe("$0");
+    expect(formatAmount(7.49, "USD")).toBe("$7.49");
+    expect(formatAmount(36.99, "USD")).toBe("$36.99");
+    expect(formatAmount(3499, "INR")).toContain("3,499");
+  });
+});
+
+describe("free tier", () => {
+  it("is 7 days", () => {
+    expect(FREE_DAYS).toBe(7);
   });
 });

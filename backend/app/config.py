@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     max_output_chars: int = 2000
 
     # Product rules (Requirement Baseline v1.1).
-    free_lessons: int = 10
+    free_lessons: int = 7
 
     @property
     def cors_list(self) -> list[str]:

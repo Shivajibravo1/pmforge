@@ -2,7 +2,7 @@ import { TOTAL_DAYS } from "./pricing";
 
 /** Single source of truth for policy facts that appear on more than one page. */
 export const LEGAL_UPDATED = "18 November 2026";
-export const CONTACT_EMAIL = "aishivajibravo@gmail.com";
+export const CONTACT_EMAIL = "contact.pmforge@gmail.com";
 export const REFUND_WINDOW_DAYS = 7;
 export const REFUND_COMPLETION_PERCENT = 30;
 /** Lessons at or above which a refund is no longer available (30% of the program). */

@@ -8,7 +8,7 @@ import {
   REFUND_RESPONSE_BUSINESS_DAYS,
   REFUND_WINDOW_DAYS,
 } from "@/lib/legal";
-import { TOTAL_DAYS } from "@/lib/pricing";
+import { FREE_DAYS, TOTAL_DAYS } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Refund Policy | PMForge",
@@ -30,7 +30,7 @@ export default function Refund() {
               A refund is <strong>not available</strong> if you have completed <strong>{REFUND_COMPLETION_PERCENT}% or more</strong> of the
               program, which is {REFUND_LESSON_THRESHOLD} or more of the {TOTAL_DAYS} lessons.
             </>,
-            "Days 1 to 10 are free, so you can try the start of the program before you pay.",
+            `Days 1 to ${FREE_DAYS} are free, so you can try the start of the program before you pay.`,
           ]}
         />
       </Section>
