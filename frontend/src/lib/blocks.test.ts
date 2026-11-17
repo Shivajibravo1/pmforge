@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseLens } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
@@ -86,5 +86,13 @@ describe("story blocks", () => {
   it("estimates reading time", () => {
     expect(readMinutes("word ".repeat(360))).toBe(2);
     expect(readMinutes("")).toBe(1);
+  });
+});
+
+describe("parseLens", () => {
+  it("parses structured rows and rejects the old free text form", () => {
+    const rows = parseLens("Shift | AI changes this\nUse AI to | draft\nKeep human | decide\nRisk | leakage");
+    expect(rows?.map((r) => r.label)).toEqual(["Shift", "Use AI to", "Keep human", "Risk"]);
+    expect(parseLens("Just two lines of advice about AI.")).toBeNull();
   });
 });

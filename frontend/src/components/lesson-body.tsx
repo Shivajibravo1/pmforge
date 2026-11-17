@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseLens,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -88,6 +88,36 @@ function Callout({ kind, src }: { kind: string; src: string }) {
       <Icon aria-hidden className="mt-0.5 h-5 w-5 shrink-0 text-lime" />
       <div><p className="text-xs font-semibold uppercase tracking-wide text-lime">{label}</p><p className="mt-1 text-sm leading-relaxed text-white">{src.trim()}</p></div>
     </aside>
+  );
+}
+
+const LENS_STYLE: Record<string, { Icon: LucideIcon; cls: string }> = {
+  shift: { Icon: Compass, cls: "text-lime" },
+  example: { Icon: Lightbulb, cls: "text-lime" },
+  use: { Icon: Sparkles, cls: "text-lime" },
+  keep: { Icon: Users, cls: "text-white" },
+  risk: { Icon: AlertTriangle, cls: "text-white" },
+  control: { Icon: ShieldCheck, cls: "text-lime" },
+  interview: { Icon: Mic, cls: "text-lime" },
+};
+
+function AiLens({ rows }: { rows: { label: string; text: string }[] }) {
+  return (
+    <section aria-label="AI lens" className="my-6 rounded-2xl border border-violet bg-gradient-to-br from-violet/30 to-lime/10 p-4">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Sparkles aria-hidden className="h-4 w-4" />AI lens</p>
+      <dl className="mt-3 space-y-3">
+        {rows.map((r) => {
+          const key = Object.keys(LENS_STYLE).find((k) => r.label.toLowerCase().startsWith(k)) ?? "shift";
+          const { Icon, cls } = LENS_STYLE[key];
+          return (
+            <div key={r.label} className="flex gap-3">
+              <Icon aria-hidden className={`mt-0.5 h-4 w-4 shrink-0 ${cls}`} />
+              <div><dt className="text-xs font-semibold uppercase tracking-wide text-muted">{r.label}</dt><dd className="mt-0.5 text-sm leading-relaxed text-white">{r.text}</dd></div>
+            </div>
+          );
+        })}
+      </dl>
+    </section>
   );
 }
 
@@ -447,6 +477,10 @@ function renderBlock(kind: BlockKind, src: string): ReactNode {
     case "flashcards": return <Flashcards src={src} />;
     case "incident": return <Incident src={src} />;
     case "answer": return <AnswerBlock src={src} />;
+    case "ai": {
+      const rows = parseLens(src);
+      return rows ? <AiLens rows={rows} /> : <Callout kind={kind} src={src} />;
+    }
     default: return <Callout kind={kind} src={src} />;
   }
 }

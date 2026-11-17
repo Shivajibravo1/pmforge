@@ -34,7 +34,8 @@ One `## ` heading is one screen (6 to 12 screens). Blocks are fenced code blocks
 | `timeline` | `When \| What happened \| ok/warn/bad/info` | how events unfold |
 | `rag` | `Area \| R or A or G \| note` | project health tiles |
 | `decision` | `? situation`, `- option \| result`, `+ best option \| result`, `= senior PM take` | exactly one `+`; every option states its consequence |
-| `tip` `note` `warn` `key` `ai` | free text | callouts; `ai` is the AI lens |
+| `tip` `note` `warn` `key` | free text | callouts |
+| `ai` | `Shift`, `Example (illustrative)`, `Use AI to`, `Keep human`, `Risk`, `Control`, `Interview line` rows | structured AI lens, one per lesson, 100+ words; enforced by test |
 | `journal` | prompt text | learner writes, optional AI feedback |
 | `ref` | `Source \| where to look \| how to use it` | framework reference and interview prep; 3 fields per line |
 | `mindmap` | `# Centre`, then `Branch \| child, child` | 3 or more branches, each with 2 or more children |

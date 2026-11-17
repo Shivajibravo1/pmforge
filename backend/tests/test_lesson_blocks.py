@@ -180,3 +180,16 @@ def test_pilot_lessons_carry_the_modern_team_kit():
         kinds = {k for k, _ in blocks(n)}
         missing = {"mindmap", "flashcards", "incident", "answer"} - kinds
         assert not missing, f"day {n}: add {sorted(missing)}"
+
+
+AI_LENS_LABELS = ["Shift", "Example (illustrative)", "Use AI to", "Keep human", "Risk", "Control", "Interview line"]
+
+
+def test_every_ai_lens_is_structured_and_substantial():
+    for n in written():
+        lens = [src for kind, src in blocks(n) if kind == "ai"]
+        assert lens, f"day {n}: missing ai lens"
+        rows = _lines(lens[0])
+        assert [r.split("|")[0].strip() for r in rows] == AI_LENS_LABELS, f"day {n}: ai lens rows"
+        assert all(len(r.split("|", 1)[1].split()) >= 6 for r in rows), f"day {n}: ai lens row too thin"
+        assert len(lens[0].split()) >= 100, f"day {n}: ai lens too short"

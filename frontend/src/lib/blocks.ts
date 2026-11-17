@@ -81,6 +81,17 @@ export function parseIncident(src: string) {
   return { title, rows };
 }
 
+export type LensRow = { label: string; text: string };
+
+/** Structured AI lens. `Label | text` rows (Shift, Use AI to, Keep human, Risk, Control, Interview line). Returns null for the old free text form. */
+export function parseLens(src: string): LensRow[] | null {
+  const rows = lines(src).filter((l) => l.includes("|")).map((l) => {
+    const [label, ...rest] = cells(l);
+    return { label, text: rest.join(" | ") };
+  }).filter((r) => r.label && r.text);
+  return rows.length >= 3 ? rows : null;
+}
+
 export type Answer = { question: string; weak: { text: string; why: string }[]; strong: string; tips: string[] };
 
 /** Interview answer. `? question`, `- weak answer | why it loses marks`, `+ strong answer`, `= tailoring tip` (repeatable). Needs a question and a strong answer. */

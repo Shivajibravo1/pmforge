@@ -88,3 +88,15 @@ describe("rich blocks", () => {
     expect(screen.getByRole("status").textContent).toContain("Deck complete");
   });
 });
+
+describe("AI lens", () => {
+  afterEach(cleanup);
+  it("renders structured rows as a labelled panel and keeps the old text form", () => {
+    render(<LessonBody body={"```ai\nShift | AI drafts faster.\nExample (illustrative) | A PM checks a draft.\nKeep human | The decision.\nRisk | A wrong answer.\n```"} />);
+    expect(screen.getByLabelText("AI lens")).toBeTruthy();
+    expect(screen.getByText("Keep human")).toBeTruthy();
+    cleanup();
+    render(<LessonBody body={"```ai\nJust a short note.\n```"} />);
+    expect(screen.getByText("Just a short note.")).toBeTruthy();
+  });
+});
