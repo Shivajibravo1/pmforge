@@ -5,6 +5,7 @@ import { LinkButton, Card } from "@/components/ui";
 import { MentorPreview } from "@/components/landing/mentor-preview";
 import { PhoneToday } from "@/components/landing/phone";
 import { Pricing } from "@/components/landing/pricing";
+import { Gates, Pressure, Reality, Segments } from "@/components/landing/sections";
 import { FREE_DAYS, TOTAL_DAYS, countryFromHeaders, currencyForCountry } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -33,6 +34,8 @@ const faqs = [
   ["How does sign-in work?", "You enter your email and we send a one-time 6-digit code. There is no password to create, reuse or leak. Codes expire after 5 minutes and allow only a few attempts."],
   ["Is the mentor a person?", "No. The mentor is an AI that reviews your work against a rubric. It can be wrong, so verify important answers, and never paste passwords, personal data or confidential client information."],
   ["Do I get proof of my work?", "Yes. Each level ends with an assessment and certificate, and your portfolio can be shared through a public link. Certificates can be checked through a verification page."],
+  ["Does PMForge cover AI security, cost and compliance?", "Yes. Level 4 covers AI business cases, evals, cost models, risk registers, NIST AI Risk Management Framework, ISO/IEC 42001, the EU AI Act and LLM security. Level 3 covers cloud cost, DevSecOps and compliance."],
+  ["Is this legal or financial advice?", "No. PMForge teaches project management practice. Check regulation and contracts with a qualified professional."],
   ["How long does it take?", `The program is ${TOTAL_DAYS} days in 4 levels of 30 days. Each level includes a buffer day for catching up.`],
 ];
 
@@ -63,11 +66,11 @@ export default async function Home() {
           <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-[1.2fr_1fr] md:py-24">
             <div>
               <p className="mb-3 text-sm font-medium text-lime">{TOTAL_DAYS} days · for working IT project managers</p>
-              <h1 className="text-4xl font-bold leading-tight sm:text-6xl">Build proof, not notes.</h1>
+              <h1 className="text-4xl font-bold leading-tight sm:text-5xl">Every IT project now has an AI question. Can you answer it?</h1>
               <p className="mt-5 max-w-xl text-lg text-muted">
-                Every day you ship a real project artifact and get an AI mentor review against a rubric. You finish with a
-                public portfolio and verifiable certificates that show what you can deliver, from basic IT projects to
-                AI-enabled programs.
+                Build proof, not notes. Every day you ship a real project artifact and get an AI mentor review against a
+                rubric, from basic IT delivery to AI-enabled programs that must stay secure, affordable and compliant. You
+                finish with a public portfolio and verifiable certificates.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <LinkButton href="/sign-in" variant="lime">Start free</LinkButton>
@@ -80,30 +83,31 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">01 · The problem</p>
-          <h2 className="mt-2 max-w-3xl text-3xl font-bold">Most PM courses end with a certificate and nothing to show.</h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <Card>
-              <h3 className="font-semibold text-muted">Typical video course</h3>
-              <ul className="mt-3 space-y-2 text-sm text-muted">
-                <li>Watch lectures, take notes</li>
-                <li>Generic examples with no IT delivery context</li>
-                <li>A completion badge, no work you can show</li>
-              </ul>
-            </Card>
-            <Card className="border-violet">
-              <h3 className="font-semibold">PMForge</h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li>Build a real artifact every working day</li>
-                <li>IT project scenarios, from app delivery to AI programs</li>
-                <li>A public portfolio and certificates others can verify</li>
-              </ul>
-            </Card>
-          </div>
+          <p className="text-sm font-medium text-lime">01 · The AI reality</p>
+          <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">AI projects are failing on cost, value and risk. That is a project management problem.</h2>
+          <Reality />
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-5 py-12">
+          <p className="text-sm font-medium text-lime">02 · Who it is for</p>
+          <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Built for people who deliver IT projects, or want to.</h2>
+          <Segments />
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-5 py-12">
+          <p className="text-sm font-medium text-lime">03 · Four gates</p>
+          <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Every AI project must clear value, security, cost and compliance.</h2>
+          <Gates />
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-5 py-12">
+          <p className="text-sm font-medium text-lime">04 · Real pressure, rehearsed</p>
+          <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Practise the hard calls before you face them at work.</h2>
+          <Pressure />
         </section>
 
         <section id="program" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">02 · The program</p>
+          <p className="text-sm font-medium text-lime">05 · The program</p>
           <h2 className="mt-2 max-w-3xl text-3xl font-bold">Four levels, 30 days each, from basics to AI-enabled programs.</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {levels.map((l) => (
@@ -127,7 +131,7 @@ export default async function Home() {
         </section>
 
         <section id="mentor" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">03 · The mentor</p>
+          <p className="text-sm font-medium text-lime">06 · The mentor</p>
           <div className="mt-2 grid items-start gap-8 md:grid-cols-2">
             <div>
               <h2 className="text-3xl font-bold">Feedback you can act on the same day.</h2>
@@ -141,7 +145,7 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">04 · Founder&apos;s note</p>
+          <p className="text-sm font-medium text-lime">07 · Founder&apos;s note</p>
           <Card className="mt-3 max-w-3xl">
             <p className="text-sm leading-relaxed text-muted">
               I served in the Indian Navy from 2007 to 2022, where I started digital transformation projects and platform
@@ -157,13 +161,13 @@ export default async function Home() {
         </section>
 
         <section id="pricing" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">05 · Pricing</p>
+          <p className="text-sm font-medium text-lime">08 · Pricing</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Start free. Upgrade when you want all {TOTAL_DAYS} days.</h2>
           <Pricing currency={currency} />
         </section>
 
         <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">06 · Questions</p>
+          <p className="text-sm font-medium text-lime">09 · Questions</p>
           <h2 className="mt-2 mb-6 text-3xl font-bold">Frequently asked questions</h2>
           <div className="divide-y divide-line rounded-2xl border border-line bg-surface">
             {faqs.map(([q, a]) => (
