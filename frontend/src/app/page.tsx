@@ -56,7 +56,7 @@ export default async function Home() {
             <a href="#faq" className="hover:text-white">FAQ</a>
           </nav>
           <div className="flex items-center gap-2">
-            <LinkButton href="/sign-in" variant="ghost">Sign in</LinkButton>
+            <LinkButton href="/sign-in?mode=signin" variant="ghost">Sign in</LinkButton>
             <span className="hidden sm:inline"><LinkButton href="/sign-in" variant="lime">Start free</LinkButton></span>
           </div>
         </div>

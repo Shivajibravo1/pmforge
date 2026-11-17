@@ -20,6 +20,8 @@ export default function Privacy() {
           head={["Data", "Why we need it"]}
           rows={[
             ["Email address", "To create your account and send your one-time sign-in code."],
+            ["Full name", "To set up your account, personalise the app and print your name on certificates."],
+            ["Mobile number, given at enrollment (we do not verify it by SMS)", "To contact you about your account and service, and, only if you opt in, to send the WhatsApp interview bonus."],
             ["Learning progress: completed days, XP, completion dates", "To run the program, show progress and issue certificates."],
             ["Work you submit: project artifacts, and the score and feedback the AI mentor returns", "To give you reviews and build your portfolio."],
             ["Certificates: code, level, issue date", "To issue certificates and let others verify them."],

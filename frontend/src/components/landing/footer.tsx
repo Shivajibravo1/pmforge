@@ -9,7 +9,7 @@ export function SiteFooter() {
           <Link href="/terms" className="hover:text-white">Terms</Link>
           <Link href="/privacy" className="hover:text-white">Privacy</Link>
           <Link href="/refund" className="hover:text-white">Refunds</Link>
-          <Link href="/sign-in" className="hover:text-white">Sign in</Link>
+          <Link href="/sign-in?mode=signin" className="hover:text-white">Sign in</Link>
         </nav>
       </div>
     </footer>

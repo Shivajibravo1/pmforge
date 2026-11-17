@@ -9,7 +9,7 @@ export function LegalPage({ title, intro, children }: { title: string; intro: st
       <header className="border-b border-line">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-3">
           <Link href="/" className="text-xl font-bold" aria-label="PMForge home">PM<span className="text-lime">Forge</span></Link>
-          <Link href="/sign-in" className="text-sm text-muted hover:text-white">Sign in</Link>
+          <Link href="/sign-in?mode=signin" className="text-sm text-muted hover:text-white">Sign in</Link>
         </div>
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-12">

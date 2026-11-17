@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
+import { APIError } from "better-auth/api";
 import { jwt } from "better-auth/plugins/jwt";
 import { Pool } from "pg";
 import { normalizeDatabaseUrl } from "./db-url.ts";
+import { normalizeName, normalizePhone } from "./enrollment.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -59,6 +61,28 @@ export const auth = betterAuth({
   trustedOrigins: (process.env.TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
   // Explicit so rate limiting cannot depend on the NODE_ENV default. Per-IP, in memory (one app instance).
   rateLimit: { enabled: true, window: 60, max: 60 },
+  // Mobile number collected at enrollment. Stored in E.164. The server validates it, whatever the browser sent.
+  user: { additionalFields: { phone: { type: "string", required: false, input: true } } },
+  databaseHooks: {
+    user: {
+      update: {
+        before: async (data) => {
+          const next: Record<string, unknown> = { ...data };
+          if (data.name !== undefined) {
+            const name = normalizeName(String(data.name));
+            if (!name) throw new APIError("BAD_REQUEST", { message: "Invalid name" });
+            next.name = name;
+          }
+          if (data.phone !== undefined) {
+            const phone = normalizePhone(String(data.phone));
+            if (!phone) throw new APIError("BAD_REQUEST", { message: "Invalid mobile number" });
+            next.phone = phone;
+          }
+          return { data: next };
+        },
+      },
+    },
+  },
   plugins: [
     emailOTP({
       otpLength: 6,
