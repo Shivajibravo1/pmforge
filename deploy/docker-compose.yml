@@ -20,8 +20,7 @@ services:
     networks: [internal]
 
   backend-migrate:
-    build:
-      context: https://github.com/Shivajibravo1/pmforge.git#main:backend
+    image: ghcr.io/shivajibravo1/pmforge-backend:${IMAGE_TAG:-latest}
     command: ["alembic", "upgrade", "head"]
     environment:
       DATABASE_URL: postgresql://pmforge:${POSTGRES_PASSWORD}@postgres:5432/pmforge?sslmode=disable
@@ -31,9 +30,7 @@ services:
     networks: [internal]
 
   auth-migrate:
-    build:
-      context: https://github.com/Shivajibravo1/pmforge.git#main:frontend
-      target: builder
+    image: ghcr.io/shivajibravo1/pmforge-frontend-migrate:${IMAGE_TAG:-latest}
     environment: &auth_env
       BETTER_AUTH_URL: https://${DOMAIN:-pmforge.pm}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?set BETTER_AUTH_SECRET (32+ random characters)}
@@ -50,8 +47,7 @@ services:
     networks: [internal]
 
   backend:
-    build:
-      context: https://github.com/Shivajibravo1/pmforge.git#main:backend
+    image: ghcr.io/shivajibravo1/pmforge-backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       ENV: production
@@ -74,9 +70,7 @@ services:
     networks: [internal]
 
   frontend:
-    build:
-      context: https://github.com/Shivajibravo1/pmforge.git#main:frontend
-      target: runner
+    image: ghcr.io/shivajibravo1/pmforge-frontend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       <<: *auth_env

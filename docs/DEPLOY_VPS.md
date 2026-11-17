@@ -26,6 +26,9 @@ Stack: Caddy (automatic HTTPS) -> Next.js frontend + FastAPI backend -> Postgres
 | `ADMIN_EMAILS` | defaults to `aishivajibravo@gmail.com` |
 | `DOMAIN` | defaults to `pmforge.pm` |
 
+## Images
+Hostinger's Docker Manager pulls images and does not build from source. GitHub Actions (`.github/workflows/images.yml`) builds three images on every push to `main` and publishes them to `ghcr.io/shivajibravo1/`: `pmforge-backend`, `pmforge-frontend`, `pmforge-frontend-migrate`. After the first run, set each package to Public (GitHub profile > Packages > package > Package settings > Change visibility), or the VPS cannot pull them.
+
 ## Steps
 1. hPanel > VPS > Docker Manager > Compose > From URL: `https://raw.githubusercontent.com/Shivajibravo1/pmforge/main/deploy/docker-compose.yml`, project name `pmforge`.
 2. Add the environment above, then deploy. The first build takes several minutes.
@@ -33,7 +36,7 @@ Stack: Caddy (automatic HTTPS) -> Next.js frontend + FastAPI backend -> Postgres
 4. Check `https://pmforge.pm/health`, sign in with the admin email, open any lesson.
 
 ## Update
-Redeploy the project (Docker Manager > Rebuild). Migrations run on each start.
+Push to `main`, wait for the Actions run to finish, then redeploy the project in Docker Manager so it pulls `latest`. Migrations run on each start.
 
 ## Backups
 Nightly dump on the VPS: `docker compose -p pmforge exec -T postgres pg_dump -U pmforge pmforge | gzip > /root/backups/pmforge-$(date +%F).sql.gz`, then copy off the server. Also enable the Hostinger weekly VPS backup. Test a restore before relying on it.
@@ -43,8 +46,8 @@ Docker Manager logs per project, `https://pmforge.pm/health` from an external up
 
 ## Risks
 - Single server: no failover. Mitigate with backups and a rebuild runbook.
-- Build from `main` on the VPS: a bad push can break a redeploy. Pin to a tag when stable.
+- `latest` follows `main`: a bad push can break a redeploy. Set `IMAGE_TAG` to a commit SHA to pin.
 - Docker bypasses host firewalls such as ufw. Use the Hostinger firewall.
 
 ## Rollback
-Redeploy a previous commit by changing `#main` to `#<commit>` in the compose build contexts, then rebuild. Database rollback uses the latest dump.
+Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy. Database rollback uses the latest dump.
