@@ -36,6 +36,7 @@ const faqs = [
   ["Is the mentor a person?", "No. The mentor is an AI that reviews your work against a rubric. It can be wrong, so verify important answers, and never paste passwords, personal data or confidential client information."],
   ["Do I get proof of my work?", "Yes. Each level ends with an assessment and certificate, and your portfolio can be shared through a public link. Certificates can be checked through a verification page."],
   ["Does PMForge cover AI security, cost and compliance?", "Yes. Level 4 covers AI business cases, evals, cost models, risk registers, NIST AI Risk Management Framework, ISO/IEC 42001, the EU AI Act and LLM security. Level 3 covers cloud cost, DevSecOps and compliance."],
+  ["What is the WhatsApp interview bonus?", "Paid members can opt in to one interview question a day on WhatsApp, rotating across AI project management, AI security and AI product management. It is optional, needs your WhatsApp number, and you can stop at any time by replying STOP or turning it off in settings."],
   ["Is this legal or financial advice?", "No. PMForge teaches project management practice. Check regulation and contracts with a qualified professional."],
   ["How long does it take?", `The program is ${TOTAL_DAYS} days in 4 levels of 30 days. Each level includes a buffer day for catching up.`],
 ];

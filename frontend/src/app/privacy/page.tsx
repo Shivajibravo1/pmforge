@@ -24,6 +24,7 @@ export default function Privacy() {
             ["Work you submit: project artifacts, and the score and feedback the AI mentor returns", "To give you reviews and build your portfolio."],
             ["Certificates: code, level, issue date", "To issue certificates and let others verify them."],
             ["Portfolio settings: public link and on or off choice", "To show your portfolio only if you choose."],
+            ["WhatsApp number and opt-in record (paid members who choose the daily interview question bonus only)", "To send the daily questions you asked for, and to prove your consent."],
             ["Plan status", "To know whether you are on the free or a paid plan."],
             ["Usage counts and cost of AI calls", "To enforce daily limits and a monthly budget."],
             ["Technical data: IP address, device and request information", "To keep the service secure, limit abuse and fix faults."],
@@ -60,6 +61,7 @@ export default function Privacy() {
             ["Hosting and database", "Run the website, the app and the database", "All account and learning data"],
             ["Email delivery", "Send your sign-in codes", "Email address and the code"],
             ["AI provider (OpenAI)", "Produce mentor replies and artifact reviews", "The text you submit for review or chat, after we remove detected personal data"],
+            ["WhatsApp messaging provider", "Deliver the optional daily interview question", "WhatsApp number and the message sent"],
             ["Payment provider", "Take and refund payments", "Payment and plan details, handled by the provider"],
           ]}
         />
