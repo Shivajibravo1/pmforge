@@ -6,6 +6,7 @@ import { EarlierNotes } from "@/components/earlier-notes";
 import { LessonPlayer } from "@/components/lesson-player";
 import { XpToast, type XpGain } from "@/components/xp-toast";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
+import { FREE_DAYS } from "@/lib/pricing";
 import { ApiError, type CompleteOut, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
 
 const ARTIFACT_TYPES = ["B", "S", "K", "P", "A"];
@@ -27,7 +28,7 @@ export default function LessonPage() {
       <Card>
         <Badge tone="violet">Full program</Badge>
         <h1 className="mt-3 text-xl font-semibold">Day {n} is part of the full program</h1>
-        <p className="mt-2 text-sm text-muted">The first lessons are free. Paid access opens in a later release. In this test build, an admin can switch your tier.</p>
+        <p className="mt-2 text-sm text-muted">Days 1 to {FREE_DAYS} are free. The rest of the program opens with a paid plan, which is not available yet.</p>
         <div className="mt-4"><LinkButton href="/app/course" variant="ghost">Back to course</LinkButton></div>
       </Card>
     );
