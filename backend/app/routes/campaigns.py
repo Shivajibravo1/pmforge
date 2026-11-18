@@ -167,5 +167,6 @@ def send_test(cid: str, admin: User = Depends(require_admin), db: Session = Depe
     except emailer.EmailError as exc:
         log.warning("test send failed: %s", exc)
         # 424, not 502: Cloudflare replaces a 502 from the origin with its own page and hides our message.
-        raise HTTPException(424, "email_not_configured" if "not configured" in str(exc) else "email_send_failed") from exc
+        code = "email_not_configured" if "not configured" in str(exc) else "email_send_failed"
+        raise HTTPException(424, code) from exc
     return {"sent_to": admin.email}
