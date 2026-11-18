@@ -91,3 +91,13 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - Sign-in codes: Better Auth limits per client address and path, and `frontend/src/lib/email-throttle.ts` limits per target email (5 code requests and 10 code attempts per hour). The email counters are in memory: they reset when the frontend container restarts and are not shared between instances.
 - Request bodies: Caddy rejects API bodies over 64 KiB and the backend enforces the same cap (`MAX_BODY_BYTES`).
 - AI spend: each mentor call reserves its worst-case cost and one daily slot before the model runs. Failed calls that reached the model still count. Global ceilings `GLOBAL_DAILY_AI_BUDGET_USD` (default 5) and `GLOBAL_MONTHLY_AI_BUDGET_USD` (default 50) stop all users with `ai_capacity_reached`. Set them in hPanel to match the OpenAI billing limit.
+
+## Daily interview question email
+
+- **Who gets it:** paid members who tick the consent box on the You page. The opt-in time and consent text version are stored in `interview_subscriptions`; turning it off keeps the row as the record.
+- **How emails are captured:** the account email is saved at sign-in. Nothing else is collected and no list is uploaded anywhere. The sender reads the member's email from the database at send time.
+- **What is sent:** at most one email per member per day, from 7:00 India time, by the `interview-mailer` service (Docker Manager shows it as a separate container). A question you wrote for that date (admin API `/api/v1/admin/interview-questions/{YYYY-MM-DD}`) is used first. A date with no question uses the built-in bank of lesson interview questions in rotation.
+- **Limit:** `INTERVIEW_EMAIL_DAILY_CAP` (default 80). The free Resend plan allows 100 emails a day in total and sign-in codes count against the same 100, so keep this below it.
+- **Unsubscribe:** every email has a link to `/unsubscribe/<token>` (one button) and a one-click `List-Unsubscribe` header. A member who fails 5 sends in a row is paused automatically.
+- **Check:** `docker logs <project>-interview-mailer-1` shows `pass done` lines. Email addresses are never logged.
+- **Before you rely on it:** confirm in Resend's current terms that daily educational email to opted-in members is allowed through the sending API, and that the `headers` field is accepted. I could not verify either from here.

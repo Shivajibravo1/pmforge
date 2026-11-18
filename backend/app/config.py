@@ -49,6 +49,14 @@ class Settings(BaseSettings):
     global_daily_ai_budget_usd: float = 5.0
     global_monthly_ai_budget_usd: float = 50.0
 
+    # Daily interview question email. Sent through Resend. The free Resend plan allows 100 emails a day in total and
+    # sign-in codes share that allowance, so the cap here stays well below it.
+    resend_api_key: str = Field(default="", repr=False)
+    email_from: str = ""
+    public_base_url: str = "http://localhost:3000"
+    interview_email_daily_cap: int = 80
+    interview_email_send_hour_ist: int = 7  # earliest hour (India time) at which the day's emails go out
+
     # Product rules (Requirement Baseline v1.1).
     free_lessons: int = 7
 

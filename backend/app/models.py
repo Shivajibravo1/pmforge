@@ -84,3 +84,26 @@ class AdminAudit(Base):
     action: Mapped[str] = mapped_column(String(32))
     detail: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class InterviewSubscription(Base):
+    """Opt-in to the daily interview question email. Opting out keeps the row as the consent record."""
+    __tablename__ = "interview_subscriptions"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    opted_in_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    consent_version: Mapped[str] = mapped_column(String(16))
+    opted_out_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    unsubscribe_token: Mapped[str] = mapped_column(
+        String(48), unique=True, index=True, default=lambda: secrets.token_urlsafe(32))
+    next_index: Mapped[int] = mapped_column(Integer, default=0)
+    last_sent_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class InterviewQuestion(Base):
+    """A question the admin wrote for a specific send date. Dates without a row use the built-in question bank."""
+    __tablename__ = "interview_questions"
+    send_on: Mapped[date] = mapped_column(Date, primary_key=True)
+    question: Mapped[str] = mapped_column(String(600))
+    tips: Mapped[list] = mapped_column(JSON, default=list)
+    lesson_day: Mapped[int | None] = mapped_column(Integer, nullable=True)

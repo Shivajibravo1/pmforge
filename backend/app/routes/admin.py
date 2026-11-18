@@ -1,12 +1,13 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.models import AdminAudit, Artifact, Certificate, Progress, Review, UsageLog, User
+from app.interview import today_ist
+from app.models import AdminAudit, Artifact, Certificate, InterviewQuestion, Progress, Review, UsageLog, User
 from app.security import require_admin
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"], dependencies=[Depends(require_admin)])
@@ -106,3 +107,42 @@ def set_tier(user_id: str, body: TierIn, admin: User = Depends(require_admin), d
         user.tier = body.tier
         db.commit()
     return {"id": user.id, "tier": user.tier, "plan": plan_of(user)}
+
+
+class QuestionIn(BaseModel):
+    question: str = Field(min_length=10, max_length=600)
+    tips: list[str] = Field(default_factory=list, max_length=6)
+    lesson_day: int | None = Field(default=None, ge=1, le=120)
+
+
+@router.get("/interview-questions")
+def list_scheduled_questions(db: Session = Depends(get_db)):
+    """Questions written for today and later, soonest first."""
+    rows = db.scalars(select(InterviewQuestion).where(InterviewQuestion.send_on >= today_ist())
+                      .order_by(InterviewQuestion.send_on).limit(400)).all()
+    return {"items": [{"send_on": r.send_on.isoformat(), "question": r.question, "tips": r.tips,
+                       "lesson_day": r.lesson_day} for r in rows]}
+
+
+@router.put("/interview-questions/{send_on}")
+def save_scheduled_question(send_on: date, body: QuestionIn, db: Session = Depends(get_db)):
+    if send_on < today_ist():
+        raise HTTPException(422, "date_in_past")
+    tips = [t.strip()[:300] for t in body.tips if t.strip()]
+    row = db.get(InterviewQuestion, send_on)
+    if row is None:
+        db.add(InterviewQuestion(send_on=send_on, question=body.question.strip(), tips=tips,
+                                 lesson_day=body.lesson_day))
+    else:
+        row.question, row.tips, row.lesson_day = body.question.strip(), tips, body.lesson_day
+    db.commit()
+    return {"saved": send_on.isoformat()}
+
+
+@router.delete("/interview-questions/{send_on}")
+def delete_scheduled_question(send_on: date, db: Session = Depends(get_db)):
+    row = db.get(InterviewQuestion, send_on)
+    if row and send_on >= today_ist():
+        db.delete(row)
+        db.commit()
+    return {"deleted": send_on.isoformat()}

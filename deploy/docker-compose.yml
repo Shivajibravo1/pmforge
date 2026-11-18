@@ -80,6 +80,23 @@ services:
       backend: { condition: service_started }
     networks: [internal]
 
+  interview-mailer:
+    # Sends the daily interview question email to members who opted in. Checks every 10 minutes and sends
+    # at most once per member per day, from 7:00 India time. Same image as the backend.
+    image: ghcr.io/shivajibravo1/pmforge-backend:${IMAGE_TAG:-latest}
+    command: ["python", "-m", "app.jobs.interview_email"]
+    restart: unless-stopped
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql://pmforge:${POSTGRES_PASSWORD}@postgres:5432/pmforge?sslmode=disable
+      RESEND_API_KEY: ${RESEND_API_KEY:?set RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
+      PUBLIC_BASE_URL: https://${DOMAIN:-pmforge.pm}
+      INTERVIEW_EMAIL_DAILY_CAP: ${INTERVIEW_EMAIL_DAILY_CAP:-80}
+    depends_on:
+      backend-migrate: { condition: service_completed_successfully }
+    networks: [internal]
+
   backup:
     # Nightly dump into /var/backups/pmforge on the VPS host. A host folder (not a Docker volume) so the
     # dumps survive deleting this project in Docker Manager. Same-server backup: see docs/DEPLOY_VPS.md.

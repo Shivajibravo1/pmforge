@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Character } from "@/components/character";
+import { InterviewEmailCard } from "@/components/interview-email-card";
 import { SampleCertificate } from "@/components/sample-certificate";
 import { Button, Card, LoadError, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Curriculum, type Me, type Progress, api, friendly, useApi } from "@/lib/api";
@@ -142,6 +143,7 @@ export default function You() {
         );
       })}
       {msg && <Notice>{msg}</Notice>}
+      <InterviewEmailCard />
       <Card>
         <p className="text-sm text-muted">Signed in as</p>
         <p className="font-medium">{me.data.email}</p>

@@ -30,3 +30,13 @@ def test_api_handle_caps_request_body():
     cf = _caddyfile()
     block = cf[cf.index("handle @api"):cf.index("reverse_proxy backend:8000")]
     assert "request_body" in block and "max_size 64KiB" in block
+
+
+def test_interview_mailer_service_is_wired():
+    block = COMPOSE[COMPOSE.index("  interview-mailer:"):COMPOSE.index("  backup:")]
+    assert '"app.jobs.interview_email"' in block
+    assert "restart: unless-stopped" in block
+    assert "backend-migrate: { condition: service_completed_successfully }" in block
+    for var in ("RESEND_API_KEY", "EMAIL_FROM", "PUBLIC_BASE_URL", "DATABASE_URL"):
+        assert var in block
+    assert "ports:" not in block  # nothing listens; it only sends

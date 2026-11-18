@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import get_settings
 from app.db import Base, engine
-from app.routes import admin, learning, mentor, portfolio
+from app.routes import admin, interview, learning, mentor, portfolio
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -96,7 +96,8 @@ def create_app() -> FastAPI:
     def health():
         return {"status": "ok"}
 
-    for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router):
+    for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router, interview.router,
+              interview.public):
         app.include_router(r)
     return app
 
