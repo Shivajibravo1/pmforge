@@ -3,7 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/app/course", useRouter: () => ({ replace: vi.fn() }) }));
-vi.mock("@/lib/auth-client", () => ({ authClient: { useSession: () => ({ data: { user: { id: "u1" } }, isPending: false }) } }));
+vi.mock("@/lib/auth-client", () => ({ authClient: { useSession: () => ({ data: { user: { id: "u1", name: "Asha Rao", phone: "+919876543210" } }, isPending: false }) } }));
 vi.mock("@/lib/api", () => ({ useApi: () => ({ data: { total_xp: 1250, streak: 4, completed: [] }, error: null, loading: false, reload: vi.fn() }) }));
 
 import AppLayout from "./layout";

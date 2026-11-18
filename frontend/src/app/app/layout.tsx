@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { Spinner } from "@/components/ui";
 import { type Progress, useApi } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
+import { isEnrolled } from "@/lib/enrollment";
 
 const nav = [
   ["/app", "Today", Home],
@@ -36,7 +37,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { reload } = prog;
 
   useEffect(() => {
-    if (!isPending && !session) router.replace("/sign-in");
+    if (isPending) return;
+    if (!session) router.replace("/sign-in");
+    else if (!isEnrolled(session.user as { name?: string; phone?: unknown })) router.replace("/complete-profile");
   }, [isPending, session, router]);
 
   // Refresh streak and XP whenever the learner moves to another screen (for example after completing a lesson).
@@ -47,7 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     lastPath.current = path;
   }, [path, session, reload]);
 
-  if (isPending || !session) return <Spinner />;
+  if (isPending || !session || !isEnrolled(session.user as { name?: string; phone?: unknown })) return <Spinner />;
   const xp = prog.data?.total_xp;
   const streak = prog.data?.streak;
 

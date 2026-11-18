@@ -69,11 +69,11 @@ def test_unknown_lesson_is_404(client):
 def test_free_tier_stops_after_free_lessons(client):
     h = auth()
     complete(client, h, get_settings().free_lessons)
-    assert client.get("/api/v1/lessons/11", headers=h).json() == {"detail": "upgrade_required"}
+    assert client.get(f"/api/v1/lessons/{get_settings().free_lessons + 1}", headers=h).json() == {"detail": "upgrade_required"}
     admin = auth("a1", "admin@example.com")
     client.get("/api/v1/me", headers=admin)
     assert client.put("/api/v1/admin/users/u1/tier", json={"tier": "paid"}, headers=admin).status_code == 200
-    assert client.get("/api/v1/lessons/11", headers=h).status_code == 200
+    assert client.get(f"/api/v1/lessons/{get_settings().free_lessons + 1}", headers=h).status_code == 200
 
 
 def test_admin_can_open_any_lesson_without_paying_or_finishing_earlier_days(client):

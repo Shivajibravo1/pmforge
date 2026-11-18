@@ -20,3 +20,12 @@ describe("gamify", () => {
     expect(earned).toEqual(["first", "free", "streak3"]);
   });
 });
+
+describe("free tier badge", () => {
+  it("is earned after the free days and not before", () => {
+    const earnedFree = (completed: number[]) =>
+      badges({ completed, streak: 0, total_xp: 0 }).find((x) => x.id === "free")?.earned;
+    expect(earnedFree([1, 2, 3, 4, 5, 6, 7])).toBe(true);
+    expect(earnedFree([1, 2, 3, 4, 5, 6])).toBe(false);
+  });
+});

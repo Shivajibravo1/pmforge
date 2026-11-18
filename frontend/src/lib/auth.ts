@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
+import { APIError } from "better-auth/api";
 import { jwt } from "better-auth/plugins/jwt";
 import { Pool } from "pg";
 import { normalizeDatabaseUrl } from "./db-url.ts";
+import { normalizeName, normalizePhone } from "./enrollment.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -57,11 +59,42 @@ export const auth = betterAuth({
   secret: required("BETTER_AUTH_SECRET"),
   database: new Pool({ connectionString: normalizeDatabaseUrl(required("DATABASE_URL")) }),
   trustedOrigins: (process.env.TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+  // Explicit so rate limiting cannot depend on the NODE_ENV default. Per-IP, in memory (one app instance).
+  rateLimit: { enabled: true, window: 60, max: 60 },
+  // Behind Cloudflare the real visitor address is in cf-connecting-ip. Trusted only because the VPS firewall
+  // accepts web traffic from Cloudflare alone (docs/DEPLOY_VPS.md). Falls back to x-forwarded-for without it.
+  advanced: { ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] } },
+  // Mobile number collected at enrollment. Stored in E.164. The server validates it, whatever the browser sent.
+  user: { additionalFields: { phone: { type: "string", required: false, input: true } } },
+  databaseHooks: {
+    user: {
+      update: {
+        before: async (data) => {
+          const next: Record<string, unknown> = { ...data };
+          if (data.name !== undefined) {
+            const name = normalizeName(String(data.name));
+            if (!name) throw new APIError("BAD_REQUEST", { message: "Invalid name" });
+            next.name = name;
+          }
+          if (data.phone !== undefined) {
+            const phone = normalizePhone(String(data.phone));
+            if (!phone) throw new APIError("BAD_REQUEST", { message: "Invalid mobile number" });
+            next.phone = phone;
+          }
+          return { data: next };
+        },
+      },
+    },
+  },
   plugins: [
     emailOTP({
       otpLength: 6,
       expiresIn: 300,
       allowedAttempts: 3,
+      // Store only a hash of each code, so a database read does not reveal valid codes.
+      storeOTP: "hashed",
+      // Code requests per address per window. Matches the library default, stated so it is reviewed.
+      rateLimit: { window: 60, max: 3 },
       sendVerificationOTP: async ({ email, otp }) => {
         await deliverOtp(email, otp);
       },
