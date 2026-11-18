@@ -1,5 +1,5 @@
 # Self-hosted build (Hostinger VPS). Vercel does not use this file.
-FROM node:22-slim AS deps
+FROM node:26-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -15,7 +15,7 @@ RUN BETTER_AUTH_URL=http://localhost:3000 \
 # Used once per release by the compose "auth-migrate" service.
 CMD ["node", "--experimental-strip-types", "scripts/migrate-auth.ts"]
 
-FROM node:22-slim AS runner
+FROM node:26-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 RUN useradd --create-home --uid 10001 app
