@@ -1,4 +1,5 @@
 "use client";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { Badge, Card, LoadError, Spinner } from "@/components/ui";
 import { type Curriculum, type Me, type Progress, TYPE_LABEL, useApi } from "@/lib/api";
@@ -35,9 +36,10 @@ export default function Course() {
                       return (
                         <li key={d.day}>
                           <Link href={`/app/lesson/${d.day}`} aria-disabled={!unlocked}
-                            className={`flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-sm hover:bg-surface2 ${unlocked ? "" : "opacity-50"}`}>
+                            className={`flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-sm hover:bg-surface2 ${unlocked ? "" : "text-white/80"}`}>
                             <span><span className="text-muted">{d.day}.</span> {d.title}</span>
                             <span className="flex shrink-0 items-center gap-2">
+                              {!unlocked && <Lock aria-label="Locked" className="h-3.5 w-3.5 text-muted" />}
                               <Badge>{TYPE_LABEL[d.type]}</Badge>
                               {done.has(d.day) ? <Badge tone="lime">Done</Badge> : !free ? <Badge tone="violet">Full</Badge> : null}
                             </span>
