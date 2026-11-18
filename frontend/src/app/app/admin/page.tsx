@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { AdminInterviewSchedule } from "@/components/admin-interview-schedule";
 import { AdminResources } from "@/components/admin-resources";
 import { AdminUsers } from "@/components/admin-users";
@@ -21,6 +22,7 @@ export default function Admin() {
       <div className="grid grid-cols-2 gap-3">
         {rows.map(([k, v]) => <Card key={k}><p className="text-xs text-muted">{k}</p><p className="text-2xl font-bold">{v}</p></Card>)}
       </div>
+      <Link href="/app/admin/emails" className="block"><Card><h2 className="font-semibold">Email composer</h2><p className="mt-1 text-sm text-muted">Write emails with images and a PDF, save drafts and schedule them.</p></Card></Link>
       <AdminResources />
       <AdminInterviewSchedule />
       <AdminUsers />

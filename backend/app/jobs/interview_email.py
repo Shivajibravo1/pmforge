@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app import emailer, interview
 from app.config import Settings, get_settings
 from app.db import SessionLocal
-from app.models import InterviewQuestion, InterviewSubscription, Resource, User
+from app.models import EmailCampaign, InterviewQuestion, InterviewSubscription, Resource, User
 
 log = logging.getLogger("pmforge.interview_email")
 IST = interview.IST
@@ -28,9 +28,16 @@ def _uid(user_id: str) -> str:
 def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_email, now: datetime | None = None) -> dict:
     now = (now or datetime.now(UTC)).astimezone(IST)
     stats = {"sent": 0, "failed": 0, "skipped": 0}
-    if now.hour < settings.interview_email_send_hour_ist:
-        return stats
     today: date = now.date()
+    # An email that was scheduled for an earlier day and never finished is closed so it cannot send late.
+    for old in db.scalars(select(EmailCampaign).where(EmailCampaign.status == "scheduled",
+                                                      EmailCampaign.send_on < today)).all():
+        old.status = "partial"
+    db.commit()
+    campaign = db.scalar(select(EmailCampaign).where(EmailCampaign.status == "scheduled",
+                                                     EmailCampaign.send_on == today))
+    if now.hour < (campaign.send_hour if campaign else settings.interview_email_send_hour_ist):
+        return stats
     sent_today = db.scalar(select(func.count()).select_from(InterviewSubscription)
                            .where(InterviewSubscription.last_sent_on == today)) or 0
     room = settings.interview_email_daily_cap - sent_today
@@ -43,7 +50,9 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
                or_(InterviewSubscription.last_sent_on.is_(None), InterviewSubscription.last_sent_on < today))
         .order_by(InterviewSubscription.last_sent_on.asc().nulls_first())
         .limit(room)).all()
-    scheduled = db.get(InterviewQuestion, today)  # a question you wrote for today beats the rotation
+    # Today's composed email beats a written question, which beats the rotation. None of them break the
+    # one-email-a-day promise: a subscriber is claimed once per day whichever is used.
+    scheduled = campaign or db.get(InterviewQuestion, today)
     for sub, user in due:
         prev_index, prev_sent = sub.next_index, sub.last_sent_on
         uid, email, token = sub.user_id, user.email, sub.unsubscribe_token
@@ -59,21 +68,28 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
             stats["skipped"] += 1
             continue
         base = settings.public_base_url.rstrip("/")
-        q = ({"day": scheduled.lesson_day, "question": scheduled.question, "tips": list(scheduled.tips or [])}
-             if scheduled else interview.question_for(prev_index))
-        if scheduled and scheduled.resource_id:
+        unsub = f"{base}/public/interview/unsubscribe/{token}"  # one-click POST for mail apps (header)
+        unsub_page = f"{base}/unsubscribe/{token}"  # page a person lands on when they click the link
+        if campaign:
+            from app.routes.campaigns import build  # imported here: routes import the job's helpers elsewhere
+            subject, text, html, attachments = build(db, campaign, base, unsub_page)
+            q = None
+        else:
+            attachments = None
+            q = ({"day": scheduled.lesson_day, "question": scheduled.question, "tips": list(scheduled.tips or [])}
+                 if scheduled else interview.question_for(prev_index))
+        if q and scheduled and scheduled.resource_id:
             res = db.get(Resource, scheduled.resource_id)
             if res and res.kind == "image" and res.in_email:
                 q["image_url"], q["image_alt"] = f"{base}/public/files/{res.id}", res.title
             elif res and res.kind == "pdf":
                 q["pdf_title"], q["resources_url"] = res.title, f"{base}/app/resources"
-        unsub = f"{base}/public/interview/unsubscribe/{token}"  # one-click POST for mail apps (header)
-        unsub_page = f"{base}/unsubscribe/{token}"  # page a person lands on when they click the link
-        lesson_url = f"{base}/app/lesson/{q['day']}" if q["day"] else f"{base}/app"
-        subject, text, html = interview.compose(q, lesson_url=lesson_url, unsubscribe_url=unsub_page)
+        if q:
+            lesson_url = f"{base}/app/lesson/{q['day']}" if q["day"] else f"{base}/app"
+            subject, text, html = interview.compose(q, lesson_url=lesson_url, unsubscribe_url=unsub_page)
         try:
             sender(settings, to=email, subject=subject, text=text, html=html, unsubscribe_url=unsub,
-                   idempotency_key=f"interview-{uid}-{today.isoformat()}")
+                   idempotency_key=f"interview-{uid}-{today.isoformat()}", attachments=attachments)
         except emailer.EmailError as exc:
             db.execute(update(InterviewSubscription).where(InterviewSubscription.user_id == uid)
                        .values(last_sent_on=prev_sent, next_index=prev_index,
@@ -85,6 +101,15 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
         db.execute(update(InterviewSubscription).where(InterviewSubscription.user_id == uid).values(failures=0))
         db.commit()
         stats["sent"] += 1
+    if campaign:
+        left = db.scalar(select(func.count()).select_from(InterviewSubscription).join(
+            User, User.id == InterviewSubscription.user_id).where(
+            InterviewSubscription.opted_out_at.is_(None), User.tier == "paid", User.email != "",
+            InterviewSubscription.failures < MAX_FAILURES,
+            or_(InterviewSubscription.last_sent_on.is_(None), InterviewSubscription.last_sent_on < today))) or 0
+        if left == 0:
+            campaign.status = "sent"
+            db.commit()
     return stats
 
 

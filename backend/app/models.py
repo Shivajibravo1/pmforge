@@ -133,3 +133,19 @@ class Resource(Base):
     data: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
     in_email: Mapped[bool] = mapped_column(Boolean, default=False)  # images only: served at a public link for emails
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class EmailCampaign(Base):
+    """An email the admin composes: subject, text and image blocks, optional PDF attachment, optional send date.
+    It replaces the daily question on its send date, so a subscriber still gets one email that day."""
+    __tablename__ = "email_campaigns"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    subject: Mapped[str] = mapped_column(String(150))
+    # Each block is {"type": "text", "text": ...} or {"type": "image", "resource_id": ...}.
+    blocks: Mapped[list] = mapped_column(JSON, default=list)
+    attachment_id: Mapped[str | None] = mapped_column(String(36), nullable=True)  # a PDF resource
+    send_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    send_hour: Mapped[int] = mapped_column(Integer, default=7)  # India time
+    status: Mapped[str] = mapped_column(String(10), default="draft")  # draft, scheduled, sent, partial
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)

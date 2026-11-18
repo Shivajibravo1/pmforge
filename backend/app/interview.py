@@ -84,3 +84,41 @@ def compose(q: dict, *, lesson_url: str, unsubscribe_url: str) -> tuple[str, str
         f'<a href="{e(unsubscribe_url)}">Unsubscribe</a></p></div>'
     )
     return subject, "\n".join(text), body
+
+
+def compose_campaign(subject: str, blocks: list[dict], *, images: dict[str, tuple[str, str]],
+                     pdf_name: str | None, unsubscribe_url: str) -> tuple[str, str, str]:
+    """Build an admin-written email. `images` maps resource id to (public url, alt text). Text is escaped;
+    a paragraph is separated by a blank line, and lines starting with '- ' become a bullet list."""
+    e = html.escape
+    text_parts: list[str] = []
+    html_parts: list[str] = []
+    for b in blocks:
+        if b.get("type") == "image" and b.get("resource_id") in images:
+            url, alt = images[b["resource_id"]]
+            html_parts.append(f'<p style="margin:0 0 16px"><img src="{e(url)}" alt="{e(alt)}" width="520" '
+                              'style="display:block;max-width:100%;height:auto;border:0"></p>')
+            text_parts.append(f"[Image: {alt}]")
+        elif b.get("type") == "text":
+            for para in re.split(r"\n\s*\n", str(b.get("text", "")).strip()):
+                lines = [ln.strip() for ln in para.splitlines() if ln.strip()]
+                if not lines:
+                    continue
+                text_parts.append("\n".join(lines))
+                if all(ln.startswith("- ") for ln in lines):
+                    items = "".join(f"<li>{e(ln[2:])}</li>" for ln in lines)
+                    html_parts.append(f'<ul style="margin:0 0 16px;padding-left:20px;line-height:1.5">{items}</ul>')
+                else:
+                    inner = "<br>".join(e(x) for x in lines)
+                    html_parts.append(f'<p style="margin:0 0 16px;line-height:1.5">{inner}</p>')
+    if pdf_name:
+        text_parts.append(f"A PDF is attached: {pdf_name}")
+        html_parts.append(f'<p style="margin:0 0 16px;font-size:13px;color:#555">A PDF is attached: {e(pdf_name)}</p>')
+    text_parts.append("You get this email because you opted in at PMForge. Unsubscribe any time:\n" + unsubscribe_url)
+    body = (
+        '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:16px;color:#111">'
+        + "".join(html_parts)
+        + f'<p style="margin:24px 0 0;font-size:12px;color:#666">You get this email because you opted in at PMForge. '
+        f'<a href="{e(unsubscribe_url)}">Unsubscribe</a></p></div>'
+    )
+    return subject, "\n\n".join(text_parts), body

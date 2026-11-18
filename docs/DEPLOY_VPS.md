@@ -110,3 +110,13 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - **Placement:** in the Admin console, "Daily interview emails", pick a date, write the question and choose one image or PDF. An image sits between the question and the tips.
 - **Backups:** files are stored in Postgres, so the nightly backup includes them. Many large files grow the database and the backup; check disk space now and then.
 - **Deleting:** a file used by a scheduled email cannot be deleted until it is removed from that email.
+
+## Email composer
+
+- **Where:** top menu, "Admin" (admins only), then "Email composer".
+- **What an email has:** subject, send date and hour (India time), text and image blocks in any order, and one optional PDF sent as a real attachment (PDF up to 5 MB; images are uploaded inline and made public for email).
+- **Status:** draft (saved, never sent), scheduled (sends at the chosen hour), sent, partial (the day ended before every subscriber was reached, usually because of the daily cap).
+- **One email a day:** a scheduled email replaces that day's interview question for everyone, so a subscriber never gets two. Only one email can be scheduled per date.
+- **Audience:** members who turned on the email on their You page. Subscribers agreed to interview-practice email, so keep content to that purpose.
+- **Send test to me:** sends the saved email to the admin's own address only. It counts toward Resend's daily limit.
+- **Check before relying on it:** confirm Resend accepts attachments through the sending API with your plan, and the 100 emails per day free limit against your subscriber count.

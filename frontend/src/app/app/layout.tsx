@@ -1,10 +1,10 @@
 "use client";
-import { BookOpen, Briefcase, Flame, Home, MessageCircle, UserCircle, Zap } from "lucide-react";
+import { BookOpen, Briefcase, Flame, Home, MessageCircle, Shield, UserCircle, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Spinner } from "@/components/ui";
-import { type Progress, useApi } from "@/lib/api";
+import { type Me, type Progress, useApi } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import { isEnrolled } from "@/lib/enrollment";
 
@@ -34,7 +34,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const path = usePathname();
   const prog = useApi<Progress>(session ? "/api/v1/progress" : null);
+  const me = useApi<Me>(session ? "/api/v1/me" : null);
   const { reload } = prog;
+  const items = me.data?.role === "admin" ? [...nav, ["/app/admin", "Admin", Shield] as const] : nav;
 
   useEffect(() => {
     if (isPending) return;
@@ -61,7 +63,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Logo />
           <nav aria-label="Primary" className="order-3 w-full md:order-none md:w-auto md:flex-1">
             <ul className="flex justify-between gap-1 md:justify-center">
-              {nav.map(([href, label, Icon]) => {
+              {items.map(([href, label, Icon]) => {
                 const active = href === "/app" ? path === href : path.startsWith(href);
                 return (
                   <li key={href} className="flex-1 md:flex-none">

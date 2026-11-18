@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, undefer
 
 from app.config import get_settings
 from app.db import get_db
-from app.models import InterviewQuestion, Resource, User
+from app.models import EmailCampaign, InterviewQuestion, Resource, User
 from app.security import current_user, require_admin
 
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
@@ -45,11 +45,15 @@ def _get(db: Session, rid: str) -> Resource:
     return r
 
 
-def _file_response(r: Resource) -> Response:
+def _file_name(r: Resource) -> str:
     ext = {"application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg"}[r.content_type]
     name = re.sub(r"[^A-Za-z0-9]+", "-", r.title).strip("-").lower()[:60] or "resource"
+    return f"{name}.{ext}"
+
+
+def _file_response(r: Resource) -> Response:
     return Response(r.data, media_type=r.content_type,
-                    headers={"Content-Disposition": f'inline; filename="{name}.{ext}"'})
+                    headers={"Content-Disposition": f'inline; filename="{_file_name(r)}"'})
 
 
 @router.get("")
@@ -89,6 +93,9 @@ def delete(rid: str, db: Session = Depends(get_db)):
     r = _get(db, rid)
     if db.scalar(select(InterviewQuestion.send_on).where(InterviewQuestion.resource_id == rid).limit(1)):
         raise HTTPException(409, "resource_in_use")
+    for c in db.scalars(select(EmailCampaign).where(EmailCampaign.status.in_(("draft", "scheduled")))):
+        if c.attachment_id == rid or any(b.get("resource_id") == rid for b in c.blocks):
+            raise HTTPException(409, "resource_in_use")
     db.delete(r)
     db.commit()
     return {"deleted": rid}
