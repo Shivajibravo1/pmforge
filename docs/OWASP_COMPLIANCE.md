@@ -13,7 +13,7 @@ ML guidance (scoped), ASVS (see end).
 |---|---|---|---|
 | A01 | Broken access control | Met | Roles read from DB, admin gated by `require_admin`, artifact ownership check (same 404 for foreign), tier gate on lessons, role revoked when email leaves `ADMIN_EMAILS` |
 | A02 | Security misconfiguration | Partial | HSTS, CSP nonce, API CSP `default-src 'none'`, docs off in prod, Cloudflare-only firewall, containers drop capabilities. Open: read-only root filesystems, DB password strength, rotate exposed keys |
-| A03 | Software supply chain failures | Partial | pip-audit, npm audit gate, gitleaks, Dependabot. Open: image scanning, SBOM, pin Actions and images by digest |
+| A03 | Software supply chain failures | Partial | pip-audit, npm audit gate, gitleaks, Dependabot. Image scan and SBOM run after each build (report-only). Open: pin Actions and images by digest |
 | A04 | Cryptographic failures | Partial | TLS at Cloudflare and Caddy, JWT EdDSA/RS256/ES256 allowlist. Open: DB traffic is unencrypted inside the Docker network, uploads are not encrypted at rest |
 | A05 | Injection | Met | SQLAlchemy parameters, LIKE wildcards escaped, HTML escaped in emails, no `dangerouslySetInnerHTML` in the frontend |
 | A06 | Insecure design | Partial | Spend caps, consent record, opt-in email, one-email-a-day rule. Open: no formal threat model document |
@@ -66,7 +66,7 @@ ML guidance (scoped), ASVS (see end).
 
 1. Rotate the OpenAI key, the Resend key and `BETTER_AUTH_SECRET` (values were exposed in a chat read). Owner: you, in hPanel.
 2. Replace the database password with a long random one, with a planned restart. Owner: you and Claude together.
-3. Add image scanning and an SBOM to the image build workflow.
+3. Read the first image scan results and fix findings, then make the scan fail the build.
 4. Add log shipping and alert rules (failed logins, 429 spikes, `ai_capacity_reached`).
 5. Read-only root filesystems and memory limits for containers, after testing on a copy.
 6. Write a short threat model, then run a full ASVS Level 1 review.
