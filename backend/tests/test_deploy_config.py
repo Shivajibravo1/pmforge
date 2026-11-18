@@ -49,3 +49,9 @@ def test_only_the_upload_route_may_take_a_large_body():
     assert "/api/v1/admin/resources" in up and "max_size 6MiB" in up
     assert cf.index("handle @upload") < cf.index("handle @api")  # first match wins
     assert "max_size 64KiB" in cf[cf.index("handle @api"):]
+
+
+def test_backend_service_can_send_test_emails():
+    block = COMPOSE[COMPOSE.index("\n  backend:\n"):COMPOSE.index("  interview-mailer:")]
+    for var in ("RESEND_API_KEY", "EMAIL_FROM", "PUBLIC_BASE_URL"):
+        assert var in block

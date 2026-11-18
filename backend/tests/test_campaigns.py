@@ -130,7 +130,8 @@ def test_test_send_goes_only_to_the_admin(client, monkeypatch):
 
 def test_unconfigured_email_is_a_clear_error(client):
     c = mk(client).json()
-    assert client.post(f"{URL}/{c['id']}/test", headers=ADMIN).status_code == 502
+    r = client.post(f"{URL}/{c['id']}/test", headers=ADMIN)
+    assert r.status_code == 424 and r.json()["detail"] == "email_not_configured"
 
 
 def test_delete_blocked_while_a_draft_uses_the_file(client):
