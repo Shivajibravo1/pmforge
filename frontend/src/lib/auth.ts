@@ -1,10 +1,13 @@
 import { betterAuth } from "better-auth";
 import { emailOTP } from "better-auth/plugins/email-otp";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { jwt } from "better-auth/plugins/jwt";
 import { Pool } from "pg";
 import { normalizeDatabaseUrl } from "./db-url.ts";
+import { bucketFor, EmailThrottle } from "./email-throttle.ts";
 import { normalizeName, normalizePhone } from "./enrollment.ts";
+
+const emailThrottle = new EmailThrottle();
 
 function required(name: string): string {
   const v = process.env[name];
@@ -63,6 +66,16 @@ export const auth = betterAuth({
   rateLimit: { enabled: true, window: 60, max: 60 },
   // Behind Cloudflare the real visitor address is in cf-connecting-ip. Trusted only because the VPS firewall
   // accepts web traffic from Cloudflare alone (docs/DEPLOY_VPS.md). Falls back to x-forwarded-for without it.
+  // Per-target-email limit on code requests and code guesses, on top of the per-address limiter above.
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      const bucket = bucketFor(ctx.path);
+      const email = (ctx.body as { email?: unknown } | undefined)?.email;
+      if (bucket && typeof email === "string" && !emailThrottle.allow(bucket, email)) {
+        throw new APIError("TOO_MANY_REQUESTS", { message: "Too many attempts. Try again later." });
+      }
+    }),
+  },
   advanced: { ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] } },
   // Mobile number collected at enrollment. Stored in E.164. The server validates it, whatever the browser sent.
   user: { additionalFields: { phone: { type: "string", required: false, input: true } } },
@@ -93,7 +106,7 @@ export const auth = betterAuth({
       allowedAttempts: 3,
       // Store only a hash of each code, so a database read does not reveal valid codes.
       storeOTP: "hashed",
-      // Code requests per address per window. Matches the library default, stated so it is reviewed.
+      // Code requests per client address and path (not per email; see the hooks above). Matches the library default.
       rateLimit: { window: 60, max: 3 },
       sendVerificationOTP: async ({ email, otp }) => {
         await deliverOtp(email, otp);

@@ -28,7 +28,13 @@ log = logging.getLogger("pmforge.ai")
 
 
 class AIError(Exception):
-    """Raised for any upstream or validation failure. Message is safe to log, not to show."""
+    """Raised for any upstream or validation failure. Message is safe to log, not to show.
+
+    `cost` is the USD cost of a model call that already completed (and was therefore billed) before the failure.
+    It stays None when no completion happened, for example a timeout or a moderation outage.
+    """
+
+    cost: float | None = None
 
 
 class AIRefused(AIError):
@@ -262,16 +268,22 @@ def review_artifact(
     user_input = f"Lesson: {lesson_title}\n{asked}Rubric:\n{rubric_txt}{note}\n\n{_wrap('artifact', text, nonce)}"
     c = client.complete(model=settings.model_review, instructions=_review_rules(nonce, canary), user_input=user_input,
                         max_output_tokens=700, user_id=user_id, json_schema=REVIEW_SCHEMA)
-    _check_leak(c.text, canary)
+    cost = cost_usd(settings, "review", c)
     try:
+        _check_leak(c.text, canary)
         start, end = c.text.find("{"), c.text.rfind("}")
         raw = json.loads(c.text[start:end + 1])
         for key in ("strengths", "gaps", "next_steps"):
             raw[key] = [sanitize_output(str(x), 300) for x in raw.get(key, [])][:6]
         result = ReviewResult.model_validate(raw)
     except (ValueError, ValidationError, AttributeError, TypeError) as exc:
-        raise AIError("invalid review output") from exc
-    return result, cost_usd(settings, "review", c), redactions
+        err = AIError("invalid review output")
+        err.cost = cost
+        raise err from exc
+    except AIError as err:
+        err.cost = cost  # the call was billed even though its output was refused
+        raise
+    return result, cost, redactions
 
 
 def chat(client: AIClient, settings: Settings, *, user_id: str, lesson_title: str,
@@ -281,8 +293,13 @@ def chat(client: AIClient, settings: Settings, *, user_id: str, lesson_title: st
     user_input = f"Current lesson: {lesson_title}\n{_wrap('question', text, nonce)}"
     c = client.complete(model=settings.model_chat, instructions=_chat_rules(nonce, canary), user_input=user_input,
                         max_output_tokens=500, user_id=user_id)
-    _check_leak(c.text, canary)
-    reply = sanitize_output(c.text, settings.max_output_chars)
-    if not reply:
-        raise AIError("empty chat output")
-    return reply, cost_usd(settings, "chat", c), redactions
+    cost = cost_usd(settings, "chat", c)
+    try:
+        _check_leak(c.text, canary)
+        reply = sanitize_output(c.text, settings.max_output_chars)
+        if not reply:
+            raise AIError("empty chat output")
+    except AIError as err:
+        err.cost = cost  # the call was billed even though its output was refused
+        raise
+    return reply, cost, redactions

@@ -85,6 +85,8 @@ export function friendly(e: ApiError | null): string {
   const map: Record<string, string> = {
     daily_limit_reached: "You have reached today's mentor limit. It resets tomorrow.",
     monthly_budget_reached: "You have used this month's AI budget.",
+    ai_capacity_reached: "The mentor is at capacity right now. Please try again later.",
+    request_too_large: "That is too large to send. Please shorten it.",
     previous_lesson_incomplete: "Complete the previous lesson first.",
     upgrade_required: "This lesson is part of the full program.",
     level_incomplete: "Finish every lesson in this level first.",

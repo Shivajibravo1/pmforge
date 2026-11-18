@@ -10,11 +10,11 @@ Stack: Caddy (automatic HTTPS) -> Next.js frontend + FastAPI backend -> Postgres
 - Backend verifies JWTs against the frontend JWKS at `http://frontend:3000/api/auth/jwks` (internal), issuer `https://<DOMAIN>`, audience `pmforge-api`.
 
 ## Cloudflare in front (needed for automatic INR or USD)
-The landing page picks the price currency from the `cf-ipcountry` header that Cloudflare adds. Without Cloudflare everyone sees USD first (the toggle still works). Caddy passes the header through unchanged.
+The landing page picks the price currency from the `cf-ipcountry` header that Cloudflare adds. Without Cloudflare everyone sees USD first (the toggle still works). Caddy passes the header through only when the connection comes from a Cloudflare address (ranges in the Caddyfile in `deploy/docker-compose.yml`, from `https://www.cloudflare.com/ips/`, last updated by Cloudflare on 28 Sep 2023). For any other source Caddy deletes `Cf-Connecting-Ip` and `Cf-Ipcountry`, so a visitor who reaches the VPS directly cannot forge their address or country. Re-check those ranges when Cloudflare publishes a change.
 1. Add `pmforge.pm` to a Cloudflare account and switch the registrar nameservers to the two Cloudflare gives you.
 2. DNS records `A pmforge.pm` and `CNAME www` stay as in Prerequisites, with the orange cloud (Proxied) on.
 3. SSL/TLS mode: **Full (strict)**. Caddy keeps its own certificate, so the origin stays encrypted.
-4. Firewall: in the Hostinger VPS firewall allow TCP 80 and 443 only from Cloudflare's published ranges (lists at `https://www.cloudflare.com/ips/`), plus 22 from your own address. This matters for security: the app trusts `cf-connecting-ip` for rate limiting and `cf-ipcountry` for currency, and anyone who can reach the VPS directly could forge them. Re-check the ranges every few months.
+4. Firewall: in the Hostinger VPS firewall allow TCP 80 and 443 only from Cloudflare's published ranges (lists at `https://www.cloudflare.com/ips/`), plus 22 from your own address. This is defence in depth with the Caddy header stripping above, and it also stops direct attacks on the origin. Re-check the ranges every few months.
 5. Check: open `https://pmforge.pm` from India and from another country (or a VPN). The currency toggle should start on INR in India and USD elsewhere.
 6. Do not turn on Cloudflare "Always Use HTTPS" caching rules for `/api/*`, `/sign-in` or `/app`. Leave caching at the default (dynamic pages are not cached).
 
@@ -86,3 +86,8 @@ Docker Manager logs per project, `https://pmforge.pm/health` from an external up
 
 ## Rollback
 Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy. Database rollback uses the latest dump.
+
+## Abuse limits (what they do and do not cover)
+- Sign-in codes: Better Auth limits per client address and path, and `frontend/src/lib/email-throttle.ts` limits per target email (5 code requests and 10 code attempts per hour). The email counters are in memory: they reset when the frontend container restarts and are not shared between instances.
+- Request bodies: Caddy rejects API bodies over 64 KiB and the backend enforces the same cap (`MAX_BODY_BYTES`).
+- AI spend: each mentor call reserves its worst-case cost and one daily slot before the model runs. Failed calls that reached the model still count. Global ceilings `GLOBAL_DAILY_AI_BUDGET_USD` (default 5) and `GLOBAL_MONTHLY_AI_BUDGET_USD` (default 50) stop all users with `ai_capacity_reached`. Set them in hPanel to match the OpenAI billing limit.

@@ -40,6 +40,15 @@ class Settings(BaseSettings):
     max_chat_chars: int = 1500
     max_output_chars: int = 2000
 
+    # Request body ceiling in bytes, enforced before authentication. The largest legitimate body is an
+    # artifact of 8000 characters (up to 32 KB as UTF-8) plus JSON overhead.
+    max_body_bytes: int = 65536
+
+    # Platform-wide AI spend ceilings in USD, on top of the per-user caps. Each user can spend up to
+    # monthly_ai_budget_usd, so without these a crowd of accounts is limited only by the provider's own billing limit.
+    global_daily_ai_budget_usd: float = 5.0
+    global_monthly_ai_budget_usd: float = 50.0
+
     # Product rules (Requirement Baseline v1.1).
     free_lessons: int = 7
 
