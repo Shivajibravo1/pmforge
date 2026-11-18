@@ -130,5 +130,6 @@ export function friendly(e: ApiError | null): string {
     level_incomplete: "Finish every lesson in this level first.",
     content_not_allowed: "That text cannot be reviewed. Please rephrase it without sensitive or inappropriate content.",
   };
-  return map[e.code] ?? "Something went wrong. Please try again.";
+  // The code and status are safe to show and let support pinpoint the failing request.
+  return map[e.code] ?? `Something went wrong (${e.status} ${e.code}). Please try again.`;
 }
