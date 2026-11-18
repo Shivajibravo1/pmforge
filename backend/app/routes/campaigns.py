@@ -124,32 +124,35 @@ def update(cid: str, body: CampaignIn, _: User = Depends(require_admin), db: Ses
 
 
 @router.post("/{cid}/schedule")
-def schedule(cid: str, _: User = Depends(require_admin), db: Session = Depends(get_db)):
+def schedule(cid: str, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     c = _get(db, cid)
     if c.status in ("sent", "partial"):
         raise HTTPException(409, "already_sent")
     _can_schedule(db, c)
     c.status = "scheduled"
     db.commit()
+    log.info("admin %s scheduled email %s for %s at %s IST", admin.id, c.id, c.send_on, c.send_hour)
     return _view(c)
 
 
 @router.post("/{cid}/unschedule")
-def unschedule(cid: str, _: User = Depends(require_admin), db: Session = Depends(get_db)):
+def unschedule(cid: str, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     c = _get(db, cid)
     if c.status == "scheduled":
         c.status = "draft"
         db.commit()
+        log.info("admin %s unscheduled email %s", admin.id, c.id)
     return _view(c)
 
 
 @router.delete("/{cid}")
-def delete(cid: str, _: User = Depends(require_admin), db: Session = Depends(get_db)):
+def delete(cid: str, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     c = _get(db, cid)
     if c.status == "scheduled":
         raise HTTPException(409, "unschedule_first")
     db.delete(c)
     db.commit()
+    log.info("admin %s deleted email %s", admin.id, cid)
     return {"deleted": cid}
 
 

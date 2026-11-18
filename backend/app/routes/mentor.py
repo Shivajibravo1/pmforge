@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -99,6 +99,11 @@ def submit_artifact(day: int, body: ArtifactIn, user: User = Depends(current_use
     meta = require_access(day, user, completed_days(db, user.id), settings)
     if meta["type"] not in ("B", "S", "K", "P", "A") and not content.journal_prompt(day):
         raise HTTPException(422, "This lesson does not take an artifact")
+    since = datetime.now(UTC) - timedelta(days=1)
+    stored = db.scalar(select(func.count()).select_from(Artifact).where(
+        Artifact.user_id == user.id, Artifact.created_at >= since)) or 0
+    if stored >= settings.max_artifacts_per_day:
+        raise HTTPException(429, "daily_limit_reached")
     art = Artifact(user_id=user.id, day=day, content=body.content)
     db.add(art)
     db.commit()

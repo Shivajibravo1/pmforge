@@ -108,6 +108,10 @@ def current_user(
         user.email = email
     if email.lower() in settings.admin_list:
         user.role = "admin"
+    elif email and user.role == "admin":
+        # ADMIN_EMAILS is the source of truth: removing an address revokes access at the next request.
+        log.warning("Admin role revoked for user %s: email no longer in ADMIN_EMAILS", user.id)
+        user.role = "user"
     db.commit()
     return user
 

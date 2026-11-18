@@ -250,3 +250,12 @@ def test_published_lessons_load_and_have_no_em_dashes(client):
         text = (content._DIR / "lessons" / name).read_text(encoding="utf-8")
         assert "—" not in text and len(text.split()) > 150, name
     assert client.get("/api/v1/lessons/1", headers=h).json()["body"].startswith("## ")
+
+
+def test_artifact_storage_is_capped_per_day(client, monkeypatch):
+    from app.config import get_settings
+    monkeypatch.setattr(get_settings(), "max_artifacts_per_day", 2)
+    h = auth("u-cap", "cap@example.com")
+    body = {"content": "x" * 30}
+    codes = [client.post("/api/v1/lessons/1/artifact", json=body, headers=h).status_code for _ in range(3)]
+    assert codes == [201, 201, 429]

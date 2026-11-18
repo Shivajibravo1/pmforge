@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     max_reviews_per_day: int = 5
     monthly_ai_budget_usd: float = 3.0
     max_artifact_chars: int = 8000
+    max_artifacts_per_day: int = 30  # stored submissions per user in 24 hours, so storage cannot be filled for free
     max_chat_chars: int = 1500
     max_output_chars: int = 3200  # a structured reply with a table must not be cut mid-table
 

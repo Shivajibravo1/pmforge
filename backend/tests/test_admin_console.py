@@ -86,3 +86,11 @@ def test_detail_has_learning_record_and_no_artifact_text(client, fake_ai):
     assert d["reviews"] == [] and d["certificates"] == [] and d["ai_usage_month"] == []
     assert "content" not in str(d)
     assert client.get("/api/v1/admin/users/ghost", headers=admin).status_code == 404
+
+
+def test_admin_role_is_revoked_when_email_leaves_admin_list(client, monkeypatch):
+    from app.config import get_settings
+    assert client.get("/api/v1/me", headers=auth("u9", "admin@example.com")).json()["role"] == "admin"
+    monkeypatch.setattr(get_settings(), "admin_emails", "someone-else@example.com")
+    assert client.get("/api/v1/me", headers=auth("u9", "admin@example.com")).json()["role"] == "user"
+    assert client.get("/api/v1/admin/stats", headers=auth("u9", "admin@example.com")).status_code == 403

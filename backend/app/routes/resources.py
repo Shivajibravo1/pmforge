@@ -1,3 +1,4 @@
+import logging
 import re
 from uuid import UUID
 
@@ -10,6 +11,7 @@ from app.db import get_db
 from app.models import EmailCampaign, InterviewQuestion, Resource, User
 from app.security import current_user, require_admin
 
+log = logging.getLogger("pmforge.admin")
 router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
 admin = APIRouter(prefix="/api/v1/admin/resources", tags=["admin"], dependencies=[Depends(require_admin)])
 public = APIRouter(prefix="/public/files", tags=["public"])
@@ -69,7 +71,7 @@ def get_file(rid: str, _: User = Depends(current_user), db: Session = Depends(ge
 
 @admin.post("")
 async def upload(request: Request, title: str = Query(min_length=3, max_length=120), in_email: bool = False,
-                 db: Session = Depends(get_db)):
+                 admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     """Raw file bytes as the request body. The admin check runs before the body is read."""
     data = await request.body()
     if not data:
@@ -85,11 +87,12 @@ async def upload(request: Request, title: str = Query(min_length=3, max_length=1
     r = Resource(kind=kind, title=title.strip(), content_type=mime, size=len(data), data=data, in_email=in_email)
     db.add(r)
     db.commit()
+    log.info("admin %s uploaded resource %s (%s, %d bytes, in_email=%s)", admin.id, r.id, kind, len(data), in_email)
     return _view(r)
 
 
 @admin.delete("/{rid}")
-def delete(rid: str, db: Session = Depends(get_db)):
+def delete(rid: str, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     r = _get(db, rid)
     if db.scalar(select(InterviewQuestion.send_on).where(InterviewQuestion.resource_id == rid).limit(1)):
         raise HTTPException(409, "resource_in_use")
@@ -98,6 +101,7 @@ def delete(rid: str, db: Session = Depends(get_db)):
             raise HTTPException(409, "resource_in_use")
     db.delete(r)
     db.commit()
+    log.info("admin %s deleted resource %s", admin.id, rid)
     return {"deleted": rid}
 
 
