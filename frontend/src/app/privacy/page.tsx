@@ -21,12 +21,12 @@ export default function Privacy() {
           rows={[
             ["Email address", "To create your account and send your one-time sign-in code."],
             ["Full name", "To set up your account, personalise the app and print your name on certificates."],
-            ["Mobile number, given at enrollment (we do not verify it by SMS)", "To contact you about your account and service, and, only if you opt in, to send the WhatsApp interview bonus."],
+            ["Mobile number, given at enrollment (we do not verify it by SMS)", "To contact you about your account and service."],
             ["Learning progress: completed days, XP, completion dates", "To run the program, show progress and issue certificates."],
             ["Work you submit: project artifacts, and the score and feedback the AI mentor returns", "To give you reviews and build your portfolio."],
             ["Certificates: code, level, issue date", "To issue certificates and let others verify them."],
             ["Portfolio settings: public link and on or off choice", "To show your portfolio only if you choose."],
-            ["WhatsApp number and opt-in record (paid members who choose the daily interview question bonus only)", "To send the daily questions you asked for, and to prove your consent."],
+            ["Interview email opt-in record: date and time, and the wording you agreed to (paid members who choose the daily interview question bonus only)", "To send the daily questions you asked for, and to prove your consent."],
             ["Plan status", "To know whether you are on the free or a paid plan."],
             ["Usage counts and cost of AI calls", "To enforce daily limits and a monthly budget."],
             ["Technical data: IP address, device and request information", "To keep the service secure, limit abuse and fix faults."],
@@ -61,9 +61,8 @@ export default function Privacy() {
           head={["Provider type", "What they do", "Data involved"]}
           rows={[
             ["Hosting and database", "Run the website, the app and the database", "All account and learning data"],
-            ["Email delivery", "Send your sign-in codes", "Email address and the code"],
+            ["Email delivery", "Send your sign-in codes and, if you opt in, the daily interview question", "Email address and the message sent"],
             ["AI provider (OpenAI)", "Produce mentor replies and artifact reviews", "The text you submit for review or chat, after we remove detected personal data"],
-            ["WhatsApp messaging provider", "Deliver the optional daily interview question", "WhatsApp number and the message sent"],
             ["Payment provider", "Take and refund payments", "Payment and plan details, handled by the provider"],
           ]}
         />

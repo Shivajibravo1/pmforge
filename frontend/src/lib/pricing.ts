@@ -37,7 +37,7 @@ export const PLANS: Plan[] = [
     name: "Monthly",
     period: "per month",
     amounts: { INR: 699, USD: 7.49 },
-    points: [`All ${TOTAL_DAYS} days across 4 levels`, "Public portfolio and verifiable certificates", "Bonus: daily interview question on WhatsApp", "Billed monthly"],
+    points: [`All ${TOTAL_DAYS} days across 4 levels`, "Public portfolio and verifiable certificates", "Bonus: daily interview question by email", "Billed monthly"],
     highlight: false,
   },
   {
@@ -45,7 +45,7 @@ export const PLANS: Plan[] = [
     name: "Yearly",
     period: "per year",
     amounts: { INR: 3499, USD: 36.99 },
-    points: [`All ${TOTAL_DAYS} days across 4 levels`, "Public portfolio and verifiable certificates", "Bonus: daily interview question on WhatsApp", "Billed yearly"],
+    points: [`All ${TOTAL_DAYS} days across 4 levels`, "Public portfolio and verifiable certificates", "Bonus: daily interview question by email", "Billed yearly"],
     highlight: true,
   },
 ];

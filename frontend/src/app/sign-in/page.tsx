@@ -117,7 +117,7 @@ function SignInForm() {
                   <span>
                     I agree to the <Link href="/terms" className="underline">Terms</Link> and the{" "}
                     <Link href="/privacy" className="underline">Privacy Policy</Link>. I understand my mobile number is used for
-                    account and service messages. Optional WhatsApp interview questions are a separate choice I make later.
+                    account and service messages. Optional daily interview questions by email are a separate choice I make later.
                   </span>
                 </label>
               </>

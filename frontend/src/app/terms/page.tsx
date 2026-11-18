@@ -40,7 +40,7 @@ export default function Terms() {
             `The free plan includes Days 1 to ${FREE_DAYS} of the ${TOTAL_DAYS}-day program. Paid plans unlock all ${TOTAL_DAYS} days.`,
             "Paid plans are billed monthly or yearly. The price, currency and any taxes are shown at checkout before you pay.",
             "Payments are handled by a third-party payment provider. We do not see or store your card details.",
-            "Paid members may opt in to a daily interview question on WhatsApp as a bonus. It is optional, is not part of the certificate or refund calculation, may be changed or paused, and can be stopped any time by replying STOP. Standard WhatsApp and data charges from your carrier may apply.",
+            "Paid members may opt in to a daily interview question by email as a bonus. It is optional, is not part of the certificate or refund calculation, may be changed or paused, and can be stopped any time with the unsubscribe link in every email.",
             "We may change prices or plans. A change does not affect a period you have already paid for.",
             <>Refunds are covered by our <Link className="underline" href="/refund">Refund Policy</Link>.</>,
           ]}
