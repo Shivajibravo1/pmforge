@@ -20,7 +20,7 @@ const ICONS: Record<string, LucideIcon> = {
 };
 const iconFor = (name: string): LucideIcon => ICONS[name.toLowerCase()] ?? Sparkles;
 
-function Flow({ src }: { src: string }) {
+export function Flow({ src }: { src: string }) {
   const steps = parseFlow(src);
   return (
     <ol className="my-6 grid gap-3 md:auto-cols-fr md:grid-flow-col" style={{ listStyle: "none", paddingLeft: 0 }} aria-label="Process">

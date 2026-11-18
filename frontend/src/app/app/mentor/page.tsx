@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Button, Card, Notice, LoadError, Spinner } from "@/components/ui";
+import { MentorReply } from "@/components/mentor-reply";
 import { type Curriculum, type Progress, api, friendly, useApi, ApiError } from "@/lib/api";
 
 type Turn = { role: "you" | "mentor"; text: string };
@@ -47,7 +48,7 @@ export default function Mentor() {
         {turns.map((t, i) => (
           <Card key={i} className={t.role === "you" ? "bg-surface2" : ""}>
             <p className="mb-1 text-xs font-semibold text-lime">{t.role === "you" ? "You" : "Mentor"}</p>
-            <p className="whitespace-pre-wrap text-sm">{t.text}</p>
+            {t.role === "you" ? <p className="whitespace-pre-wrap text-sm">{t.text}</p> : <MentorReply text={t.text} />}
           </Card>
         ))}
       </div>

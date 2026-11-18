@@ -28,7 +28,7 @@ def estimate_cost(settings: Settings, kind: str) -> float:
     if kind == "review":
         c = ai.Completion("", settings.max_artifact_chars + 1500, 700)
     else:
-        c = ai.Completion("", settings.max_chat_chars + 800, 500)
+        c = ai.Completion("", settings.max_chat_chars + 800, ai.CHAT_MAX_OUTPUT_TOKENS)
     return ai.cost_usd(settings, kind, c)
 
 

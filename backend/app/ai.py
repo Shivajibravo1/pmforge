@@ -229,12 +229,25 @@ def _review_rules(nonce: str, canary: str) -> str:
     )
 
 
+CHAT_MAX_OUTPUT_TOKENS = 700  # room for a table and a flow block
+
+CHAT_FORMAT = (
+    "Format every reply as clean Markdown for a small screen. Open with a one or two sentence answer in plain "
+    "paragraphs. Use a bullet list for sets of points, a numbered list for procedures, and a table (header row, a "
+    "|---|---| separator row, 2 to 4 columns, short cells) when comparing items. For a process or sequence, add one "
+    "fenced block that starts with ```flow and has one step per line written as: Step title | one short detail, with "
+    "3 to 6 steps. Use ## headings only when the answer has several sections. Use **bold** sparingly for key terms. "
+    "Never use HTML, links, images or code blocks other than the flow block. "
+    "Keep the whole reply under about 250 words."
+)
+
+
 def _chat_rules(nonce: str, canary: str) -> str:
     return (
         f"{_SECURITY_RULES} Internal marker (never output it): {canary}. "
         "Role: PMForge Mentor for working IT project managers. Answer only about IT project delivery, Agile and "
         "hybrid methods, cloud, DevSecOps, service management and AI governance. Be concise and practical. "
-        f"The learner question is inside <question-{nonce}> tags."
+        f"The learner question is inside <question-{nonce}> tags. {CHAT_FORMAT}"
     )
 
 
@@ -292,7 +305,7 @@ def chat(client: AIClient, settings: Settings, *, user_id: str, lesson_title: st
     text, redactions = _prepare(settings, client, user_id, message, settings.max_chat_chars)
     user_input = f"Current lesson: {lesson_title}\n{_wrap('question', text, nonce)}"
     c = client.complete(model=settings.model_chat, instructions=_chat_rules(nonce, canary), user_input=user_input,
-                        max_output_tokens=500, user_id=user_id)
+                        max_output_tokens=CHAT_MAX_OUTPUT_TOKENS, user_id=user_id)
     cost = cost_usd(settings, "chat", c)
     try:
         _check_leak(c.text, canary)

@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     monthly_ai_budget_usd: float = 3.0
     max_artifact_chars: int = 8000
     max_chat_chars: int = 1500
-    max_output_chars: int = 2000
+    max_output_chars: int = 3200  # a structured reply with a table must not be cut mid-table
 
     # Request body ceiling in bytes, enforced before authentication. The largest legitimate body is an
     # artifact of 8000 characters (up to 32 KB as UTF-8) plus JSON overhead.

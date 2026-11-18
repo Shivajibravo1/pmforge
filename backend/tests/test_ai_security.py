@@ -151,3 +151,18 @@ def test_review_items_are_sanitised(client, fake_ai):
 def test_invalid_model_output_is_rejected(client, fake_ai, bad):
     fake_ai.text = bad
     assert _review(client).status_code == 502
+
+
+def test_chat_prompt_asks_for_structured_markdown_without_html_or_links(client, fake_ai):
+    fake_ai.text = "ok"
+    r = client.post("/api/v1/mentor/chat", json={"day": 1, "message": "What is RAID?"}, headers=auth())
+    assert r.status_code == 200
+    ins = fake_ai.calls[0]["instructions"]
+    assert "```flow" in ins and "table" in ins and "bullet" in ins
+    assert "Never use HTML, links, images" in ins
+
+
+def test_markdown_structure_survives_sanitising():
+    from app import ai
+    md = "Answer.\n\n| A | B |\n|---|---|\n| **x** | y |\n\n```flow\nOne | first\nTwo | second\n```"
+    assert ai.sanitize_output(md, 4000) == md
