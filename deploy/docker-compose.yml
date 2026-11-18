@@ -28,6 +28,8 @@ services:
       postgres: { condition: service_healthy }
     restart: "no"
     networks: [internal]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 
   auth-migrate:
     image: ghcr.io/shivajibravo1/pmforge-frontend-migrate:${IMAGE_TAG:-latest}
@@ -45,6 +47,8 @@ services:
       postgres: { condition: service_healthy }
     restart: "no"
     networks: [internal]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 
   backend:
     image: ghcr.io/shivajibravo1/pmforge-backend:${IMAGE_TAG:-latest}
@@ -72,6 +76,8 @@ services:
       timeout: 5s
       retries: 5
     networks: [internal]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 
   frontend:
     image: ghcr.io/shivajibravo1/pmforge-frontend:${IMAGE_TAG:-latest}
@@ -83,6 +89,8 @@ services:
       auth-migrate: { condition: service_completed_successfully }
       backend: { condition: service_started }
     networks: [internal]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 
   interview-mailer:
     # Sends the daily interview question email to members who opted in. Checks every 10 minutes and sends
@@ -100,6 +108,8 @@ services:
     depends_on:
       backend-migrate: { condition: service_completed_successfully }
     networks: [internal]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
 
   backup:
     # Nightly dump into /var/backups/pmforge on the VPS host. A host folder (not a Docker volume) so the

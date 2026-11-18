@@ -5,6 +5,7 @@ _tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp.name}"
 os.environ["ADMIN_EMAILS"] = "admin@example.com"
 os.environ["OPENAI_API_KEY"] = ""
+os.environ["RATE_LIMIT_PER_MINUTE"] = "0"  # the limiter has its own tests
 
 import jwt  # noqa: E402
 import pytest  # noqa: E402

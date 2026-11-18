@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     max_body_bytes: int = 65536
     max_upload_bytes: int = 5 * 1024 * 1024  # admin image and PDF uploads, the only route allowed a large body
 
+    # Requests per minute per client address. 0 turns the limit off (tests only). Public routes need no login.
+    rate_limit_per_minute: int = 240
+    rate_limit_public_per_minute: int = 60
+
     # Platform-wide AI spend ceilings in USD, on top of the per-user caps. Each user can spend up to
     # monthly_ai_budget_usd, so without these a crowd of accounts is limited only by the provider's own billing limit.
     global_daily_ai_budget_usd: float = 5.0

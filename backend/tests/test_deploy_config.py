@@ -55,3 +55,10 @@ def test_backend_service_can_send_test_emails():
     block = COMPOSE[COMPOSE.index("\n  backend:\n"):COMPOSE.index("  interview-mailer:")]
     for var in ("RESEND_API_KEY", "EMAIL_FROM", "PUBLIC_BASE_URL"):
         assert var in block
+
+
+def test_app_containers_drop_privileges():
+    """OWASP A02 / container hardening: no extra privileges and no Linux capabilities for our own services."""
+    for name in ("backend-migrate", "auth-migrate", "backend", "frontend", "interview-mailer"):
+        block = COMPOSE.split(f"\n  {name}:\n", 1)[1].split("\n\n", 1)[0]
+        assert "no-new-privileges:true" in block and "cap_drop: [ALL]" in block, name

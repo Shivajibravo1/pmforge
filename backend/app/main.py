@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import get_settings
 from app.db import Base, engine
+from app.ratelimit import RateLimit
 from app.routes import admin, campaigns, interview, learning, mentor, portfolio, resources
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -88,6 +89,8 @@ def create_app() -> FastAPI:
     app = FastAPI(title="PMForge API", version="0.1.0", docs_url=docs, redoc_url=None, openapi_url=
                   None if settings.env == "production" else "/openapi.json")
     app.add_middleware(SecurityHeaders)
+    app.add_middleware(RateLimit, per_minute=settings.rate_limit_per_minute,
+                       public_per_minute=settings.rate_limit_public_per_minute)
     app.add_middleware(MaxBodySize, max_bytes=settings.max_body_bytes,
                        overrides={("POST", "/api/v1/admin/resources"): settings.max_upload_bytes})
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_list, allow_credentials=False,
