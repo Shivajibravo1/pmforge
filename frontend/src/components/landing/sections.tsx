@@ -1,22 +1,24 @@
+import { Briefcase, Bug, Coins, Gauge, MessagesSquare, Repeat, Scale, ShieldAlert, ShieldCheck, TrendingUp, Award, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui";
+import { CountUp, InView } from "./motion";
 
 const ext = { target: "_blank", rel: "noopener noreferrer" } as const;
 
 const reality = [
   {
-    stat: "40%+",
+    n: 40, suffix: "%+", stat: "40%+",
     text: "of agentic AI projects forecast to be cancelled by the end of 2027, citing rising costs, unclear business value and inadequate risk controls.",
     who: "Gartner forecast, June 2025",
     href: "https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027.",
   },
   {
-    stat: "80%+",
+    n: 80, suffix: "%+", stat: "80%+",
     text: "of AI projects fail by some estimates, twice the rate of IT projects that do not involve AI.",
     who: "RAND Corporation, root-cause study",
     href: "https://www.rand.org/pubs/research_reports/RRA2680-1.html",
   },
   {
-    stat: "81%",
+    n: 81, suffix: "%", stat: "81%",
     text: "of project professionals say projects have become more complex, and 97% managed at least one complex project in the past year.",
     who: "PMI Pulse of the Profession 2026",
     href: "https://www.pmi.org/about/press-media/2026/pulse-why-complex-projects-fail-best-practices-are-not-enough-system-thinking",
@@ -26,17 +28,20 @@ const reality = [
 export function Reality() {
   return (
     <div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <InView className="grid gap-4 md:grid-cols-3">
         {reality.map((r) => (
           <Card key={r.stat}>
-            <p className="text-4xl font-bold text-lime">{r.stat}</p>
+            <p className="text-5xl font-bold text-lime"><CountUp to={r.n} suffix={r.suffix} /></p>
+            <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface2">
+              <div className="pm-bar h-full rounded-full bg-lime" style={{ width: `${r.n}%` }} />
+            </div>
             <p className="mt-3 text-sm">{r.text}</p>
             <a href={r.href} {...ext} className="mt-4 inline-block text-xs text-muted underline hover:text-white">
               {r.who}
             </a>
           </Card>
         ))}
-      </div>
+      </InView>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Card>
           <h3 className="font-semibold">Regulation is arriving, not going away</h3>
@@ -63,6 +68,7 @@ export function Reality() {
   );
 }
 
+const segmentIcons: LucideIcon[] = [Briefcase, Repeat, Award];
 const segments = [
   ["Working IT project managers", "Your sponsor now asks for an AI plan, with security, cost and compliance answers. Get a framework and the proof to back it."],
   ["Career switchers", "Moving from development, business analysis, testing or support? Build the artifacts hiring managers ask to see."],
@@ -72,12 +78,16 @@ const segments = [
 export function Segments() {
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      {segments.map(([t, d]) => (
+      {segments.map(([t, d], i) => {
+        const Icon = segmentIcons[i];
+        return (
         <Card key={t}>
+          <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-violet/25 text-lime"><Icon className="h-5 w-5" /></span>
           <h3 className="font-semibold">{t}</h3>
           <p className="mt-2 text-sm text-muted">{d}</p>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -89,17 +99,22 @@ const gates = [
   ["Compliance", "Which standards and laws apply, and who signs off?", "Days 77, 105, 106, 107, 110"],
 ];
 
+const gateIcons: LucideIcon[] = [TrendingUp, ShieldCheck, Coins, Scale];
+
 export function Gates() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {gates.map(([t, q, d], i) => (
-        <Card key={t}>
-          <span className="text-xs font-semibold text-lime">Gate {i + 1}</span>
-          <h3 className="mt-1 text-lg font-semibold">{t}</h3>
+      {gates.map(([t, q, d], i) => {
+        const Icon = gateIcons[i];
+        return (
+        <Card key={t} className="transition hover:-translate-y-1 hover:border-violet">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet text-white"><Icon className="h-6 w-6" /></span>
+          <h3 className="mt-3 text-lg font-semibold">{t}</h3>
           <p className="mt-2 text-sm text-muted">{q}</p>
           <p className="mt-4 border-t border-line pt-3 text-xs text-muted">{d}</p>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -113,26 +128,23 @@ const pressure = [
   ["You need to prove your skills in an interview", "Day 116 (AI-graded mock interview)"],
 ];
 
+const pressureIcons: LucideIcon[] = [Gauge, ShieldAlert, Bug, Coins, Scale, MessagesSquare];
+
 export function Pressure() {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line bg-surface">
-      <table className="w-full min-w-[32rem] text-left text-sm">
-        <caption className="sr-only">Real project pressures and where PMForge lets you practise them</caption>
-        <thead>
-          <tr className="border-b border-line bg-surface2 text-muted">
-            <th scope="col" className="p-4 font-medium">When this happens</th>
-            <th scope="col" className="p-4 font-medium">You practise it in</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pressure.map(([a, b]) => (
-            <tr key={a} className="border-b border-line last:border-0">
-              <td className="p-4">{a}</td>
-              <td className="p-4 text-lime">{b}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3" aria-label="Real project pressures and where PMForge lets you practise them">
+      {pressure.map(([a, b], i) => {
+        const Icon = pressureIcons[i];
+        return (
+          <li key={a} className="flex gap-4 rounded-2xl border border-line bg-surface p-4 transition hover:border-lime">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface2 text-lime"><Icon className="h-5 w-5" /></span>
+            <span>
+              <span className="block text-sm">{a}</span>
+              <span className="mt-2 inline-block rounded-full bg-violet/30 px-2.5 py-1 text-xs text-lime">Practise: {b}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

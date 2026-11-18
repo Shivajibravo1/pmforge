@@ -5,6 +5,11 @@ import { LinkButton, Card } from "@/components/ui";
 import { MentorPreview } from "@/components/landing/mentor-preview";
 import { PhoneToday } from "@/components/landing/phone";
 import { Pricing } from "@/components/landing/pricing";
+import { Bot, Cloud, ClipboardList, Workflow } from "lucide-react";
+import { DayMap } from "@/components/landing/day-map";
+import { Evolution } from "@/components/landing/evolution";
+import { LearningLoop } from "@/components/landing/loop";
+import { Stats } from "@/components/landing/stats";
 import { Gates, Pressure, Reality, Segments } from "@/components/landing/sections";
 import { SiteFooter } from "@/components/landing/footer";
 import { FREE_DAYS, TOTAL_DAYS, countryFromHeaders, resolveCurrency } from "@/lib/pricing";
@@ -22,12 +27,7 @@ const levels = [
   { lv: "Level 4", days: "Days 91 to 120", title: "AI-enabled IT Programs", text: "AI business cases, evals, governance and a capstone program plan.", sample: "Day 100: 20-row eval set run against the OpenAI API" },
 ];
 
-const method = [
-  ["Learn", "Short concept lessons, one screen at a time, with real IT project scenarios."],
-  ["Build", "Produce the artifact a sponsor would ask for: a charter, RAID log, release plan or AI business case."],
-  ["Decide", "Work through tough stakeholder scenarios, such as a sponsor who cuts the budget by 20%."],
-  ["Review", "Get rubric-based mentor feedback with strengths, gaps and next steps, then improve and resubmit."],
-];
+const levelIcons = [ClipboardList, Workflow, Cloud, Bot];
 
 const faqs = [
   ["Who is PMForge for?", "Working IT project managers who want to move from basic IT delivery to AI-enabled programs, and anyone preparing for a PM interview in that space."],
@@ -83,56 +83,65 @@ export default async function Home() {
           </div>
         </section>
 
+        <Stats />
+
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">01 · The AI reality</p>
+          <p className="text-sm font-medium text-lime">The AI reality</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">AI projects are failing on cost, value and risk. That is a project management problem.</h2>
           <Reality />
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">02 · Who it is for</p>
+          <p className="text-sm font-medium text-lime">Who it is for</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Built for people who deliver IT projects, or want to.</h2>
           <Segments />
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">03 · Four gates</p>
+          <p className="text-sm font-medium text-lime">Four gates</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Every AI project must clear value, security, cost and compliance.</h2>
           <Gates />
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">04 · Real pressure, rehearsed</p>
+          <p className="text-sm font-medium text-lime">Real pressure, rehearsed</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Practise the hard calls before you face them at work.</h2>
           <Pressure />
         </section>
 
         <section id="program" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">05 · The program</p>
+          <p className="text-sm font-medium text-lime">The program</p>
           <h2 className="mt-2 max-w-3xl text-3xl font-bold">Four levels, 30 days each, from basics to AI-enabled programs.</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {levels.map((l) => (
-              <Card key={l.lv}>
-                <p className="text-sm text-lime">{l.lv} · {l.days}</p>
-                <h3 className="mt-1 text-lg font-semibold">{l.title}</h3>
-                <p className="mt-2 text-sm text-muted">{l.text}</p>
-                <p className="mt-4 border-t border-line pt-3 text-xs text-muted">{l.sample}</p>
-              </Card>
-            ))}
+            {levels.map((l, i) => {
+              const Icon = levelIcons[i];
+              return (
+                <Card key={l.lv} className="group relative overflow-hidden transition hover:border-violet">
+                  <div aria-hidden className="absolute inset-x-0 top-0 flex h-1">
+                    {levels.map((_, k) => <span key={k} className={`flex-1 ${k <= i ? "bg-lime" : "bg-surface2"}`} />)}
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet text-white transition group-hover:scale-110"><Icon className="h-6 w-6" /></span>
+                    <div>
+                      <p className="text-sm text-lime">{l.lv} · {l.days}</p>
+                      <h3 className="mt-1 text-lg font-semibold">{l.title}</h3>
+                      <p className="mt-2 text-sm text-muted">{l.text}</p>
+                    </div>
+                  </div>
+                  <p className="mt-4 border-t border-line pt-3 text-xs text-muted">{l.sample}</p>
+                </Card>
+              );
+            })}
           </div>
-          <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="How each day works">
-            {method.map(([t, d], i) => (
-              <li key={t} className="rounded-2xl border border-line bg-surface2 p-5">
-                <span className="text-xs font-semibold text-lime">Step {i + 1}</span>
-                <h3 className="mt-1 font-semibold">{t}</h3>
-                <p className="mt-2 text-sm text-muted">{d}</p>
-              </li>
-            ))}
-          </ol>
+          <h3 className="mt-14 mb-4 text-xl font-semibold">Every day follows one loop</h3>
+          <LearningLoop />
+          <h3 className="mt-14 mb-2 text-xl font-semibold">All {TOTAL_DAYS} days, one screen</h3>
+          <p className="mb-4 max-w-2xl text-sm text-muted">Hover, tap or tab through the map to read any day, or pick a lesson type to light it up.</p>
+          <DayMap />
         </section>
 
         <section id="mentor" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">06 · The mentor</p>
+          <p className="text-sm font-medium text-lime">The mentor</p>
           <div className="mt-2 grid items-start gap-8 md:grid-cols-2">
             <div>
               <h2 className="text-3xl font-bold">Feedback you can act on the same day.</h2>
@@ -146,7 +155,13 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-5 py-12">
-          <p className="text-sm font-medium text-lime">07 · Our ambition</p>
+          <p className="text-sm font-medium text-lime">Your progress, visible</p>
+          <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Your character grows as your skills do.</h2>
+          <Evolution />
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-5 py-12">
+          <p className="text-sm font-medium text-lime">Our ambition</p>
           <h2 className="mt-2 max-w-3xl text-3xl font-bold">Make every IT project manager AI-ready, with proof to show for it.</h2>
           <p className="mt-4 max-w-3xl text-muted">
             AI is now part of how IT projects are justified, funded, secured and audited. PMForge exists so that a project
@@ -168,13 +183,13 @@ export default async function Home() {
         </section>
 
         <section id="pricing" className="mx-auto w-full max-w-6xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">08 · Pricing</p>
+          <p className="text-sm font-medium text-lime">Pricing</p>
           <h2 className="mt-2 mb-8 max-w-3xl text-3xl font-bold">Start free. Upgrade when you want all {TOTAL_DAYS} days.</h2>
           <Pricing initialCurrency={currency} />
         </section>
 
         <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-20 px-5 py-12">
-          <p className="text-sm font-medium text-lime">09 · Questions</p>
+          <p className="text-sm font-medium text-lime">Questions</p>
           <h2 className="mt-2 mb-6 text-3xl font-bold">Frequently asked questions</h2>
           <div className="divide-y divide-line rounded-2xl border border-line bg-surface">
             {faqs.map(([q, a]) => (

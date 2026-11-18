@@ -1,4 +1,4 @@
-import { BookOpen, Briefcase, Home, MessageCircle, UserCircle } from "lucide-react";
+import { Award, BookOpen, Briefcase, FileCheck2, Home, MessageCircle, Sparkles, UserCircle } from "lucide-react";
 
 const tabs = [
   ["Today", Home],
@@ -11,6 +11,30 @@ const tabs = [
 /** Decorative preview of the Today screen. Day 5 and Day 6 are real titles from the curriculum. */
 export function PhoneToday() {
   return (
+    <div className="relative mx-auto w-fit">
+      <Chip className="-left-3 -top-4 sm:-left-36 sm:top-8" delay="0s" icon={FileCheck2} text="Artifact shipped" />
+      <Chip className="-right-3 top-44 sm:-right-20" delay="1.2s" icon={Sparkles} text="Mentor review" />
+      <Chip className="-left-3 bottom-8 sm:-left-36 sm:bottom-20" delay="2.1s" icon={Award} text="Level certificate" />
+      <PhoneBody />
+    </div>
+  );
+}
+
+function Chip({ className, delay, icon: Icon, text }: { className: string; delay: string; icon: typeof Award; text: string }) {
+  return (
+    <span
+      aria-hidden
+      style={{ animationDelay: delay }}
+      className={`pm-bob absolute z-10 flex items-center gap-2 rounded-full border border-line bg-surface/95 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur ${className}`}
+    >
+      <Icon className="h-4 w-4 text-lime" />
+      {text}
+    </span>
+  );
+}
+
+function PhoneBody() {
+  return (
     <div
       role="img"
       aria-label="Preview of the PMForge Today screen showing Day 5, Write a project charter for a website migration"
@@ -22,7 +46,7 @@ export function PhoneToday() {
           <span className="rounded-full bg-surface2 px-2 py-0.5 text-lime">Level 1</span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface2">
-          <div className="h-full w-[4%] rounded-full bg-lime" />
+          <div className="pm-hero-bar h-full w-[4%] rounded-full bg-lime" />
         </div>
         <p className="mt-5 text-[11px] font-medium text-lime">Today · Build sprint</p>
         <p className="mt-1 text-base font-semibold leading-snug">Write a project charter for a website migration</p>
