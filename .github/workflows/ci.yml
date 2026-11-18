@@ -39,7 +39,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm audit --audit-level=high
+      - run: node --experimental-strip-types scripts/audit-gate.ts
       - run: npm run build
   secrets:
     runs-on: ubuntu-latest
