@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.interview import today_ist
-from app.models import AdminAudit, Artifact, Certificate, InterviewQuestion, Progress, Review, UsageLog, User
+from app.models import AdminAudit, Artifact, Certificate, InterviewQuestion, Progress, Resource, Review, UsageLog, User
 from app.security import require_admin
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"], dependencies=[Depends(require_admin)])
@@ -113,6 +113,7 @@ class QuestionIn(BaseModel):
     question: str = Field(min_length=10, max_length=600)
     tips: list[str] = Field(default_factory=list, max_length=6)
     lesson_day: int | None = Field(default=None, ge=1, le=120)
+    resource_id: str | None = Field(default=None, max_length=36)
 
 
 @router.get("/interview-questions")
@@ -121,7 +122,7 @@ def list_scheduled_questions(db: Session = Depends(get_db)):
     rows = db.scalars(select(InterviewQuestion).where(InterviewQuestion.send_on >= today_ist())
                       .order_by(InterviewQuestion.send_on).limit(400)).all()
     return {"items": [{"send_on": r.send_on.isoformat(), "question": r.question, "tips": r.tips,
-                       "lesson_day": r.lesson_day} for r in rows]}
+                       "lesson_day": r.lesson_day, "resource_id": r.resource_id} for r in rows]}
 
 
 @router.put("/interview-questions/{send_on}")
@@ -129,12 +130,19 @@ def save_scheduled_question(send_on: date, body: QuestionIn, db: Session = Depen
     if send_on < today_ist():
         raise HTTPException(422, "date_in_past")
     tips = [t.strip()[:300] for t in body.tips if t.strip()]
+    if body.resource_id:
+        res = db.get(Resource, body.resource_id)
+        if not res:
+            raise HTTPException(422, "resource_not_found")
+        if res.kind == "image" and not res.in_email:
+            raise HTTPException(422, "image_not_email_ready")
     row = db.get(InterviewQuestion, send_on)
     if row is None:
         db.add(InterviewQuestion(send_on=send_on, question=body.question.strip(), tips=tips,
-                                 lesson_day=body.lesson_day))
+                                 lesson_day=body.lesson_day, resource_id=body.resource_id or None))
     else:
         row.question, row.tips, row.lesson_day = body.question.strip(), tips, body.lesson_day
+        row.resource_id = body.resource_id or None
     db.commit()
     return {"saved": send_on.isoformat()}
 

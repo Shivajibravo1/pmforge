@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app import emailer, interview
 from app.config import Settings, get_settings
 from app.db import SessionLocal
-from app.models import InterviewQuestion, InterviewSubscription, User
+from app.models import InterviewQuestion, InterviewSubscription, Resource, User
 
 log = logging.getLogger("pmforge.interview_email")
 IST = interview.IST
@@ -61,6 +61,12 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
         base = settings.public_base_url.rstrip("/")
         q = ({"day": scheduled.lesson_day, "question": scheduled.question, "tips": list(scheduled.tips or [])}
              if scheduled else interview.question_for(prev_index))
+        if scheduled and scheduled.resource_id:
+            res = db.get(Resource, scheduled.resource_id)
+            if res and res.kind == "image" and res.in_email:
+                q["image_url"], q["image_alt"] = f"{base}/public/files/{res.id}", res.title
+            elif res and res.kind == "pdf":
+                q["pdf_title"], q["resources_url"] = res.title, f"{base}/app/resources"
         unsub = f"{base}/public/interview/unsubscribe/{token}"  # one-click POST for mail apps (header)
         unsub_page = f"{base}/unsubscribe/{token}"  # page a person lands on when they click the link
         lesson_url = f"{base}/app/lesson/{q['day']}" if q["day"] else f"{base}/app"

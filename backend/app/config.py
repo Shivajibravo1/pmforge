@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     # Request body ceiling in bytes, enforced before authentication. The largest legitimate body is an
     # artifact of 8000 characters (up to 32 KB as UTF-8) plus JSON overhead.
     max_body_bytes: int = 65536
+    max_upload_bytes: int = 5 * 1024 * 1024  # admin image and PDF uploads, the only route allowed a large body
 
     # Platform-wide AI spend ceilings in USD, on top of the per-user caps. Each user can spend up to
     # monthly_ai_budget_usd, so without these a crowd of accounts is limited only by the provider's own billing limit.

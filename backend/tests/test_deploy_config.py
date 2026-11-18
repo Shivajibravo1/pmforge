@@ -28,7 +28,8 @@ def test_no_unescaped_dollar_in_caddyfile():
 
 def test_api_handle_caps_request_body():
     cf = _caddyfile()
-    block = cf[cf.index("handle @api"):cf.index("reverse_proxy backend:8000")]
+    start = cf.index("handle @api")
+    block = cf[start:cf.index("reverse_proxy backend:8000", start)]
     assert "request_body" in block and "max_size 64KiB" in block
 
 
@@ -40,3 +41,11 @@ def test_interview_mailer_service_is_wired():
     for var in ("RESEND_API_KEY", "EMAIL_FROM", "PUBLIC_BASE_URL", "DATABASE_URL"):
         assert var in block
     assert "ports:" not in block  # nothing listens; it only sends
+
+
+def test_only_the_upload_route_may_take_a_large_body():
+    cf = _caddyfile()
+    up = cf[cf.index("@upload path"):cf.index("handle @api")]
+    assert "/api/v1/admin/resources" in up and "max_size 6MiB" in up
+    assert cf.index("handle @upload") < cf.index("handle @api")  # first match wins
+    assert "max_size 64KiB" in cf[cf.index("handle @api"):]

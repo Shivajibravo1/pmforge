@@ -59,6 +59,9 @@ def compose(q: dict, *, lesson_url: str, unsubscribe_url: str) -> tuple[str, str
             "Say your answer out loud for two minutes before you read on."]
     if tips:
         text += ["", "A strong answer:"] + [f"- {t}" for t in tips]
+    pdf = q.get("pdf_title")
+    if pdf:
+        text += ["", f"Download the PDF \"{pdf}\": {q['resources_url']}"]
     text += ["", f"Open the lesson: {lesson_url}", "",
              "You get this email because you opted in at PMForge. Unsubscribe any time:", unsubscribe_url]
     e = html.escape
@@ -68,10 +71,14 @@ def compose(q: dict, *, lesson_url: str, unsubscribe_url: str) -> tuple[str, str
         '<p style="margin:0 0 8px;font-size:13px;color:#555">Today\'s interview question</p>'
         f'<p style="margin:0 0 16px;font-size:18px;line-height:1.4;font-weight:bold">{e(q["question"])}</p>'
         '<p style="margin:0 0 16px;line-height:1.5">Say your answer out loud for two minutes before you read on.</p>'
+        + (f'<p style="margin:0 0 16px"><img src="{e(q["image_url"])}" alt="{e(q.get("image_alt", ""))}" width="520" '
+           'style="display:block;max-width:100%;height:auto;border:0"></p>' if q.get("image_url") else "")
         + (
             '<p style="margin:0 0 4px;font-weight:bold">A strong answer:</p>'
             f'<ul style="margin:0 0 16px;padding-left:20px;line-height:1.5">{tip_html}</ul>' if tips else ""
         )
+        + (f'<p style="margin:0 0 16px"><a href="{e(q["resources_url"])}">Download the PDF: {e(pdf)}</a></p>'
+           if pdf else "")
         + f'<p style="margin:0 0 24px"><a href="{e(lesson_url)}">Open the lesson</a></p>'
         '<p style="margin:0;font-size:12px;color:#666">You get this email because you opted in at PMForge. '
         f'<a href="{e(unsubscribe_url)}">Unsubscribe</a></p></div>'

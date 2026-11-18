@@ -101,3 +101,12 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - **Unsubscribe:** every email has a link to `/unsubscribe/<token>` (one button) and a one-click `List-Unsubscribe` header. A member who fails 5 sends in a row is paused automatically.
 - **Check:** `docker logs <project>-interview-mailer-1` shows `pass done` lines. Email addresses are never logged.
 - **Before you rely on it:** confirm in Resend's current terms that daily educational email to opted-in members is allowed through the sending API, and that the `headers` field is accepted. I could not verify either from here.
+
+## Resources (images and PDFs) and email images
+
+- **Upload:** Admin console, "Resources". PDF, PNG or JPG, up to 5 MB. The file type is decided from the file's own contents, so a renamed file or an SVG is refused. Only the upload route accepts a large body (Caddy 6 MiB, API 5 MiB); every other route stays at 64 KiB.
+- **Who sees it:** any signed-in member, on the Resources page (You page has the link). Members download through their login, so a copied link does not work for outsiders.
+- **Email images:** tick "Use in emails" when uploading an image. That image gets a public, unguessable link (`/public/files/<id>`) so mail apps can show it. Do not tick it for anything private. PDFs are never public: the email links to the Resources page, where members sign in to download.
+- **Placement:** in the Admin console, "Daily interview emails", pick a date, write the question and choose one image or PDF. An image sits between the question and the tips.
+- **Backups:** files are stored in Postgres, so the nightly backup includes them. Many large files grow the database and the backup; check disk space now and then.
+- **Deleting:** a file used by a scheduled email cannot be deleted until it is removed from that email.

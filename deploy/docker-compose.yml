@@ -177,6 +177,13 @@ configs:
         request_header @notcf -Cf-Connecting-Ip
         request_header @notcf -Cf-Ipcountry
         @api path /api/v1/* /public/* /health
+        @upload path /api/v1/admin/resources
+        handle @upload {
+          request_body {
+            max_size 6MiB
+          }
+          reverse_proxy backend:8000
+        }
         handle @api {
           request_body {
             max_size 64KiB

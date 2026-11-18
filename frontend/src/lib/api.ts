@@ -25,16 +25,37 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
     signal: AbortSignal.timeout(20000), // never leave the screen loading forever
   });
-  if (!res.ok) {
-    let code = "request_failed";
-    try {
-      const j = await res.json();
-      if (typeof j.detail === "string") code = j.detail;
-    } catch {
-      /* non-JSON error body */
-    }
-    throw new ApiError(res.status, code);
+  if (!res.ok) throw await failure(res);
+  return (await res.json()) as T;
+}
+
+async function failure(res: Response): Promise<ApiError> {
+  let code = "request_failed";
+  try {
+    const j = await res.json();
+    if (typeof j.detail === "string") code = j.detail;
+  } catch {
+    /* non-JSON error body */
   }
+  return new ApiError(res.status, code);
+}
+
+/** Fetches a protected file (needs the sign-in token, so a plain link will not work). */
+export async function apiBlob(path: string): Promise<Blob> {
+  const res = await fetch(`${API_URL}${path}`, { headers: { Authorization: `Bearer ${await token()}` }, signal: AbortSignal.timeout(60000) });
+  if (!res.ok) throw await failure(res);
+  return res.blob();
+}
+
+/** Sends a file as the raw request body (admin resource upload). */
+export async function apiUpload<T>(path: string, file: File): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/octet-stream" },
+    body: file,
+    signal: AbortSignal.timeout(120000),
+  });
+  if (!res.ok) throw await failure(res);
   return (await res.json()) as T;
 }
 
@@ -89,6 +110,13 @@ export function friendly(e: ApiError | null): string {
     request_too_large: "That is too large to send. Please shorten it.",
     consent_required: "Please tick the box to agree before turning this on.",
     email_missing: "Your account has no email address.",
+    unsupported_file_type: "Only PDF, PNG and JPG files are allowed.",
+    empty_file: "That file is empty.",
+    only_images_in_email: "Only images can be shown inside an email. Untick that option for PDFs.",
+    resource_in_use: "A scheduled email uses this file. Remove it from the email first.",
+    image_not_email_ready: "That image was not uploaded for email. Upload it again with the email option ticked.",
+    resource_not_found: "That file no longer exists.",
+    date_in_past: "Pick today or a later date.",
     previous_lesson_incomplete: "Complete the previous lesson first.",
     upgrade_required: "This lesson is part of the full program.",
     level_incomplete: "Finish every lesson in this level first.",

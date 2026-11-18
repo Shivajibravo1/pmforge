@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import get_settings
 from app.db import Base, engine
-from app.routes import admin, interview, learning, mentor, portfolio
+from app.routes import admin, interview, learning, mentor, portfolio, resources
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -19,17 +19,19 @@ class MaxBodySize:
     Content-Length first, then counts bytes for chunked bodies that declare none.
     """
 
-    def __init__(self, app, max_bytes: int):
+    def __init__(self, app, max_bytes: int, overrides: dict[tuple[str, str], int] | None = None):
         self.app = app
         self.max_bytes = max_bytes
+        self.overrides = overrides or {}  # (METHOD, path) -> larger limit for that one route
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
+        limit = self.overrides.get((scope["method"], scope["path"]), self.max_bytes)
         declared = next((v for k, v in scope["headers"] if k == b"content-length"), None)
         if declared is not None:
             try:
-                too_big = int(declared) > self.max_bytes
+                too_big = int(declared) > limit
             except ValueError:
                 too_big = True
             if too_big:
@@ -47,7 +49,7 @@ class MaxBodySize:
             msg = await receive()
             if msg["type"] == "http.request":
                 seen += len(msg.get("body", b""))
-                if seen > self.max_bytes:
+                if seen > limit:
                     exceeded = True
                     return {"type": "http.request", "body": b"", "more_body": False}
             return msg
@@ -86,7 +88,8 @@ def create_app() -> FastAPI:
     app = FastAPI(title="PMForge API", version="0.1.0", docs_url=docs, redoc_url=None, openapi_url=
                   None if settings.env == "production" else "/openapi.json")
     app.add_middleware(SecurityHeaders)
-    app.add_middleware(MaxBodySize, max_bytes=settings.max_body_bytes)
+    app.add_middleware(MaxBodySize, max_bytes=settings.max_body_bytes,
+                       overrides={("POST", "/api/v1/admin/resources"): settings.max_upload_bytes})
     app.add_middleware(CORSMiddleware, allow_origins=settings.cors_list, allow_credentials=False,
                        allow_methods=["GET", "POST", "PUT"], allow_headers=["Authorization", "Content-Type"])
     if settings.env != "production":
@@ -97,7 +100,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router, interview.router,
-              interview.public):
+              interview.public, resources.router, resources.admin, resources.public):
         app.include_router(r)
     return app
 

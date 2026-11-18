@@ -2,7 +2,19 @@ import secrets
 import uuid
 from datetime import UTC, date, datetime
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -107,3 +119,17 @@ class InterviewQuestion(Base):
     question: Mapped[str] = mapped_column(String(600))
     tips: Mapped[list] = mapped_column(JSON, default=list)
     lesson_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    resource_id: Mapped[str | None] = mapped_column(String(36), nullable=True)  # image shown or PDF linked in the email
+
+
+class Resource(Base):
+    """An image or PDF uploaded by an admin. Bytes live in Postgres so the nightly backup covers them."""
+    __tablename__ = "resources"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    kind: Mapped[str] = mapped_column(String(8))  # "image" or "pdf"
+    title: Mapped[str] = mapped_column(String(120))
+    content_type: Mapped[str] = mapped_column(String(32))
+    size: Mapped[int] = mapped_column(Integer)
+    data: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
+    in_email: Mapped[bool] = mapped_column(Boolean, default=False)  # images only: served at a public link for emails
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

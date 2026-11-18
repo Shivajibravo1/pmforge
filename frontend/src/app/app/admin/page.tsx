@@ -1,4 +1,6 @@
 "use client";
+import { AdminInterviewSchedule } from "@/components/admin-interview-schedule";
+import { AdminResources } from "@/components/admin-resources";
 import { AdminUsers } from "@/components/admin-users";
 import { Card, Notice, Spinner } from "@/components/ui";
 import { useApi } from "@/lib/api";
@@ -19,6 +21,8 @@ export default function Admin() {
       <div className="grid grid-cols-2 gap-3">
         {rows.map(([k, v]) => <Card key={k}><p className="text-xs text-muted">{k}</p><p className="text-2xl font-bold">{v}</p></Card>)}
       </div>
+      <AdminResources />
+      <AdminInterviewSchedule />
       <AdminUsers />
     </div>
   );
