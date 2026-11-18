@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Character } from "@/components/character";
+import { SampleCertificate } from "@/components/sample-certificate";
 import { Button, Card, LoadError, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Curriculum, type Me, type Progress, api, friendly, useApi } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
@@ -19,6 +20,8 @@ export default function You() {
   const [codes, setCodes] = useState<Record<number, string>>({});
   const [msg, setMsg] = useState("");
   const [preview, setPreview] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(true);
+  const [sampleLevel, setSampleLevel] = useState<number | null>(null);
   const failed = me.error ?? prog.error ?? cur.error;
   if (failed) return <LoadError status={failed.status} onRetry={() => { me.reload(); prog.reload(); cur.reload(); }} />;
   if (!me.data || !prog.data || !cur.data) return <Spinner />;
@@ -27,10 +30,13 @@ export default function You() {
   const form = formFor(xp);
   const next = nextForm(xp);
   const pct = formProgress(xp);
+  // Admin preview: unlocks every form, badge and certificate view. Real XP, streak and progress stay real.
+  const adminAll = me.data.role === "admin" && showAll;
+  const unlockedTier = adminAll ? FORMS.length : form.tier;
   const shown = FORMS[(preview ?? form.tier) - 1];
-  const locked = shown.tier > form.tier;
+  const locked = shown.tier > unlockedTier;
   const done = new Set(prog.data.completed);
-  const earned = badges(prog.data);
+  const earned = badges(prog.data).map((b) => (adminAll ? { ...b, earned: true } : b));
 
   async function claim(level: number) {
     setMsg("");
@@ -44,6 +50,15 @@ export default function You() {
 
   return (
     <div className="space-y-5">
+      {me.data.role === "admin" && (
+        <Card className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold">Admin preview</p>
+            <p className="text-xs text-muted">Shows every form, badge and certificate. Your XP, streak and lessons stay real.</p>
+          </div>
+          <Button variant="ghost" aria-pressed={showAll} onClick={() => setShowAll((v) => !v)}>{showAll ? "Preview on" : "Preview off"}</Button>
+        </Card>
+      )}
       <section aria-label="Your character" className="relative overflow-hidden rounded-3xl border border-violet bg-gradient-to-b from-[#1a0f3d] via-surface to-black p-5 text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-lime">Form {shown.tier} of {FORMS.length}</p>
         <div className="mx-auto mt-2 flex justify-center"><Character tier={shown.tier} size={210} silhouette={locked} /></div>
@@ -76,7 +91,7 @@ export default function You() {
         <h2 className="mb-2 font-semibold">Evolution path</h2>
         <div className="flex gap-2 overflow-x-auto pb-2">
           {FORMS.map((f) => {
-            const isLocked = f.tier > form.tier;
+            const isLocked = f.tier > unlockedTier;
             const active = shown.tier === f.tier;
             return (
               <button key={f.tier} type="button" onClick={() => setPreview(f.tier)} aria-pressed={active}
@@ -112,12 +127,18 @@ export default function You() {
       {cur.data.levels.map((lv) => {
         const complete = lv.days.every((d) => done.has(d.day));
         return (
-          <Card key={lv.id} className="flex items-center justify-between gap-3">
-            <div><p className="font-medium">Level {lv.id}: {lv.title}</p>
-              {codes[lv.id] && <Link className="text-sm text-lime underline" href={`/verify/${codes[lv.id]}`}>Verification page</Link>}
-            </div>
-            <Button variant="ghost" disabled={!complete} onClick={() => claim(lv.id)}>{complete ? "Claim" : "Locked"}</Button>
-          </Card>
+          <div key={lv.id} className="space-y-3">
+            <Card className="flex items-center justify-between gap-3">
+              <div><p className="font-medium">Level {lv.id}: {lv.title}</p>
+                {codes[lv.id] && <Link className="text-sm text-lime underline" href={`/verify/${codes[lv.id]}`}>Verification page</Link>}
+              </div>
+              <div className="flex gap-2">
+                {adminAll && <Button variant="ghost" onClick={() => setSampleLevel(sampleLevel === lv.id ? null : lv.id)}>Sample</Button>}
+                <Button variant="ghost" disabled={!complete} onClick={() => claim(lv.id)}>{complete ? "Claim" : "Locked"}</Button>
+              </div>
+            </Card>
+            {adminAll && sampleLevel === lv.id && <SampleCertificate level={lv.id} title={lv.title} lessons={lv.days.length} onClose={() => setSampleLevel(null)} />}
+          </div>
         );
       })}
       {msg && <Notice>{msg}</Notice>}

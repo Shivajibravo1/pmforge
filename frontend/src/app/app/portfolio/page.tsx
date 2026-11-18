@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
+import { SamplePortfolio } from "@/components/sample-portfolio";
 import { Badge, Button, Card, LoadError, Spinner } from "@/components/ui";
-import { api, useApi } from "@/lib/api";
+import { type Me, api, useApi } from "@/lib/api";
 
 type Portfolio = { public: boolean; slug: string | null; items: { day: number; title: string; score: number; content: string }[] };
 
 export default function PortfolioPage() {
   const { data, error, reload } = useApi<Portfolio>("/api/v1/portfolio");
+  const me = useApi<Me>("/api/v1/me");
   const [busy, setBusy] = useState(false);
   if (error) return <LoadError status={error.status} onRetry={reload} />;
   if (!data) return <Spinner />;
@@ -34,6 +36,7 @@ export default function PortfolioPage() {
           <p className="mt-2 whitespace-pre-wrap text-sm text-muted">{i.content}</p>
         </Card>
       ))}
+      {me.data?.role === "admin" && <SamplePortfolio />}
     </div>
   );
 }
