@@ -80,6 +80,33 @@ services:
       backend: { condition: service_started }
     networks: [internal]
 
+  backup:
+    # Nightly dump into /var/backups/pmforge on the VPS host. A host folder (not a Docker volume) so the
+    # dumps survive deleting this project in Docker Manager. Same-server backup: see docs/DEPLOY_VPS.md.
+    image: postgres:17-alpine
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    environment:
+      PGHOST: postgres
+      PGUSER: pmforge
+      PGDATABASE: pmforge
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    configs:
+      - source: backup_script
+        target: /backup.sh
+    volumes:
+      - /var/backups/pmforge:/backups
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      # Healthy only while the newest daily dump is under 26 hours old.
+      test: ["CMD-SHELL", "find /backups/daily -name 'pmforge-*.dump' -mmin -1560 | grep -q ."]
+      interval: 1h
+      timeout: 10s
+      retries: 1
+      start_period: 15m
+    networks: [internal]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -98,6 +125,28 @@ services:
     networks: [internal]
 
 configs:
+  backup_script:
+    content: |
+      set -eu
+      umask 077
+      B=/backups
+      mkdir -p "$$B/daily" "$$B/weekly"
+      while true; do
+        ts=$$(date -u +%Y%m%dT%H%M%SZ)
+        tmp="$$B/daily/.pmforge-$$ts.tmp"
+        # Keep a dump only if it is written in full and its table of contents can be read back.
+        if pg_dump -Fc --no-owner -f "$$tmp" && pg_restore -l "$$tmp" > /dev/null; then
+          mv "$$tmp" "$$B/daily/pmforge-$$ts.dump"
+          if [ "$$(date -u +%u)" = "7" ]; then cp "$$B/daily/pmforge-$$ts.dump" "$$B/weekly/pmforge-$$ts.dump"; fi
+          find "$$B/daily" -name 'pmforge-*.dump' -mtime +7 -delete
+          find "$$B/weekly" -name 'pmforge-*.dump' -mtime +28 -delete
+          echo "backup ok $$ts"
+        else
+          rm -f "$$tmp"
+          echo "backup FAILED $$ts" >&2
+        fi
+        sleep 86400
+      done
   caddyfile:
     content: |
       www.{$$DOMAIN} {
