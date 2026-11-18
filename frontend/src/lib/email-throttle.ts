@@ -26,8 +26,17 @@ export function bucketFor(path: string): Bucket | null {
 
 export class EmailThrottle {
   private hits = new Map<string, number[]>();
+  private rules: Record<string, Rule>;
+  private maxKeys: number;
+  private now: () => number;
 
-  constructor(private rules: Record<string, Rule> = OTP_RULES, private maxKeys = 10_000, private now: () => number = Date.now) {}
+  // Plain fields, not constructor parameter properties: the migrate image runs this file with
+  // node --experimental-strip-types, which cannot execute that syntax.
+  constructor(rules: Record<string, Rule> = OTP_RULES, maxKeys = 10_000, now: () => number = Date.now) {
+    this.rules = rules;
+    this.maxKeys = maxKeys;
+    this.now = now;
+  }
 
   /** Records one attempt. Returns false when the email has used up its allowance for this bucket. */
   allow(bucket: string, email: string): boolean {
