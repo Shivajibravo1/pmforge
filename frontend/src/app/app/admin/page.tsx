@@ -1,4 +1,5 @@
 "use client";
+import { AdminUsers } from "@/components/admin-users";
 import { Card, Notice, Spinner } from "@/components/ui";
 import { useApi } from "@/lib/api";
 
@@ -18,6 +19,7 @@ export default function Admin() {
       <div className="grid grid-cols-2 gap-3">
         {rows.map(([k, v]) => <Card key={k}><p className="text-xs text-muted">{k}</p><p className="text-2xl font-bold">{v}</p></Card>)}
       </div>
+      <AdminUsers />
     </div>
   );
 }

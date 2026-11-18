@@ -73,3 +73,14 @@ class Certificate(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     level: Mapped[int] = mapped_column(Integer)
     issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class AdminAudit(Base):
+    """Who changed what. One row per admin action that alters a user."""
+    __tablename__ = "admin_audit"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    admin_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    target_user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    action: Mapped[str] = mapped_column(String(32))
+    detail: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
