@@ -102,14 +102,12 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - **Check:** `docker logs <project>-interview-mailer-1` shows `pass done` lines. Email addresses are never logged.
 - **Before you rely on it:** confirm in Resend's current terms that daily educational email to opted-in members is allowed through the sending API, and that the `headers` field is accepted. I could not verify either from here.
 
-## Resources (images and PDFs) and email images
+## Images and PDFs
 
-- **Upload:** Admin console, "Resources". PDF, PNG or JPG, up to 5 MB. The file type is decided from the file's own contents, so a renamed file or an SVG is refused. Only the upload route accepts a large body (Caddy 6 MiB, API 5 MiB); every other route stays at 64 KiB.
-- **Who sees it:** any signed-in member, on the Resources page (You page has the link). Members download through their login, so a copied link does not work for outsiders.
-- **Email images:** tick "Use in emails" when uploading an image. That image gets a public, unguessable link (`/public/files/<id>`) so mail apps can show it. Do not tick it for anything private. PDFs are never public: the email links to the Resources page, where members sign in to download.
-- **Placement:** in the Admin console, "Daily interview emails", pick a date, write the question and choose one image or PDF. An image sits between the question and the tips.
-- **Backups:** files are stored in Postgres, so the nightly backup includes them. Many large files grow the database and the backup; check disk space now and then.
-- **Deleting:** a file used by a scheduled email cannot be deleted until it is removed from that email.
+There is no separate Resources panel and no member Resources page. Images and the PDF attachment are uploaded from your
+computer inside the Email composer (PNG, JPG or PDF, up to 5 MB). An image used in an email gets a public link so mail
+apps can show it; PDFs are only ever attached. Members cannot browse or download uploads. The file type is decided from
+the file's own first bytes, never from its name.
 
 ## Email composer
 
@@ -120,3 +118,10 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - **Audience:** members who turned on the email on their You page. Subscribers agreed to interview-practice email, so keep content to that purpose.
 - **Send test to me:** sends the saved email to the admin's own address only. It counts toward Resend's daily limit.
 - **Check before relying on it:** confirm Resend accepts attachments through the sending API with your plan, and the 100 emails per day free limit against your subscriber count.
+
+## Subscribers
+
+Admin, then Subscribers. Paid and Free tabs list every member with an "Opted in" badge. Tick people (or "Select all who
+opted in") and press Send to send today's interview email now. Only members who opted in can be ticked, each member gets
+at most one email a day (a manual send uses up that day's email), and the daily cap still applies. Free members cannot
+opt in today, so the Free tab only becomes selectable for a free member who had opted in while on a paid plan.

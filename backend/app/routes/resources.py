@@ -9,10 +9,9 @@ from sqlalchemy.orm import Session, undefer
 from app.config import get_settings
 from app.db import get_db
 from app.models import EmailCampaign, InterviewQuestion, Resource, User
-from app.security import current_user, require_admin
+from app.security import require_admin
 
 log = logging.getLogger("pmforge.admin")
-router = APIRouter(prefix="/api/v1/resources", tags=["resources"])
 admin = APIRouter(prefix="/api/v1/admin/resources", tags=["admin"], dependencies=[Depends(require_admin)])
 public = APIRouter(prefix="/public/files", tags=["public"])
 
@@ -58,15 +57,11 @@ def _file_response(r: Resource) -> Response:
                     headers={"Content-Disposition": f'inline; filename="{_file_name(r)}"'})
 
 
-@router.get("")
-def list_resources(_: User = Depends(current_user), db: Session = Depends(get_db)):
+@admin.get("")
+def list_resources(db: Session = Depends(get_db)):
+    """What the email composer can pick from. Members never see these files, only the public email images."""
     rows = db.scalars(select(Resource).order_by(Resource.created_at.desc()).limit(200)).all()
     return {"items": [_view(r) for r in rows]}
-
-
-@router.get("/{rid}/file")
-def get_file(rid: str, _: User = Depends(current_user), db: Session = Depends(get_db)):
-    return _file_response(_get(db, rid))
 
 
 @admin.post("")

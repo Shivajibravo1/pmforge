@@ -1,9 +1,6 @@
 "use client";
-import Link from "next/link";
-import { AdminInterviewSchedule } from "@/components/admin-interview-schedule";
-import { AdminResources } from "@/components/admin-resources";
 import { AdminUsers } from "@/components/admin-users";
-import { Card, Notice, Spinner } from "@/components/ui";
+import { Card, LinkButton, Notice, Spinner } from "@/components/ui";
 import { useApi } from "@/lib/api";
 
 type Stats = { users: number; lessons_completed: number; reviews: number; certificates: number; ai_cost_month_usd: number };
@@ -22,9 +19,10 @@ export default function Admin() {
       <div className="grid grid-cols-2 gap-3">
         {rows.map(([k, v]) => <Card key={k}><p className="text-xs text-muted">{k}</p><p className="text-2xl font-bold">{v}</p></Card>)}
       </div>
-      <Link href="/app/admin/emails" className="block"><Card><h2 className="font-semibold">Email composer</h2><p className="mt-1 text-sm text-muted">Write emails with images and a PDF, save drafts and schedule them.</p></Card></Link>
-      <AdminResources />
-      <AdminInterviewSchedule />
+      <div className="flex flex-wrap gap-3">
+        <LinkButton href="/app/admin/emails">Email Composer</LinkButton>
+        <LinkButton href="/app/admin/subscribers" variant="ghost">Subscribers</LinkButton>
+      </div>
       <AdminUsers />
     </div>
   );

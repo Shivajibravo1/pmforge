@@ -143,7 +143,6 @@ export default function You() {
         );
       })}
       {msg && <Notice>{msg}</Notice>}
-      <Link href="/app/resources" className="block"><Card><h2 className="font-semibold">Resources</h2><p className="mt-1 text-sm text-muted">Guides and images to view or download.</p></Card></Link>
       <InterviewEmailCard />
       <Card>
         <p className="text-sm text-muted">Signed in as</p>

@@ -40,14 +40,14 @@ def test_size_limit_is_enforced(client):
                        headers={"Content-Type": "application/json"}).status_code == 413  # other routes stay small
 
 
-def test_members_list_and_download_with_login_only(client):
+def test_members_cannot_see_or_download_uploads(client):
+    """Composer uploads (drafts, PDF attachments) are not a member library."""
     rid = up(client, PDF, title="Interview guide").json()["id"]
-    assert client.get("/api/v1/resources").status_code == 401
-    items = client.get("/api/v1/resources", headers=USER).json()["items"]
+    assert client.get("/api/v1/resources", headers=USER).status_code == 404
+    assert client.get(f"/api/v1/resources/{rid}/file", headers=USER).status_code == 404
+    assert client.get(URL, headers=USER).status_code == 403
+    items = client.get(URL, headers=ADMIN).json()["items"]
     assert items[0]["title"] == "Interview guide" and "data" not in items[0]
-    f = client.get(f"/api/v1/resources/{rid}/file", headers=USER)
-    assert f.status_code == 200 and f.headers["content-type"] == "application/pdf" and f.content == PDF
-    assert client.get("/api/v1/resources/not-a-uuid/file", headers=USER).status_code == 404
 
 
 def test_public_link_only_for_email_images(client):

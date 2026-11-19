@@ -25,7 +25,10 @@ def _uid(user_id: str) -> str:
     return hashlib.sha256(user_id.encode()).hexdigest()[:8]
 
 
-def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_email, now: datetime | None = None) -> dict:
+def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_email, now: datetime | None = None,
+             only: set[str] | None = None, ignore_hour: bool = False) -> dict:
+    """`only` restricts a pass to those user ids (the admin's manual send). People who opted in are the only ones
+    ever emailed; a manual send still claims today's slot, so nobody gets two emails in a day."""
     now = (now or datetime.now(UTC)).astimezone(IST)
     stats = {"sent": 0, "failed": 0, "skipped": 0}
     today: date = now.date()
@@ -36,7 +39,7 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
     db.commit()
     campaign = db.scalar(select(EmailCampaign).where(EmailCampaign.status == "scheduled",
                                                      EmailCampaign.send_on == today))
-    if now.hour < (campaign.send_hour if campaign else settings.interview_email_send_hour_ist):
+    if not ignore_hour and now.hour < (campaign.send_hour if campaign else settings.interview_email_send_hour_ist):
         return stats
     sent_today = db.scalar(select(func.count()).select_from(InterviewSubscription)
                            .where(InterviewSubscription.last_sent_on == today)) or 0
@@ -45,9 +48,10 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
         return stats
     due = db.execute(
         select(InterviewSubscription, User).join(User, User.id == InterviewSubscription.user_id)
-        .where(InterviewSubscription.opted_out_at.is_(None), User.tier == "paid", User.email != "",
+        .where(InterviewSubscription.opted_out_at.is_(None), User.email != "",
                InterviewSubscription.failures < MAX_FAILURES,
-               or_(InterviewSubscription.last_sent_on.is_(None), InterviewSubscription.last_sent_on < today))
+               or_(InterviewSubscription.last_sent_on.is_(None), InterviewSubscription.last_sent_on < today),
+               *([InterviewSubscription.user_id.in_(only)] if only is not None else [User.tier == "paid"]))
         .order_by(InterviewSubscription.last_sent_on.asc().nulls_first())
         .limit(room)).all()
     # Today's composed email beats a written question, which beats the rotation. None of them break the
@@ -82,8 +86,6 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
             res = db.get(Resource, scheduled.resource_id)
             if res and res.kind == "image" and res.in_email:
                 q["image_url"], q["image_alt"] = f"{base}/public/files/{res.id}", res.title
-            elif res and res.kind == "pdf":
-                q["pdf_title"], q["resources_url"] = res.title, f"{base}/app/resources"
         if q:
             lesson_url = f"{base}/app/lesson/{q['day']}" if q["day"] else f"{base}/app"
             subject, text, html = interview.compose(q, lesson_url=lesson_url, unsubscribe_url=unsub_page)

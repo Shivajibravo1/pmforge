@@ -1,5 +1,6 @@
 "use client";
-import { ArrowDown, ArrowUp, Image as ImageIcon, Paperclip, Trash2, Type } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Image as ImageIcon, Paperclip, Trash2, Type } from "lucide-react";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { Badge, Button, Card, Notice } from "@/components/ui";
 import { ApiError, api, apiUpload, friendly, useApi } from "@/lib/api";
@@ -18,7 +19,7 @@ const HOURS = Array.from({ length: 24 }, (_, h) => h);
 
 export function EmailComposer() {
   const list = useApi<{ items: Email[] }>("/api/v1/admin/emails");
-  const res = useApi<{ items: ResourceItem[] }>("/api/v1/resources");
+  const res = useApi<{ items: ResourceItem[] }>("/api/v1/admin/resources");
   const [d, setD] = useState<Draft | null>(null);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -117,8 +118,13 @@ export function EmailComposer() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Email composer</h1>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Link href="/app/admin" aria-label="Back to Admin" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-line hover:bg-surface2">
+            <ArrowLeft size={20} aria-hidden="true" />
+          </Link>
+          <h1 className="text-2xl font-bold">Email composer</h1>
+        </div>
         <Button onClick={() => { setMsg(""); setD(blank()); }}>New email</Button>
       </div>
       <p className="text-sm text-muted">Emails go to members who turned on the daily email on their You page. A scheduled email replaces that day&apos;s interview question, so nobody gets two emails in a day. Times are India time.</p>
