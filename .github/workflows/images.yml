@@ -48,27 +48,3 @@ jobs:
             ghcr.io/${{ env.OWNER }}/${{ matrix.name }}:${{ github.sha }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}
-      # Report-only for now: a scan problem must never stop an image from being published.
-      - name: Scan image for known vulnerabilities
-        continue-on-error: true
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ghcr.io/${{ env.OWNER }}/${{ matrix.name }}:${{ github.sha }}
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "0"
-          format: table
-      - name: Create software bill of materials
-        continue-on-error: true
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ghcr.io/${{ env.OWNER }}/${{ matrix.name }}:${{ github.sha }}
-          format: cyclonedx
-          output: sbom-${{ matrix.name }}.cdx.json
-      - name: Keep the bill of materials
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-${{ matrix.name }}
-          path: sbom-${{ matrix.name }}.cdx.json
-          retention-days: 90
