@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Character } from "@/components/character";
 import { InterviewEmailCard } from "@/components/interview-email-card";
 import { SampleCertificate } from "@/components/sample-certificate";
+import { UpgradeOptions } from "@/components/upgrade-options";
 import { Button, Card, LoadError, Notice, Spinner } from "@/components/ui";
 import { ApiError, type Curriculum, type Me, type Progress, api, friendly, useApi } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
@@ -58,6 +59,18 @@ export default function You() {
             <p className="text-xs text-muted">Shows every form, badge and certificate. Your XP, streak and lessons stay real.</p>
           </div>
           <Button variant="ghost" aria-pressed={showAll} onClick={() => setShowAll((v) => !v)}>{showAll ? "Preview on" : "Preview off"}</Button>
+        </Card>
+      )}
+      {me.data.role !== "admin" && (
+        <Card>
+          <p className="text-sm font-semibold">
+            {me.data.tier === "paid"
+              ? me.data.paid_until ? `Full program active until ${me.data.paid_until}` : "Full program active"
+              : "Free plan: Days 1 to 7"}
+          </p>
+          {!(me.data.tier === "paid" && !me.data.paid_until) && (
+            <div className="mt-3"><UpgradeOptions email={me.data.email} renew={me.data.tier === "paid"} /></div>
+          )}
         </Card>
       )}
       <section aria-label="Your character" className="relative overflow-hidden rounded-3xl border border-violet bg-gradient-to-b from-[#1a0f3d] via-surface to-black p-5 text-center">

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app import content
+from app import billing, content
 from app.config import Settings, get_settings
 from app.db import get_db
 from app.models import Progress, User
@@ -54,8 +54,11 @@ def get_curriculum(settings: Settings = Depends(get_settings)):
 
 
 @router.get("/me")
-def me(user: User = Depends(current_user)):
-    return {"id": user.id, "email": user.email, "role": user.role, "tier": user.tier}
+def me(user: User = Depends(current_user), db: Session = Depends(get_db),
+       settings: Settings = Depends(get_settings)):
+    billing.claim_pending(db, user, billing.plan_days(settings))
+    return {"id": user.id, "email": user.email, "role": user.role, "tier": user.tier,
+            "paid_until": user.paid_until.isoformat() if user.paid_until else None}
 
 
 @router.get("/lessons/{day}")

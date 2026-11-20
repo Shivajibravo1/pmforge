@@ -15,6 +15,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from app import billing
 from app.config import Settings, get_settings
 from app.db import get_db
 from app.models import User
@@ -112,6 +113,7 @@ def current_user(
         # ADMIN_EMAILS is the source of truth: removing an address revokes access at the next request.
         log.warning("Admin role revoked for user %s: email no longer in ADMIN_EMAILS", user.id)
         user.role = "user"
+    billing.expire_if_due(user)
     db.commit()
     return user
 

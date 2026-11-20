@@ -14,9 +14,11 @@ export function proxy(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
     `style-src 'self' 'nonce-${nonce}'`,
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' blob: data:",
+    // facebook.com: Meta Pixel beacons, sent only after the visitor allows them (components/meta-pixel.tsx).
+    // The pixel script itself loads under 'strict-dynamic' because our nonce-trusted bundle inserts it.
+    "img-src 'self' blob: data: https://www.facebook.com",
     "font-src 'self'",
-    "connect-src 'self'",
+    "connect-src 'self' https://www.facebook.com https://connect.facebook.net",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -63,7 +63,8 @@ export default function Privacy() {
             ["Hosting and database", "Run the website, the app and the database", "All account and learning data"],
             ["Email delivery", "Send your sign-in codes and, if you opt in, the daily interview question", "Email address and the message sent"],
             ["AI provider (OpenAI)", "Produce mentor replies and artifact reviews", "The text you submit for review or chat, after we remove detected personal data"],
-            ["Payment provider", "Take and refund payments", "Payment and plan details, handled by the provider"],
+            ["Payment provider (SuperProfile)", "Take and refund payments", "Payment and plan details, handled by the provider. We receive your email, the plan, the amount and the transaction ID so we can open your access"],
+            ["Advertising measurement (Meta)", "Measure our Facebook and Instagram ads, only if you allow it", "Pages visited on PMForge, sign-up and checkout events, and device and browser data collected by the Meta Pixel. We never send your name, email or lesson content"],
           ]}
         />
         <p>
@@ -89,9 +90,10 @@ export default function Privacy() {
 
       <Section n={5} title="Cookies">
         <p>
-          We use only essential cookies, which keep you signed in and protect your session. We do not currently use
-          advertising or analytics cookies on PMForge. If that changes, we will update this policy and ask for consent where
-          the law requires it.
+          We use essential cookies, which keep you signed in and protect your session. With your permission we also use
+          the Meta Pixel, which sets advertising cookies so we can measure our Facebook and Instagram ads. We ask before
+          loading it, and it stays off if you decline. To change your choice, clear this site&apos;s data in your browser
+          and choose again when the banner appears.
         </p>
       </Section>
 

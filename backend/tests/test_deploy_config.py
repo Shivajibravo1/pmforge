@@ -62,3 +62,20 @@ def test_app_containers_drop_privileges():
     for name in ("backend-migrate", "auth-migrate", "backend", "frontend", "interview-mailer"):
         block = COMPOSE.split(f"\n  {name}:\n", 1)[1].split("\n\n", 1)[0]
         assert "no-new-privileges:true" in block and "cap_drop: [ALL]" in block, name
+
+
+def test_payment_relay_is_not_reachable_from_the_internet():
+    cf = _caddyfile()
+    assert "@payments path /public/payments/*" in cf
+    # A top-level respond runs after handle blocks in Caddy's directive order, so the block must be a handle,
+    # written before every other handle (named-matcher handles are tried in written order, first match wins).
+    start = cf.index("handle @payments {")
+    assert "respond 404" in cf[start:cf.index("}", start)]
+    assert start < cf.index("handle @upload") < cf.index("handle @api")
+
+
+def test_n8n_bridge_is_wired_to_the_payment_secret():
+    block = COMPOSE[COMPOSE.index("  n8n:"):COMPOSE.index("  backup:")]
+    assert "PMFORGE_PAYMENT_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}" in block
+    assert "networks: [internal]" in block
+    assert "PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}" in COMPOSE[COMPOSE.index("  backend:"):]

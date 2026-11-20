@@ -105,6 +105,7 @@ def set_tier(user_id: str, body: TierIn, admin: User = Depends(require_admin), d
         db.add(AdminAudit(admin_id=admin.id, target_user_id=user.id, action="set_tier",
                           detail={"from": user.tier, "to": body.tier}))
         user.tier = body.tier
+        user.paid_until = None  # a hand-set plan has no end date
         db.commit()
     return {"id": user.id, "tier": user.tier, "plan": plan_of(user)}
 

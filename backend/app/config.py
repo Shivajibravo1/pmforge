@@ -66,6 +66,17 @@ class Settings(BaseSettings):
     # Product rules (Requirement Baseline v1.1).
     free_lessons: int = 7
 
+    # SuperProfile purchases relayed by the n8n bridge. The secret signs every relay (HMAC-SHA256); with no secret
+    # the endpoint refuses everything. Titles must match the SuperProfile payment page titles exactly.
+    payment_webhook_secret: str = Field(default="", repr=False)
+    payment_webhook_max_age_seconds: int = 300
+    superprofile_monthly_title: str = ""
+    superprofile_yearly_title: str = ""
+    plan_monthly_inr: float = 699
+    plan_yearly_inr: float = 3499
+    plan_monthly_days: int = 30
+    plan_yearly_days: int = 365
+
     @property
     def cors_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
