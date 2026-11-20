@@ -2,6 +2,7 @@
 import hashlib
 import hmac
 import json
+import secrets
 import time
 from datetime import date, timedelta
 
@@ -13,7 +14,7 @@ from app.db import SessionLocal
 from app.models import Payment, User
 from tests.conftest import auth
 
-SECRET = "test-secret-0123456789"
+SECRET = secrets.token_hex(16)  # random per run, so the secrets scanner sees no literal key
 URL = "/public/payments/superprofile"
 
 
