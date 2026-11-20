@@ -92,7 +92,7 @@ export function useApi<T>(path: string | null) {
 export type Level = { id: number; title: string; days: { day: number; type: string; title: string; phase: string }[] };
 export type Curriculum = { free_lessons: number; levels: Level[] };
 export type Progress = { completed: number[]; total_xp: number; streak: number };
-export type Me = { id: string; email: string; role: string; tier: string };
+export type Me = { id: string; email: string; role: string; tier: string; paid_until?: string | null };
 export type Lesson = { day: number; type: string; title: string; phase: string; level: number; rubric: string[]; body: string | null; completed?: boolean };
 export type CompleteOut = { day: number; xp_awarded: number; total_xp: number; streak: number; newly_completed: boolean };
 export type ReviewOut = { review_id: string; score: number; strengths: string[]; gaps: string[]; next_steps: string[]; redacted?: string[] };

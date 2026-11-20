@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Card, Notice, Spinner } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { track } from "@/lib/meta-pixel";
 import { enrollmentErrors, isEnrolled, normalizeName, normalizePhone } from "@/lib/enrollment";
 
 export default function CompleteProfile() {
@@ -33,6 +34,7 @@ export default function CompleteProfile() {
     } as Parameters<typeof authClient.updateUser>[0]);
     setBusy(false);
     if (error) return setMsg("We could not save your details. Please check them and try again.");
+    track("CompleteRegistration", { content_name: "free_signup" });
     router.replace("/app");
   }
 

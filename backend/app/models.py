@@ -34,6 +34,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), default="")
     role: Mapped[str] = mapped_column(String(16), default="learner")
     tier: Mapped[str] = mapped_column(String(16), default="free")
+    # Last India date of a purchased plan. None with tier "paid" means no end date (set by the admin by hand).
+    paid_until: Mapped[date | None] = mapped_column(Date, nullable=True)
     portfolio_slug: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
     portfolio_public: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
@@ -149,3 +151,21 @@ class EmailCampaign(Base):
     status: Mapped[str] = mapped_column(String(10), default="draft")  # draft, scheduled, sent, partial
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class Payment(Base):
+    """One SuperProfile purchase, as relayed by the n8n bridge. transaction_id makes every relay idempotent.
+    status: applied (access granted), pending (no account with that email yet), review (amount below the plan
+    price, so a person must check it), ignored (a SuperProfile product that is not a PMForge plan)."""
+    __tablename__ = "payments"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    transaction_id: Mapped[str] = mapped_column(String(64), unique=True)
+    buyer_email: Mapped[str] = mapped_column(String(320), index=True)
+    product_title: Mapped[str] = mapped_column(String(200))
+    plan: Mapped[str | None] = mapped_column(String(10), nullable=True)  # monthly, yearly
+    amount: Mapped[float] = mapped_column(Float)
+    currency: Mapped[str] = mapped_column(String(3), default="INR")
+    status: Mapped[str] = mapped_column(String(10))
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    applied_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

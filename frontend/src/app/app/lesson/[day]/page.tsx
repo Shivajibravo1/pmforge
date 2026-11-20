@@ -6,8 +6,9 @@ import { EarlierNotes } from "@/components/earlier-notes";
 import { LessonPlayer } from "@/components/lesson-player";
 import { XpToast, type XpGain } from "@/components/xp-toast";
 import { Badge, Button, Card, LinkButton, Notice, Spinner } from "@/components/ui";
+import { UpgradeOptions } from "@/components/upgrade-options";
 import { FREE_DAYS } from "@/lib/pricing";
-import { ApiError, type CompleteOut, type Lesson, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
+import { ApiError, type CompleteOut, type Lesson, type Me, type ReviewOut, TYPE_LABEL, api, friendly, useApi } from "@/lib/api";
 
 const ARTIFACT_TYPES = ["B", "S", "K", "P", "A"];
 
@@ -15,6 +16,7 @@ export default function LessonPage() {
   const { day } = useParams<{ day: string }>();
   const n = Number(day);
   const { data: lesson, error, loading, reload } = useApi<Lesson>(Number.isInteger(n) ? `/api/v1/lessons/${n}` : null);
+  const me = useApi<Me>("/api/v1/me");
   const [text, setText] = useState("");
   const [review, setReview] = useState<ReviewOut | null>(null);
   const [msg, setMsg] = useState("");
@@ -28,7 +30,8 @@ export default function LessonPage() {
       <Card>
         <Badge tone="violet">Full program</Badge>
         <h1 className="mt-3 text-xl font-semibold">Day {n} is part of the full program</h1>
-        <p className="mt-2 text-sm text-muted">Days 1 to {FREE_DAYS} are free. The rest of the program opens with a paid plan, which is not available yet.</p>
+        <p className="mt-2 text-sm text-muted">Days 1 to {FREE_DAYS} are free. Unlock all 120 days, plus a daily real-world AI situational interview question with its answer by email.</p>
+        {me.data && <div className="mt-4"><UpgradeOptions email={me.data.email} /></div>}
         <div className="mt-4"><LinkButton href="/app/course" variant="ghost">Back to course</LinkButton></div>
       </Card>
     );

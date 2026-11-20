@@ -9,7 +9,7 @@ from datetime import UTC, date, datetime
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
-from app import emailer, interview
+from app import billing, emailer, interview
 from app.config import Settings, get_settings
 from app.db import SessionLocal
 from app.models import EmailCampaign, InterviewQuestion, InterviewSubscription, Resource, User
@@ -32,6 +32,7 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
     now = (now or datetime.now(UTC)).astimezone(IST)
     stats = {"sent": 0, "failed": 0, "skipped": 0}
     today: date = now.date()
+    billing.expire_due(db, today)  # an ended plan must not receive the paid email
     # An email that was scheduled for an earlier day and never finished is closed so it cannot send late.
     for old in db.scalars(select(EmailCampaign).where(EmailCampaign.status == "scheduled",
                                                       EmailCampaign.send_on < today)).all():
