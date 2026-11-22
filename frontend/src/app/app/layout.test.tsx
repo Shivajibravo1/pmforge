@@ -15,7 +15,7 @@ describe("top navigation bar", () => {
     render(<AppLayout><p>page</p></AppLayout>);
     expect(screen.getByLabelText("PMForge, go to Today").getAttribute("href")).toBe("/app");
     const nav = within(screen.getByRole("navigation", { name: "Primary" }));
-    for (const label of ["Today", "Course", "Portfolio", "Mentor", "You"]) expect(nav.getByText(label)).toBeTruthy();
+    for (const label of ["Today", "Course", "Library", "Portfolio", "Mentor", "You"]) expect(nav.getByText(label)).toBeTruthy();
     const progress = within(screen.getByLabelText("Your progress"));
     expect(progress.getByText("4")).toBeTruthy();
     expect(progress.getByText("1,250")).toBeTruthy();

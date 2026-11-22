@@ -3,14 +3,14 @@ import { AdminUsers } from "@/components/admin-users";
 import { Card, LinkButton, Notice, Spinner } from "@/components/ui";
 import { useApi } from "@/lib/api";
 
-type Stats = { users: number; lessons_completed: number; reviews: number; certificates: number; ai_cost_month_usd: number };
+type Stats = { users: number; active_7d?: number; lessons_completed: number; reviews: number; certificates: number; ai_cost_month_usd: number };
 
 export default function Admin() {
   const { data, error } = useApi<Stats>("/api/v1/admin/stats");
   if (error) return <Notice>{error.status === 403 ? "Admin access required." : "Could not load stats."}</Notice>;
   if (!data) return <Spinner />;
   const rows: [string, string | number][] = [
-    ["Users", data.users], ["Lessons completed", data.lessons_completed], ["Mentor reviews", data.reviews],
+    ["Users", data.users], ["Seen in last 7 days", data.active_7d ?? 0], ["Lessons completed", data.lessons_completed], ["Mentor reviews", data.reviews],
     ["Certificates", data.certificates], ["AI cost this month (USD)", data.ai_cost_month_usd.toFixed(4)],
   ];
   return (

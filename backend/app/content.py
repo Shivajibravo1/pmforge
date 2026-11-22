@@ -42,3 +42,9 @@ def journal_prompt(day: int) -> str | None:
     body = lesson_body(day) or ""
     m = re.search(r"```journal\n(.*?)```", body, re.S)
     return m.group(1).strip() if m else None
+
+
+@lru_cache
+def architecture() -> list[dict]:
+    """Architecture Library: business-language explainers for project managers (content/architecture.json)."""
+    return json.loads((_DIR / "architecture.json").read_text(encoding="utf-8"))["items"]

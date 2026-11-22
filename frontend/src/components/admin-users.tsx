@@ -5,7 +5,7 @@ import { ApiError, api, friendly, useApi } from "@/lib/api";
 
 export type AdminUser = {
   id: string; email: string; role: string; tier: string; plan: "free" | "paid" | "admin";
-  created_at: string; lessons_done: number; total_xp: number; last_active: string | null;
+  created_at: string; lessons_done: number; total_xp: number; last_active: string | null; last_seen?: string | null;
 };
 type UserList = { total: number; items: AdminUser[] };
 type UserDetailData = {
@@ -38,7 +38,7 @@ export function UsersList({ items, selected, onSelect }: { items: AdminUser[]; s
               <PlanBadge plan={u.plan} />
             </span>
             <span className="mt-1 block text-xs text-muted">
-              {u.lessons_done} lessons · {u.total_xp} XP · last active {day(u.last_active)} · joined {day(u.created_at)}
+              {u.lessons_done} lessons · {u.total_xp} XP · last lesson {day(u.last_active)} · last seen {day(u.last_seen ?? null)} · joined {day(u.created_at)}
             </span>
           </button>
         </li>

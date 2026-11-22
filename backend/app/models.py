@@ -36,6 +36,7 @@ class User(Base):
     tier: Mapped[str] = mapped_column(String(16), default="free")
     # Last India date of a purchased plan. None with tier "paid" means no end date (set by the admin by hand).
     paid_until: Mapped[date | None] = mapped_column(Date, nullable=True)
+    last_seen_on: Mapped[date | None] = mapped_column(Date, nullable=True)  # India date of last visit, once a day
     portfolio_slug: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
     portfolio_public: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

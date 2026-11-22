@@ -42,7 +42,7 @@ describe("plan labels", () => {
     expect(row("aishivajibravo@gmail.com").textContent).toContain("Admin");
     expect(row("free.user@example.com").textContent).toContain("Free");
     expect(row("paid.user@example.com").textContent).toContain("Paid");
-    expect(row("free.user@example.com").textContent).toContain("last active None yet");
+    expect(row("free.user@example.com").textContent).toContain("last lesson None yet");
   });
   it("tells the admin when nothing matches", () => {
     render(<UsersList items={[]} selected={null} onSelect={vi.fn()} />);

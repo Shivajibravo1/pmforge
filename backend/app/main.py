@@ -12,6 +12,7 @@ from app.routes import (
     campaigns,
     interview,
     learning,
+    library,
     marketing,
     mentor,
     payments,
@@ -116,7 +117,8 @@ def create_app() -> FastAPI:
 
     for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router, interview.router,
               interview.public, resources.admin, resources.public,
-              campaigns.router, subscribers.router, marketing.router, push.router, payments.public, payments.admin):
+              campaigns.router, subscribers.router, marketing.router, push.router, library.router,
+              payments.public, payments.admin):
         app.include_router(r)
     return app
 

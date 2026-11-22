@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -23,6 +23,8 @@ def stats(db: Session = Depends(get_db)):
     first = date.today().replace(day=1)
     return {
         "users": db.scalar(select(func.count()).select_from(User)),
+        "active_7d": db.scalar(select(func.count()).select_from(User)
+                               .where(User.last_seen_on >= today_ist() - timedelta(days=6))) or 0,
         "lessons_completed": db.scalar(select(func.count()).select_from(Progress)),
         "reviews": db.scalar(select(func.count()).select_from(Review)),
         "certificates": db.scalar(select(func.count()).select_from(Certificate)),
@@ -52,6 +54,7 @@ def list_users(q: str = Query("", max_length=100), limit: int = Query(50, ge=1, 
             "created_at": u.created_at.isoformat(),
             "lessons_done": lessons or 0, "total_xp": int(xp or 0),
             "last_active": last.isoformat() if last else None,
+            "last_seen": u.last_seen_on.isoformat() if u.last_seen_on else None,
         } for u, lessons, xp, last in rows],
     }
 

@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Briefcase, Flame, Home, MessageCircle, Shield, UserCircle, Zap } from "lucide-react";
+import { BookOpen, Briefcase, Flame, Home, Layers, MessageCircle, Shield, UserCircle, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -11,6 +11,7 @@ import { isEnrolled } from "@/lib/enrollment";
 const nav = [
   ["/app", "Today", Home],
   ["/app/course", "Course", BookOpen],
+  ["/app/library", "Library", Layers],
   ["/app/portfolio", "Portfolio", Briefcase],
   ["/app/mentor", "Mentor", MessageCircle],
   ["/app/you", "You", UserCircle],

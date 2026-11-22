@@ -1,0 +1,382 @@
+{
+ "items": [
+  {
+   "id": "api-gateway",
+   "title": "API gateway",
+   "tagline": "One controlled front door for every system that talks to yours.",
+   "category": "Integration",
+   "free": true,
+   "business": "An API is how one system asks another for something, for example the portal asking the order system for a customer's delivery status. An API gateway sits in front of those requests. It checks who is asking, limits how often, routes the request to the right system and records what happened. Without it, every system builds its own door and its own lock.",
+   "analogy": "A hotel reception desk. Guests do not wander the building looking for the right room. Reception checks the booking, hands over the key and keeps a log.",
+   "arch": "# API gateway in Project Nimbus\nClients | Customer portal, mobile app, partner systems\nGateway | Authentication, rate limits, routing, request logging\nServices | Orders, Customers, Payments, AI assistant\nData | Order database, customer records, document store\n~Cross-cutting | Security policy, monitoring, versioning",
+   "pm_cost": [
+    "Adds a team dependency: whoever owns the gateway can slow every other team, so agree service levels early.",
+    "Every new service needs registering and testing through the gateway. Add this to the definition of done.",
+    "Needs separate environments (test and live) with their own settings, which affects the environment plan and cost."
+   ],
+   "goes_wrong": [
+    "A single misconfigured rule can block every customer at once, so gateway changes need the same change control as a release.",
+    "Teams bypass the gateway 'just for speed' and quietly lose the security checks.",
+    "Changing an API without telling consumers breaks their apps. Versioning and notice periods are a plan item, not a technical detail."
+   ],
+   "ask": [
+    "Who owns the gateway and what is the change process for it?",
+    "How do we version an API so existing consumers are not broken?",
+    "What happens to customers if the gateway is down, and how fast can we tell?",
+    "Which requests are logged, and do the logs contain personal data?"
+   ],
+   "interview": "In a delivery I treated the gateway as shared infrastructure with its own owner, service level and change window. I asked engineers what a bad rule would do to customers and made sure that change went through the same control as a release."
+  },
+  {
+   "id": "microservices",
+   "title": "Microservices and monoliths",
+   "tagline": "One big application or many small ones: a delivery trade-off, not a fashion choice.",
+   "category": "Integration",
+   "free": false,
+   "business": "A monolith is one application that does everything and is released as one unit. Microservices split the system into small services, each owned by a team and released on its own. Small services let teams move independently, but you now run many moving parts and must manage the connections between them.",
+   "analogy": "A department store versus a shopping street. In the store everything is under one roof and one manager. On the street each shop trades on its own, which is flexible but needs roads, signs and rules to work as a whole.",
+   "arch": "# Monolith versus microservices\nMonolith | One codebase, one release, one database, one team boundary\nMicroservices | Orders service, Billing service, Notifications service, Search service\nPlatform needed | Gateway, messaging, containers, central logging\n~Cross-cutting | Testing across services, ownership, security, cost",
+   "pm_cost": [
+    "Microservices usually need more platform work first: pipelines, monitoring and containers. Plan that before the features.",
+    "Testing is harder because a feature may cross several services. Budget for integration testing and test data.",
+    "Team structure matters: each service needs an owner who is on call for it."
+   ],
+   "goes_wrong": [
+    "A team splits a small system into many services too early and spends the year on plumbing.",
+    "Unclear ownership means nobody fixes a failing service at 2 AM.",
+    "Shared databases hide a monolith inside the microservices and remove the independence you paid for."
+   ],
+   "ask": [
+    "Why does this system need to be split now, and what problem does it solve for the business?",
+    "Who owns each service and who is on call?",
+    "How will we test a change that touches three services?",
+    "What is the plan if we want to merge two services back?"
+   ],
+   "interview": "I do not push for or against microservices. I ask what business problem the split solves, whether the platform and ownership are ready, and I plan the extra integration testing and run cost into the schedule."
+  },
+  {
+   "id": "ci-cd",
+   "title": "CI/CD pipeline",
+   "tagline": "The automated production line that turns a developer's change into a safe release.",
+   "category": "Delivery",
+   "free": true,
+   "business": "Continuous integration (CI) means every change is automatically built and tested as soon as it is saved. Continuous delivery or deployment (CD) means passing changes are packaged and released through the same automated steps each time. The point for a project manager is predictability: releases become routine instead of events.",
+   "analogy": "A factory production line with quality gates. Each part is checked at every station, and a faulty part is stopped at the line instead of reaching the customer.",
+   "arch": "# A release pipeline\nSource | Developer commits code to the repository\nBuild and test | Compile, unit tests, security and dependency scans\nStage | Deploy to a test environment, integration and acceptance tests\nApprove | Change approval, release notes, go or no-go\nRelease | Deploy to production, health checks, rollback if needed\n~Cross-cutting | Audit trail, secrets management, environment configuration",
+   "pm_cost": [
+    "Setting up the pipeline is real work early in the project. Putting it off makes every later release manual and risky.",
+    "Automated tests are an investment. Thin tests mean the pipeline says 'green' while defects still reach users.",
+    "Pipelines enforce your security and change rules, so the control owners (security, operations) should agree the gates up front."
+   ],
+   "goes_wrong": [
+    "A pipeline that is often red or flaky teaches the team to ignore it.",
+    "Manual steps hidden outside the pipeline cause 'it worked in test' failures.",
+    "Skipping the gates 'just this once' under deadline pressure is how the serious incidents start."
+   ],
+   "ask": [
+    "Which gates must pass before production, and who approved them?",
+    "How long does a change take from commit to live, and where is the wait?",
+    "How do we roll back, and have we practised it?",
+    "Where are secrets stored, and who can see them?"
+   ],
+   "interview": "I ask for the pipeline in the first sprint, agree the gates with security and operations, and track lead time from commit to production, because it shows me real delivery health better than a status colour."
+  },
+  {
+   "id": "cloud-landing-zone",
+   "title": "Cloud landing zone and shared responsibility",
+   "tagline": "The prepared, governed ground your cloud projects are built on.",
+   "category": "Cloud",
+   "free": true,
+   "business": "Moving to the cloud does not hand over all the risk to the provider. The provider secures the underlying data centres and services. You are still responsible for how you configure them, who can access them and what data you put there. A landing zone is the pre-built, governed foundation (accounts, networks, access rules, policies, cost tags) so each project starts safe instead of improvising.",
+   "analogy": "Renting a serviced office. The landlord looks after the building, the lifts and the front door. You still decide who gets a key, what is locked in your cabinets and who pays for the meeting rooms.",
+   "arch": "# Landing zone\nGovernance | Account structure, policies, cost tags and budgets\nIdentity | Single sign-on, roles, least privilege, privileged access\nNetwork | Segmented networks, private connections, firewalls\nWorkloads | Project Nimbus applications, data stores, AI services\n~Cross-cutting | Logging, monitoring, backup, security baselines",
+   "pm_cost": [
+    "Landing zone work comes before the first workload. It is often missing from early plans and then blocks the migration.",
+    "Cloud cost is variable. Plan cost reporting and budgets alongside the schedule.",
+    "Responsibility has to be written down: who configures, who monitors and who responds for each service."
+   ],
+   "goes_wrong": [
+    "Teams create resources outside the standard setup and security cannot see them.",
+    "Costs surprise the sponsor because nobody tagged or budgeted workloads.",
+    "A public storage setting left open exposes data. The provider does not catch what you misconfigure."
+   ],
+   "ask": [
+    "What does the provider secure and what do we secure, for each service we use?",
+    "Is the landing zone ready, and who owns it after go-live?",
+    "How are costs tagged, reported and capped?",
+    "Who gets alerted when a setting drifts from policy?"
+   ],
+   "interview": "I use the shared responsibility idea to make accountability explicit. I make sure the landing zone is in the plan before workloads move and that cost ownership and security configuration have named owners."
+  },
+  {
+   "id": "containers-kubernetes",
+   "title": "Containers and Kubernetes",
+   "tagline": "Package an application once and run it the same way everywhere.",
+   "category": "Cloud",
+   "free": false,
+   "business": "A container packages an application with everything it needs, so it runs the same on a laptop, in test and in production. Kubernetes is a platform that runs many containers: it starts them, restarts them when they fail and adds copies when demand rises. It gives consistency and scale at the price of a platform that someone must run and understand.",
+   "analogy": "Shipping containers in logistics. Goods are packed in a standard box, so any ship, train or truck can carry them without repacking.",
+   "arch": "# Container platform\nApplications | Portal, orders service, AI assistant service\nContainers | Packaged applications and their dependencies\nOrchestration | Kubernetes schedules, scales and restarts containers\nInfrastructure | Cloud compute, networking, storage\n~Cross-cutting | Image scanning, access control, monitoring, cost",
+   "pm_cost": [
+    "Needs platform skills that many teams do not have yet. Plan training, hiring or a managed service.",
+    "Environments become consistent, which cuts 'works on my machine' delays.",
+    "Cost can drift because capacity scales. Set budgets and review them each month."
+   ],
+   "goes_wrong": [
+    "A small system is put on Kubernetes without a need, adding cost and complexity.",
+    "Unscanned container images bring known vulnerabilities into production.",
+    "Only one or two people understand the platform and they become a single point of failure."
+   ],
+   "ask": [
+    "Do we need this level of platform for the scale we expect, or is a simpler option enough?",
+    "Who runs and supports the platform, and is it a managed service?",
+    "How are container images scanned and updated?",
+    "What is the monthly cost range at normal and peak load?"
+   ],
+   "interview": "I ask whether the platform is justified by the scale and whether we have the skills to run it. If not, I plan training or a managed service so the team does not depend on one expert."
+  },
+  {
+   "id": "observability",
+   "title": "Observability",
+   "tagline": "Knowing what your system is doing, so problems are found before customers report them.",
+   "category": "Delivery",
+   "free": false,
+   "business": "Observability combines metrics (numbers over time, such as response time), logs (a record of events) and traces (the path of one request through many systems). Together they answer 'is it working, and if not, where is it broken'. Monitoring tells you something is wrong. Observability helps you find why.",
+   "analogy": "The dashboard and warning lights of a car, plus the service history. You see speed and fuel at a glance, and a mechanic can trace a fault to its cause.",
+   "arch": "# Observability\nSignals | Metrics, logs, traces, user experience checks\nCollection | Agents, central log store, tracing\nInsight | Dashboards, alerts, service level indicators\nResponse | On-call rota, incident process, runbooks\n~Cross-cutting | Data privacy in logs, retention, cost",
+   "pm_cost": [
+    "Monitoring must be built before go-live, not after the first outage. Add it to the definition of done.",
+    "Alerts need owners and a response process, or they become noise.",
+    "Logs cost money to store. Agree retention and what may be logged."
+   ],
+   "goes_wrong": [
+    "Personal data or secrets end up in logs and become a security issue.",
+    "Too many alerts cause alert fatigue and the real one is missed.",
+    "Nobody owns the dashboards, so they go stale after launch."
+   ],
+   "ask": [
+    "What does 'healthy' look like for this service, in numbers?",
+    "Who is alerted, how, and what do they do first?",
+    "What is logged, and does it include personal data?",
+    "How do we trace one customer's failed request end to end?"
+   ],
+   "interview": "I make monitoring and alert ownership part of the definition of done, and I agree what healthy means in numbers with operations before go-live so we can hand over cleanly."
+  },
+  {
+   "id": "identity-sso",
+   "title": "Identity: SSO, MFA and least privilege",
+   "tagline": "Who can do what, proved properly and limited to what the job needs.",
+   "category": "Security",
+   "free": true,
+   "business": "Single sign-on (SSO) lets people use one trusted login across many systems. Multi-factor authentication (MFA) adds a second proof, such as a phone prompt. Least privilege means each person or system gets only the access the job requires, for as long as it is needed. Most serious breaches involve stolen or over-powered access, so this is core project work.",
+   "analogy": "A building pass system. One badge opens only the doors your role needs, security checks you at sensitive floors, and the badge is cancelled the day you leave.",
+   "arch": "# Identity and access\nPeople | Staff, contractors, customers, administrators\nIdentity provider | Single sign-on, MFA, lifecycle (joiners, movers, leavers)\nAccess control | Roles, least privilege, privileged access approval\nSystems | Portal, cloud console, databases, AI services\n~Cross-cutting | Audit logs, access reviews, secrets management",
+   "pm_cost": [
+    "Integrating a system with SSO is a task with its own testing. List it in the plan per system.",
+    "Joiner, mover and leaver processes depend on HR data. Involve HR early.",
+    "Access reviews are a recurring cost after go-live. Name the owner."
+   ],
+   "goes_wrong": [
+    "Contractors keep access after the contract ends.",
+    "Shared admin accounts mean nobody can tell who did what.",
+    "Service accounts and API keys are forgotten and never rotated."
+   ],
+   "ask": [
+    "Which systems support SSO and which do not?",
+    "How is privileged access approved, time-limited and logged?",
+    "What happens to access on the day someone leaves?",
+    "Where are service credentials stored and who rotates them?"
+   ],
+   "interview": "I put access into the plan as a deliverable: SSO integration per system, a leaver process agreed with HR, and a named owner for periodic access reviews."
+  },
+  {
+   "id": "zero-trust",
+   "title": "Zero trust",
+   "tagline": "Never assume a request is safe because it comes from inside the network.",
+   "category": "Security",
+   "free": false,
+   "business": "Older security trusted anything inside the company network. Zero trust treats every request as untrusted until it proves who it is, that the device is healthy and that it is allowed to reach that specific resource. Access is checked continuously and is limited to what is needed. It is a direction of travel built from many controls, not one product.",
+   "analogy": "An airport. Even after you have entered the building you need your boarding pass checked at security, again at the gate and again at the aircraft door.",
+   "arch": "# Zero trust principles\nVerify | Strong identity, device health, context for every request\nLimit | Least privilege, segmented networks, just-in-time access\nAssume breach | Contain damage, monitor behaviour, respond quickly\nResources | Applications, data, cloud services, APIs\n~Cross-cutting | Policy engine, logging, automation",
+   "pm_cost": [
+    "It is a programme of many projects. Phase it by risk and by system, with clear outcomes per phase.",
+    "User experience matters. Extra prompts without good design cause pushback and workarounds.",
+    "Needs inventory of systems, data and users first, which often takes longer than expected."
+   ],
+   "goes_wrong": [
+    "Sold as a single product purchase and the real process and identity work never happens.",
+    "Strict rules block legitimate work and people find insecure workarounds.",
+    "No baseline of what exists, so progress cannot be measured."
+   ],
+   "ask": [
+    "Which systems and data are most critical, so we start there?",
+    "How do we measure progress, not just buy tools?",
+    "What is the plan for people who cannot use MFA or a managed device?",
+    "How do we test that segmentation really blocks movement?"
+   ],
+   "interview": "I describe zero trust as a risk-based roadmap, not a product. I phase it by critical systems, set measurable outcomes and plan for the user experience so security does not push people to workarounds."
+  },
+  {
+   "id": "data-pipeline",
+   "title": "Data pipeline and warehouse",
+   "tagline": "How raw data from many systems becomes numbers the business can trust.",
+   "category": "Data",
+   "free": false,
+   "business": "A data pipeline collects data from source systems, cleans and combines it and stores it where reports and AI can use it. Most reporting and AI problems are really data problems: missing fields, different definitions of the same word or stale data. Quality and ownership decide whether the numbers are believed.",
+   "analogy": "Water supply. Water is taken from rivers, treated, tested and piped to homes. If treatment is poor, no tap can fix the taste.",
+   "arch": "# Data pipeline\nSources | Order system, CRM, service desk, files\nIngest | Scheduled and streaming extracts\nClean and combine | Quality checks, standard definitions, history\nStore | Data warehouse or lake, access controls\nUse | Reports, dashboards, AI features\n~Cross-cutting | Data owner, privacy, lineage, cost",
+   "pm_cost": [
+    "Data work is often the critical path for reporting and AI. Plan source analysis and cleaning early.",
+    "Each data set needs a business owner who decides definitions and quality.",
+    "Privacy and retention rules apply from the first extract, not at the end."
+   ],
+   "goes_wrong": [
+    "Two teams use the same term for different numbers and the sponsor loses trust in the dashboard.",
+    "A source system changes a field and the pipeline silently breaks.",
+    "Personal data is copied into places it should not be."
+   ],
+   "ask": [
+    "Who owns each data set and signs off its definitions?",
+    "How do we know the data is complete and fresh?",
+    "What personal data flows through, and who can see it?",
+    "What happens downstream if a source changes?"
+   ],
+   "interview": "I treat data as a deliverable with an owner. I plan discovery and cleaning early, agree definitions with the business and add data quality checks to acceptance criteria."
+  },
+  {
+   "id": "rag-assistant",
+   "title": "RAG assistant (answers from your own documents)",
+   "tagline": "How a company AI assistant answers from approved content instead of guessing.",
+   "category": "AI",
+   "free": true,
+   "business": "Retrieval-augmented generation (RAG) lets an AI assistant look up passages from your approved documents first and then write an answer based on them. This keeps answers tied to your own policies and lets you show the source. It does not remove errors: poor documents, poor search or missing access rules still lead to wrong or leaked answers.",
+   "analogy": "An open-book exam with a librarian. The librarian fetches the relevant pages from the approved shelf and the student writes the answer from them, citing the pages.",
+   "arch": "# RAG assistant\nUser | Customer or staff member asks a question\nGuardrails | Input checks, personal data redaction, access rights\nRetrieval | Search of approved documents, relevant passages selected\nModel | Language model answers using only the passages, with sources\nChecks | Output checks, refusal when unsure, feedback and logging\n~Cross-cutting | Content owners, evaluation tests, cost limits, monitoring",
+   "pm_cost": [
+    "Content is the big workload: collecting, cleaning and keeping documents current. Name content owners.",
+    "Needs an evaluation set of real questions and approved answers so quality is measured, not felt.",
+    "Running cost depends on usage. Set limits and watch the bill during the pilot."
+   ],
+   "goes_wrong": [
+    "The assistant quotes an outdated policy because old documents were not removed.",
+    "Retrieval ignores user permissions and shows content a person should not see.",
+    "Hidden instructions in a document or message manipulate the assistant (prompt injection)."
+   ],
+   "ask": [
+    "Which documents are approved sources and who keeps them current?",
+    "How do we check the assistant respects who may see what?",
+    "How will we measure answer quality before and after launch?",
+    "When the assistant is unsure, what does it do, and who handles the handover to a person?"
+   ],
+   "interview": "For an AI assistant I plan content ownership, an evaluation set and access controls before launch, and I define when it must hand over to a person. I report quality against the evaluation set, not opinions."
+  },
+  {
+   "id": "ai-agents",
+   "title": "AI agents with tools",
+   "tagline": "An assistant that can take actions, which changes the risk conversation.",
+   "category": "AI",
+   "free": false,
+   "business": "An AI agent is a language model that can plan steps and use tools, such as searching, updating a record or sending a message. That makes it useful for multi-step work and also raises the stakes: a wrong or manipulated decision can now change real systems. The control question is not only 'is it accurate' but 'what is it allowed to do and who approves'.",
+   "analogy": "A new assistant who can use your systems. You would give them narrow permissions, ask for approval on anything risky and read their activity log, especially in the first weeks.",
+   "arch": "# Agent with controls\nGoal | Business task with clear limits and success measure\nAgent | Model plans steps and chooses tools\nTools | Read-only lookups, limited write actions, approval for high impact\nHuman oversight | Approval steps, escalation, kill switch\n~Cross-cutting | Least privilege, logging, evaluation, cost caps",
+   "pm_cost": [
+    "Define allowed actions per tool and the approval step for risky ones before building.",
+    "Testing needs scenario tests and adversarial tests, which take more time than normal acceptance tests.",
+    "Logging of actions is essential for audit and for learning from errors."
+   ],
+   "goes_wrong": [
+    "An agent with broad permissions is tricked by hidden text into taking a harmful action.",
+    "Loops of repeated calls drive up cost quickly.",
+    "Nobody owns what the agent did, so accountability is unclear."
+   ],
+   "ask": [
+    "What can the agent change, and what needs human approval?",
+    "How can we stop it immediately?",
+    "How do we test for misuse and manipulation?",
+    "Who is accountable for its actions and how do we audit them?"
+   ],
+   "interview": "With agents I start from permissions and approvals. I make autonomy earned in stages, require action logs and name an accountable owner, and I note that practices in this area are still evolving, so I check current guidance."
+  },
+  {
+   "id": "llm-gateway",
+   "title": "LLM gateway and guardrails",
+   "tagline": "One controlled path to AI models, with limits, filters and records.",
+   "category": "AI",
+   "free": false,
+   "business": "Instead of each team calling an AI model directly, an LLM gateway offers one governed route. It can hide secrets, remove personal data, apply content rules, cap usage and cost, log activity and switch between models. For a project manager it turns scattered AI experiments into something that can be budgeted, audited and supported.",
+   "analogy": "A company switchboard. Calls go through one place that checks who is calling, applies the rules and records the call, rather than every desk having its own outside line.",
+   "arch": "# LLM gateway\nApplications | Assistant, summariser, internal tools\nGateway | Authentication, usage caps, cost tracking, model routing\nProtection | Personal data redaction, input and output filters, prompt injection checks\nModels | Approved language models from chosen providers\n~Cross-cutting | Audit logs, vendor terms, evaluation, monitoring",
+   "pm_cost": [
+    "Adds a shared service to plan, own and fund, but saves repeating the same controls in each project.",
+    "Vendor and model choices become a governance decision with legal and security input.",
+    "Usage reports let you forecast cost instead of being surprised by it."
+   ],
+   "goes_wrong": [
+    "Teams bypass the gateway and use unapproved tools.",
+    "Filters block valid work and users complain, so the rules are quietly loosened.",
+    "Logs store prompts with personal data and create a new risk."
+   ],
+   "ask": [
+    "Which models are approved and who decides?",
+    "What data is never allowed to leave our boundary?",
+    "How are prompts and outputs logged and for how long?",
+    "What are the spending limits and who gets alerted?"
+   ],
+   "interview": "I support a single governed route to AI models so security, legal and finance can see usage. I plan ownership, cost limits and logging rules together so AI use is both safe and measurable."
+  },
+  {
+   "id": "disaster-recovery",
+   "title": "Disaster recovery: RPO and RTO",
+   "tagline": "Agree what you can lose and how long you can be down, before something breaks.",
+   "category": "Cloud",
+   "free": false,
+   "business": "Recovery point objective (RPO) is how much recent data the business can afford to lose, measured in time. Recovery time objective (RTO) is how long the service can be down before the damage is unacceptable. These are business decisions that set the technical design and the cost: shorter targets cost more.",
+   "analogy": "An insurance excess and a repair promise. You decide how much loss you can tolerate and how fast it must be fixed, and the price follows.",
+   "arch": "# Recovery design\nBusiness targets | RPO and RTO agreed with the sponsor per service\nProtection | Backups, copies in another location, tested restores\nRecovery | Failover plan, runbooks, roles and contacts\nProof | Scheduled recovery tests and reports\n~Cross-cutting | Cost, security of backups, communication plan",
+   "pm_cost": [
+    "The business must set the targets. Facilitate the conversation and record the decision and its cost.",
+    "Recovery tests need environments, time and sometimes downtime windows. Put them in the plan.",
+    "Backups must also be protected from tampering and deletion."
+   ],
+   "goes_wrong": [
+    "Backups exist but have never been restored, and the restore fails in a real incident.",
+    "Targets are assumed by IT and never agreed with the business.",
+    "Contacts and runbooks are out of date when they are needed."
+   ],
+   "ask": [
+    "What are the RPO and RTO for each service and who approved them?",
+    "When did we last restore from backup and what did we learn?",
+    "What is the communication plan during an outage?",
+    "What does tightening the targets cost?"
+   ],
+   "interview": "I get RPO and RTO agreed with the sponsor in business terms with the cost shown, and I schedule a real recovery test before go-live, because an untested backup is only a hope."
+  },
+  {
+   "id": "event-driven-queues",
+   "title": "Event-driven systems and message queues",
+   "tagline": "Systems that pass messages instead of waiting on each other.",
+   "category": "Integration",
+   "free": false,
+   "business": "In an event-driven design a system publishes a message, such as 'order placed', and other systems react in their own time through a message queue. This makes the whole less fragile and easier to scale, because a slow system does not hold up the others. The trade-off is that things happen at slightly different times, so tracking and testing need more care.",
+   "analogy": "A restaurant order ticket rail. The waiter posts the ticket and the kitchen picks it up when ready. The waiter does not stand waiting at the stove.",
+   "arch": "# Messaging flow\nProducers | Order service publishes 'order placed'\nQueue | Message broker holds messages safely until used\nConsumers | Billing, stock, notifications, analytics\nOperations | Retry rules, dead letter queue, monitoring\n~Cross-cutting | Message formats, ordering, security, replay",
+   "pm_cost": [
+    "Needs agreed message formats between teams. Treat them as contracts and plan changes.",
+    "Testing must cover delays, duplicates and failures, not only the happy path.",
+    "Monitoring queue depth and failures is part of operations from day one."
+   ],
+   "goes_wrong": [
+    "Messages pile up unnoticed in a failed queue and customers wait.",
+    "Duplicate messages cause double charges if systems are not built to handle repeats.",
+    "Nobody can trace one order across systems without shared identifiers."
+   ],
+   "ask": [
+    "What happens to a message that cannot be processed?",
+    "How do we avoid processing the same message twice?",
+    "How do we trace one transaction across systems?",
+    "Who monitors the queues and what are the alert thresholds?"
+   ],
+   "interview": "I plan for the failure cases as well as the main path: retries, duplicates and monitoring. I make message formats a managed contract between teams so changes do not surprise anyone."
+  }
+ ]
+}
