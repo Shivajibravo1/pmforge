@@ -3,7 +3,7 @@ import re
 
 from app.content import days, get_day, lesson_body
 
-KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm"}
+KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm", "diagram"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -214,7 +214,23 @@ def test_comm_exercises_are_well_formed():
 def test_enhanced_days_carry_an_architecture_diagram_and_a_comm_exercise():
     for n in ENHANCED_DAYS:
         kinds = [k for k, _ in blocks(n)]
-        assert "arch" in kinds, f"day {n}: add an arch diagram"
+        assert "arch" in kinds or "diagram" in kinds, f"day {n}: add an architecture diagram"
         assert kinds.count("comm") == 1, f"day {n}: add one comm exercise"
         screens = len(re.findall(r"^## ", lesson_body(n) or "", re.M))
         assert 6 <= screens <= 12, f"day {n}: {screens} screens"
+
+
+def test_process_diagrams_are_well_formed():
+    for n in written():
+        for kind, src in blocks(n):
+            if kind != "diagram":
+                continue
+            ls = _lines(src)
+            ids = [r[5:].split("|")[0].strip() for r in ls if r.startswith("node ")]
+            assert ls[0].startswith("# "), f"day {n}: diagram needs a title"
+            assert any(r.startswith("zone ") for r in ls) and len(ids) >= 4, f"day {n}: diagram needs zones and four or more nodes"
+            assert len(ids) == len(set(ids)), f"day {n}: duplicate node id"
+            for r in ls:
+                if r.startswith("edge "):
+                    a, _, b = r[5:].split("|")[0].partition(">")
+                    assert a.strip() in ids and b.strip() in ids, f"day {n}: edge points at an unknown node: {r}"

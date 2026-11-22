@@ -2,13 +2,13 @@
 import {
   AlertTriangle, ArrowRight, BarChart3, BookOpen, Brain, CheckCircle2, ChevronDown, Cloud, Code2, DollarSign, Database, Eye, FileText,
   Flag, GitBranch, Layers, Lightbulb, Link2, Lock, type LucideIcon, Map as MapIcon, Rocket, Search, Server, Settings, ShieldCheck,
-  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info, MessageCircle, Bot, Network, KeyRound, Radar, Wrench, Siren, RotateCcw, Handshake, Cpu, Compass, Mic,
+  Sparkles, Target, Users, Workflow, XCircle, Zap, Clock, Info, MessageCircle, Bot, Network, KeyRound, Radar, Wrench, Siren, RotateCcw, Handshake, Cpu, Compass, Mic, Globe, Smartphone, Mail, Bell, Monitor, HardDrive,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseLens,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseDiagram, layoutDiagram, DIAGRAM, parseLens,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -16,6 +16,7 @@ const ICONS: Record<string, LucideIcon> = {
   alert: AlertTriangle, check: CheckCircle2, clock: Clock, money: DollarSign, layers: Layers, lock: Lock, workflow: Workflow,
   chart: BarChart3, rocket: Rocket, search: Search, file: FileText, link: Link2, settings: Settings, brain: Brain, zap: Zap,
   flag: Flag, eye: Eye, book: BookOpen, map: MapIcon, spark: Sparkles,
+  globe: Globe, phone: Smartphone, mail: Mail, bell: Bell, monitor: Monitor, disk: HardDrive,
   bot: Bot, network: Network, key: KeyRound, radar: Radar, wrench: Wrench, handshake: Handshake, cpu: Cpu, compass: Compass, mic: Mic,
 };
 const iconFor = (name: string): LucideIcon => ICONS[name.toLowerCase()] ?? Sparkles;
@@ -345,6 +346,65 @@ function AnswerBlock({ src }: { src: string }) {
   );
 }
 
+const ZONE_COLOURS = ["#0078d4", "#8661c5", "#107c10", "#ca5010", "#c239b3", "#038387"];
+
+function Diagram({ src }: { src: string }) {
+  const d = parseDiagram(src);
+  const uid = useId().replace(/:/g, "");
+  if (!d.nodes.length) return null;
+  const { routes, pos, width, height } = layoutDiagram(d);
+  const { zoneW, nodeW, nodeH, pad } = DIAGRAM;
+  const label = d.title || "Architecture diagram";
+  return (
+    <figure className="my-6 rounded-2xl border border-line bg-surface2 p-4">
+      <figcaption className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><Network aria-hidden className="h-4 w-4" />{label}</figcaption>
+      <div className="overflow-x-auto">
+        <svg role="img" aria-label={label} viewBox={`0 0 ${width} ${height}`} style={{ minWidth: Math.round(width * 0.78), width: "100%" }}>
+          <defs>
+            <marker id={`ah-${uid}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a3e635" /></marker>
+          </defs>
+          {d.zones.map((z, i) => (
+            <g key={z}>
+              <rect x={i * zoneW + pad} y={pad} width={zoneW - pad * 2} height={height - pad * 2} rx={12} fill="#0b1220" fillOpacity={0.55} stroke={ZONE_COLOURS[i % ZONE_COLOURS.length]} strokeOpacity={0.8} strokeDasharray="6 5" />
+              <text x={i * zoneW + zoneW / 2} y={pad + 22} textAnchor="middle" fontSize={13} fontWeight={700} fill="#cbd5e1">{z}</text>
+            </g>
+          ))}
+          {routes.map((r, i) => <path key={i} d={r.path} fill="none" stroke="#a3e635" strokeWidth={2} markerEnd={`url(#ah-${uid})`} />)}
+          {d.nodes.map((n) => {
+            const p = pos.get(n.id)!;
+            const Icon = iconFor(n.icon);
+            const colour = ZONE_COLOURS[n.zone % ZONE_COLOURS.length];
+            return (
+              <g key={n.id}>
+                <rect x={p.x} y={p.y} width={nodeW} height={nodeH} rx={10} fill="#111827" stroke="#334155" />
+                <rect x={p.x} y={p.y} width={46} height={nodeH} rx={10} fill={colour} />
+                <rect x={p.x + 30} y={p.y} width={16} height={nodeH} fill={colour} />
+                <Icon x={p.x + 11} y={p.y + nodeH / 2 - 12} width={24} height={24} color="#ffffff" aria-hidden="true" />
+                <foreignObject x={p.x + 52} y={p.y + 4} width={nodeW - 58} height={nodeH - 8}>
+                  <div style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", color: "#fff", lineHeight: 1.2, overflow: "hidden" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{n.label}</span>
+                    {n.caption && <span style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{n.caption}</span>}
+                  </div>
+                </foreignObject>
+              </g>
+            );
+          })}
+          {routes.filter((r) => r.label).map((r, i) => {
+            const w = r.label.length * 6.2 + 14;
+            return (
+              <g key={i}>
+                <rect x={r.lx - w / 2} y={r.ly - 10} width={w} height={20} rx={10} fill="#0b0f14" stroke="#a3e635" strokeOpacity={0.7} />
+                <text x={r.lx} y={r.ly + 4} textAnchor="middle" fontSize={11} fill="#e2e8f0">{r.label}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <ul className="sr-only">{routes.map((r, i) => <li key={i}>{`${d.nodes.find((n) => n.id === r.from)?.label} to ${d.nodes.find((n) => n.id === r.to)?.label}${r.label ? `: ${r.label}` : ""}`}</li>)}</ul>
+    </figure>
+  );
+}
+
 function Quote({ src }: { src: string }) {
   return (
     <div className="my-6 space-y-3 border-l-4 border-lime bg-surface2 p-4" role="group" aria-label="Workplace messages">
@@ -501,6 +561,7 @@ function renderBlock(kind: BlockKind, src: string): ReactNode {
     case "flashcards": return <Flashcards src={src} />;
     case "incident": return <Incident src={src} />;
     case "comm": return <Comm src={src} />;
+    case "diagram": return <Diagram src={src} />;
     case "answer": return <AnswerBlock src={src} />;
     case "ai": {
       const rows = parseLens(src);

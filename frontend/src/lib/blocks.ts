@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref" | "mindmap" | "flashcards" | "incident" | "answer" | "comm";
-export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm"];
+export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref" | "mindmap" | "flashcards" | "incident" | "answer" | "comm" | "diagram";
+export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm", "diagram"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -222,3 +222,68 @@ export function parseDecision(src: string): Decision | null {
 }
 
 export const readMinutes = (text: string) => Math.max(1, Math.round(text.split(/\s+/).filter(Boolean).length / 180));
+
+
+export type DiagramNode = { id: string; icon: string; label: string; caption: string; zone: number; row: number };
+export type DiagramEdge = { from: string; to: string; label: string };
+
+/**
+ * Process diagram in the style of a cloud architecture drawing. Lines:
+ * `# Title`, `zone Name` (starts a column), `node id | icon | Label | caption`, `edge from > to | label`.
+ */
+export function parseDiagram(src: string) {
+  const title = lines(src).find((l) => l.startsWith("#"))?.replace(/^#\s*/, "") ?? "";
+  const zones: string[] = [];
+  const nodes: DiagramNode[] = [];
+  const edges: DiagramEdge[] = [];
+  for (const l of lines(src)) {
+    if (l.startsWith("#")) continue;
+    if (l.startsWith("zone ")) { zones.push(l.slice(5).trim()); continue; }
+    if (l.startsWith("node ") && zones.length) {
+      const [id, icon = "layers", label = "", ...cap] = cells(l.slice(5));
+      nodes.push({ id, icon, label, caption: cap.join(" | "), zone: zones.length - 1, row: nodes.filter((n) => n.zone === zones.length - 1).length });
+    } else if (l.startsWith("edge ")) {
+      const [pair, ...lab] = cells(l.slice(5));
+      const [from, to] = pair.split(">").map((x) => x.trim());
+      if (from && to) edges.push({ from, to, label: lab.join(" | ") });
+    }
+  }
+  const ids = new Set(nodes.map((n) => n.id));
+  return { title, zones, nodes, edges: edges.filter((e) => ids.has(e.from) && ids.has(e.to) && e.from !== e.to) };
+}
+
+export const DIAGRAM = { zoneW: 290, nodeW: 176, nodeH: 68, gap: 30, top: 46, pad: 8 };
+
+/** Positions every node and routes every edge as a smooth curve between node sides. */
+export function layoutDiagram(d: ReturnType<typeof parseDiagram>) {
+  const { zoneW, nodeW, nodeH, gap, top, pad } = DIAGRAM;
+  const pos = new Map<string, { x: number; y: number }>();
+  for (const n of d.nodes) pos.set(n.id, { x: n.zone * zoneW + (zoneW - nodeW) / 2, y: top + n.row * (nodeH + gap) });
+  const rows = Math.max(1, ...d.nodes.map((n) => n.row + 1));
+  const zoneOf = new Map(d.nodes.map((n) => [n.id, n.zone]));
+  const routes = d.edges.map((e) => {
+    const a = pos.get(e.from)!;
+    const b = pos.get(e.to)!;
+    const za = zoneOf.get(e.from)!;
+    const zb = zoneOf.get(e.to)!;
+    let x1: number, y1: number, x2: number, y2: number, path: string;
+    let lxo = 0;
+    if (za === zb && Math.abs(a.y - b.y) > nodeH + gap + 1) {
+      // Skips over another node: bow out to the right so the line does not run behind it.
+      x1 = a.x + nodeW; x2 = x1; y1 = a.y + nodeH / 2; y2 = b.y + nodeH / 2;
+      path = `M ${x1} ${y1} C ${x1 + 70} ${y1}, ${x2 + 70} ${y2}, ${x2} ${y2}`;
+      lxo = 52;
+    } else if (za === zb) {
+      const down = b.y > a.y;
+      x1 = a.x + nodeW / 2; x2 = x1; y1 = down ? a.y + nodeH : a.y; y2 = down ? b.y : b.y + nodeH;
+      path = `M ${x1} ${y1} L ${x2} ${y2}`;
+    } else {
+      const right = zb > za;
+      x1 = right ? a.x + nodeW : a.x; x2 = right ? b.x : b.x + nodeW; y1 = a.y + nodeH / 2; y2 = b.y + nodeH / 2;
+      const dx = (x2 - x1) / 2;
+      path = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+    }
+    return { ...e, path, lx: (x1 + x2) / 2 + lxo, ly: (y1 + y2) / 2 };
+  });
+  return { pos, routes, width: d.zones.length * zoneW, height: top + rows * (nodeH + gap) - gap + pad * 2 };
+}

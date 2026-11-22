@@ -43,6 +43,7 @@ One `## ` heading is one screen (6 to 12 screens). Blocks are fenced code blocks
 | `mindmap` | `# Centre`, then `Branch \| child, child` | 3 or more branches, each with 2 or more children |
 | `flashcards` | `Front \| Back` | 3 or more cards; tap to flip, review again or got it |
 | `incident` | `# Title (illustrative)`, then `What happened`, `Impact`, `Root cause`, `Resolution`, `PM move` rows | real world scenario with resolution |
+| `diagram` | `# Title`, `zone Name`, `node id \| icon \| Label \| caption`, `edge a > b \| label` | cloud style process diagram: dashed zones as columns, icon tiles, arrows with labels. Keep to 2 to 4 zones, labels under 14 characters. Used on free days 1 to 10 and the free Library explainers. Icons as for cards plus globe phone mail bell monitor disk |
 | `comm` | `# Title`, then `Audience`, `Situation`, `Task`, `Good looks like` rows | communication exercise; the model answer is hidden until the learner has written their own |
 | `answer` | `? question`, `- weak answer \| why it fails`, `+ strong answer`, `= tailoring tip` | interview answer; tips repeat; the learner replaces the example with their own real story |
 

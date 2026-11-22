@@ -8,7 +8,7 @@ import { UpgradeOptions } from "@/components/upgrade-options";
 import { type Me, useApi } from "@/lib/api";
 
 type Detail = {
-  id: string; title: string; tagline: string; category: string; business: string; analogy: string; arch: string;
+  id: string; title: string; tagline: string; category: string; business: string; analogy: string; arch: string; diagram?: string;
   pm_cost: string[]; goes_wrong: string[]; ask: string[]; interview: string;
 };
 
@@ -48,7 +48,7 @@ export default function LibraryItem() {
       <p className="text-muted">{data.tagline}</p>
       <Card><h2 className="font-semibold">In business language</h2><p className="mt-2 text-sm">{data.business}</p></Card>
       <Card><h2 className="font-semibold">Think of it like this</h2><p className="mt-2 text-sm">{data.analogy}</p></Card>
-      <LessonBody body={"```arch\n" + data.arch + "\n```"} />
+      <LessonBody body={data.diagram ? "```diagram\n" + data.diagram + "\n```" : "```arch\n" + data.arch + "\n```"} />
       <Card><h2 className="font-semibold">What it does to your plan</h2>{list(data.pm_cost)}</Card>
       <Card><h2 className="font-semibold">What goes wrong</h2>{list(data.goes_wrong)}</Card>
       <Card><h2 className="font-semibold">Questions to ask the engineers</h2>{list(data.ask)}</Card>

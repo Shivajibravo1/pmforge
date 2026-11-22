@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseLens } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseDiagram, layoutDiagram, parseLens } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
@@ -27,6 +27,16 @@ describe("lesson block parsers", () => {
     expect(c.title).toBe("Tell the sponsor");
     expect(c.rows.map((r) => r.label)).toEqual(["Audience", "Situation", "Task"]);
     expect(c.good).toBe("Plain and specific");
+  });
+  it("lays out a process diagram and routes edges between nodes", () => {
+    const d = parseDiagram("# Flow\nzone Users\nnode u | users | Customer | Browser\nzone App\nnode a | server | Portal\nnode b | database | Orders\nedge u > a | HTTPS\nedge a > b\nedge a > nowhere");
+    expect(d.zones).toEqual(["Users", "App"]);
+    expect(d.edges).toHaveLength(2);
+    const l = layoutDiagram(d);
+    expect(l.routes[0].path.startsWith("M ")).toBe(true);
+    expect(l.routes[0].label).toBe("HTTPS");
+    expect(l.routes[1].path).toContain("L");
+    expect(l.width).toBe(580);
   });
   it("parses cards with icon, text and an optional risk", () => {
     expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a", risk: "b" });
