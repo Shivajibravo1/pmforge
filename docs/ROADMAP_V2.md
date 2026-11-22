@@ -24,9 +24,9 @@ Member answers, gets a score against a rubric and a model answer. Builds on the 
 Eight fill-in templates (RAID log, risk register, charter, RACI, business case, test strategy, status report, stakeholder register) with a worked Nimbus example, tips and common mistakes. Drafts stay on the device; CSV download protects against spreadsheet formula injection. Three are free.
 
 ## Wave 5: Lesson enhancement (in progress)
-Status: a new `comm` block (communication exercise) exists. Days 1 to 40 (except buffer day 29) carry one architecture
-diagram and one communication exercise, enforced by `ENHANCED_DAYS` in `test_lesson_blocks.py`. Remaining: days 41 to 120
-except buffer days 59, 89 and 119, in waves of about 20.
+Status: a new `comm` block (communication exercise) exists. Days 1 to 90 (except buffer days 29, 59 and 89) carry one architecture
+diagram and one communication exercise, enforced by `ENHANCED_DAYS` in `test_lesson_blocks.py`. Remaining: days 91 to 120
+except buffer day 119.
 
 Original plan:
 Add an architecture diagram and a "tech in business language" screen to every lesson that touches technology (only 11

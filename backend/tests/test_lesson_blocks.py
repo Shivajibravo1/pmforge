@@ -196,7 +196,7 @@ def test_every_ai_lens_is_structured_and_substantial():
 
 
 # Lessons enhanced with an architecture diagram and a communication exercise. Extend as waves land.
-ENHANCED_DAYS: list[int] = list(range(1, 21)) + list(range(21, 29)) + list(range(30, 41))
+ENHANCED_DAYS: list[int] = [n for n in range(1, 91) if n not in (29, 59, 89)]
 COMM_LABELS = ["Audience", "Situation", "Task", "Good looks like"]
 
 
