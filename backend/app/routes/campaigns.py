@@ -4,13 +4,13 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, undefer
 
 from app import emailer, interview
 from app.config import get_settings
 from app.db import get_db
-from app.models import EmailCampaign, Resource, User
+from app.models import CampaignDelivery, EmailCampaign, InterviewSubscription, MarketingConsent, Resource, User
 from app.security import require_admin
 
 log = logging.getLogger("pmforge.campaigns")
@@ -71,7 +71,8 @@ def _can_schedule(db: Session, c: EmailCampaign) -> None:
         raise HTTPException(409, "date_taken")
 
 
-def build(db: Session, c: EmailCampaign, base: str, unsubscribe_url: str, subject_prefix: str = ""):
+def build(db: Session, c: EmailCampaign, base: str, unsubscribe_url: str, subject_prefix: str = "",
+          postal_address: str = ""):
     """Returns (subject, text, html, attachments) for one campaign. Used by the job and by test sends."""
     images = {}
     for b in c.blocks:
@@ -87,7 +88,8 @@ def build(db: Session, c: EmailCampaign, base: str, unsubscribe_url: str, subjec
             pdf = f"{_file_name(r)}"
             attachments = [{"filename": pdf, "content": r.data}]
     subject, text, html = interview.compose_campaign(subject_prefix + c.subject, c.blocks, images=images,
-                                                     pdf_name=pdf, unsubscribe_url=unsubscribe_url)
+                                                     pdf_name=pdf, unsubscribe_url=unsubscribe_url,
+                                                     postal_address=postal_address)
     return subject, text, html, attachments
 
 
@@ -173,3 +175,73 @@ def send_test(cid: str, admin: User = Depends(require_admin), db: Session = Depe
         code = "email_not_configured" if "not configured" in str(exc) else "email_send_failed"
         raise HTTPException(424, code) from exc
     return {"sent_to": admin.email}
+
+
+Audience = Literal["all", "paid", "free"]
+BROADCAST_BATCH = 50  # one request stays well inside the proxy's time limit; the page asks again until done
+
+
+def _audience_query(audience: str):
+    """Members who agreed to tips and offers emails, on the chosen plan. Admins are never in an audience."""
+    q = (select(User.id, User.email, MarketingConsent.unsubscribe_token)
+         .join(MarketingConsent, MarketingConsent.user_id == User.id)
+         .where(MarketingConsent.opted_out_at.is_(None), User.email != "", User.role != "admin"))
+    if audience != "all":
+        q = q.where(User.tier == audience)
+    return q
+
+
+@router.get("/audience")
+def audience_counts(_: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """How many members each send button would reach. Only people who turned on tips and offers are counted."""
+    def n(audience: str) -> int:
+        return db.scalar(select(func.count()).select_from(_audience_query(audience).subquery())) or 0
+    s = get_settings()
+    return {"all": n("all"), "paid": n("paid"), "free": n("free"), "daily_limit": s.interview_email_daily_cap,
+            "mailing_address_set": bool(s.mailing_address.strip())}
+
+
+class BroadcastIn(BaseModel):
+    audience: Audience
+
+
+@router.post("/{cid}/broadcast")
+def broadcast(cid: str, body: BroadcastIn, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Sends this email now to members on the chosen plan who agreed to tips and offers. Safe to press again: nobody
+    gets the same email twice, and the daily limit (shared with all other email) just pauses it until tomorrow."""
+    s = get_settings()
+    if not s.resend_api_key or not s.email_from:
+        raise HTTPException(424, "email_not_configured")
+    c = _get(db, cid)
+    if not any(b.get("type") == "image" or str(b.get("text", "")).strip() for b in c.blocks):
+        raise HTTPException(422, "body_required")
+    today = interview.today_ist()
+    start = datetime.combine(today, datetime.min.time(), tzinfo=interview.IST)
+    used = (db.scalar(select(func.count()).select_from(InterviewSubscription)
+                      .where(InterviewSubscription.last_sent_on == today)) or 0) + (
+        db.scalar(select(func.count()).select_from(CampaignDelivery)
+                  .where(CampaignDelivery.source == "broadcast", CampaignDelivery.sent_at >= start)) or 0)
+    room = max(0, s.interview_email_daily_cap - used)
+    done = select(CampaignDelivery.user_id).where(CampaignDelivery.campaign_id == c.id)
+    pending = _audience_query(body.audience).where(User.id.not_in(done)).order_by(User.created_at, User.id)
+    todo = db.execute(pending.limit(min(room, BROADCAST_BATCH))).all()
+    base = s.public_base_url.rstrip("/")
+    sent = failed = 0
+    for uid, email, token in todo:
+        subject, text, html, attachments = build(db, c, base, f"{base}/unsubscribe/{token}",
+                                                 postal_address=s.mailing_address)
+        try:
+            emailer.send_email(s, to=email, subject=subject, text=text, html=html,
+                               unsubscribe_url=f"{base}/public/interview/unsubscribe/{token}",
+                               idempotency_key=f"broadcast-{c.id}-{uid}", attachments=attachments)
+        except emailer.EmailError as exc:
+            failed += 1
+            log.warning("broadcast send failed for user %s: %s", uid, exc)
+            continue
+        db.add(CampaignDelivery(campaign_id=c.id, user_id=uid, source="broadcast"))
+        db.commit()
+        sent += 1
+    remaining = db.scalar(select(func.count()).select_from(pending.subquery())) or 0
+    log.info("admin %s broadcast email %s to %s: sent %d, failed %d, remaining %d", admin.id, c.id, body.audience,
+             sent, failed, remaining)
+    return {"sent": sent, "failed": failed, "remaining": remaining, "limit_reached": room - sent <= 0 and remaining > 0}

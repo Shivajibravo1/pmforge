@@ -68,6 +68,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:?set RESEND_API_KEY}
       EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
       PUBLIC_BASE_URL: https://${DOMAIN:-pmforge.pm}
+      MAILING_ADDRESS: ${MAILING_ADDRESS:-}
       # SuperProfile purchases relayed by n8n (docs/PAYMENTS_N8N.md). Without the secret the endpoint refuses all.
       PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}
       SUPERPROFILE_MONTHLY_TITLE: ${SUPERPROFILE_MONTHLY_TITLE:-}
@@ -112,6 +113,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:?set RESEND_API_KEY}
       EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
       PUBLIC_BASE_URL: https://${DOMAIN:-pmforge.pm}
+      MAILING_ADDRESS: ${MAILING_ADDRESS:-}
       INTERVIEW_EMAIL_DAILY_CAP: ${INTERVIEW_EMAIL_DAILY_CAP:-80}
     depends_on:
       backend-migrate: { condition: service_completed_successfully }

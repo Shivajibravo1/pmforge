@@ -9,6 +9,7 @@ from app import content
 
 _BLOCK = re.compile(r"```answer\n(.*?)```", re.S)
 
+MARKETING_CONSENT_VERSION = "2026-11-22"
 CONSENT_VERSION = "2026-11-18"
 IST = timezone(timedelta(hours=5, minutes=30))  # send dates are India dates
 
@@ -87,7 +88,7 @@ def compose(q: dict, *, lesson_url: str, unsubscribe_url: str) -> tuple[str, str
 
 
 def compose_campaign(subject: str, blocks: list[dict], *, images: dict[str, tuple[str, str]],
-                     pdf_name: str | None, unsubscribe_url: str) -> tuple[str, str, str]:
+                     pdf_name: str | None, unsubscribe_url: str, postal_address: str = "") -> tuple[str, str, str]:
     """Build an admin-written email. `images` maps resource id to (public url, alt text). Text is escaped;
     a paragraph is separated by a blank line, and lines starting with '- ' become a bullet list."""
     e = html.escape
@@ -115,10 +116,20 @@ def compose_campaign(subject: str, blocks: list[dict], *, images: dict[str, tupl
         text_parts.append(f"A PDF is attached: {pdf_name}")
         html_parts.append(f'<p style="margin:0 0 16px;font-size:13px;color:#555">A PDF is attached: {e(pdf_name)}</p>')
     text_parts.append("You get this email because you opted in at PMForge. Unsubscribe any time:\n" + unsubscribe_url)
+    if postal_address.strip():
+        text_parts.append(f"PMForge, {postal_address.strip()}")
     body = (
         '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:16px;color:#111">'
         + "".join(html_parts)
         + f'<p style="margin:24px 0 0;font-size:12px;color:#666">You get this email because you opted in at PMForge. '
-        f'<a href="{e(unsubscribe_url)}">Unsubscribe</a></p></div>'
+        f'<a href="{e(unsubscribe_url)}">Unsubscribe</a></p>'
+        + (f'<p style="margin:4px 0 0;font-size:12px;color:#666">PMForge, {e(postal_address.strip())}</p>'
+           if postal_address.strip() else "")
+        + "</div>"
     )
     return subject, "\n\n".join(text_parts), body
+
+
+def marketing_consent_text(email: str) -> str:
+    return (f"Yes, email me at {email or 'my sign-in address'} now and then about learning tips, new features and "
+            "offers from PMForge. I can turn this off any time from my You page or the link in each email.")

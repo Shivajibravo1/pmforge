@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app import billing, emailer, interview
 from app.config import Settings, get_settings
 from app.db import SessionLocal
-from app.models import EmailCampaign, InterviewQuestion, InterviewSubscription, Resource, User
+from app.models import CampaignDelivery, EmailCampaign, InterviewQuestion, InterviewSubscription, Resource, User
 
 log = logging.getLogger("pmforge.interview_email")
 IST = interview.IST
@@ -72,12 +72,16 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
         if claimed != 1:
             stats["skipped"] += 1
             continue
+        if campaign and db.get(CampaignDelivery, (campaign.id, uid)):  # already got this email by another route
+            stats["skipped"] += 1
+            continue
         base = settings.public_base_url.rstrip("/")
         unsub = f"{base}/public/interview/unsubscribe/{token}"  # one-click POST for mail apps (header)
         unsub_page = f"{base}/unsubscribe/{token}"  # page a person lands on when they click the link
         if campaign:
             from app.routes.campaigns import build  # imported here: routes import the job's helpers elsewhere
-            subject, text, html, attachments = build(db, campaign, base, unsub_page)
+            subject, text, html, attachments = build(db, campaign, base, unsub_page,
+                                                     postal_address=settings.mailing_address)
             q = None
         else:
             attachments = None
@@ -102,6 +106,8 @@ def run_once(db: Session, settings: Settings, sender: Sender = emailer.send_emai
             log.warning("send failed for %s: %s", _uid(uid), exc)
             continue
         db.execute(update(InterviewSubscription).where(InterviewSubscription.user_id == uid).values(failures=0))
+        if campaign:
+            db.add(CampaignDelivery(campaign_id=campaign.id, user_id=uid, source="job"))
         db.commit()
         stats["sent"] += 1
     if campaign:

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Character } from "@/components/character";
 import { InterviewEmailCard } from "@/components/interview-email-card";
+import { MarketingEmailCard } from "@/components/marketing-email-card";
 import { SampleCertificate } from "@/components/sample-certificate";
 import { UpgradeOptions } from "@/components/upgrade-options";
 import { Button, Card, LoadError, Notice, Spinner } from "@/components/ui";
@@ -157,6 +158,7 @@ export default function You() {
       })}
       {msg && <Notice>{msg}</Notice>}
       <InterviewEmailCard />
+      <MarketingEmailCard />
       <Card>
         <p className="text-sm text-muted">Signed in as</p>
         <p className="font-medium">{me.data.email}</p>

@@ -31,6 +31,7 @@ The landing page picks the price currency from the `cf-ipcountry` header that Cl
 | `OPENAI_API_KEY` | your key |
 | `RESEND_API_KEY` | your key |
 | `EMAIL_FROM` | e.g. `PMForge <login@pmforge.pm>` |
+| `MAILING_ADDRESS` | your postal address, printed at the bottom of every composer email (needed before you send tips and offers) |
 | `AUTH_TEST_EMAILS` | optional |
 | `ADMIN_EMAILS` | defaults to `aishivajibravo@gmail.com` |
 | `DOMAIN` | defaults to `pmforge.pm` |
@@ -125,3 +126,15 @@ Admin, then Subscribers. Paid and Free tabs list every member with an "Opted in"
 opted in") and press Send to send today's interview email now. Only members who opted in can be ticked, each member gets
 at most one email a day (a manual send uses up that day's email), and the daily cap still applies. Free members cannot
 opt in today, so the Free tab only becomes selectable for a free member who had opted in while on a paid plan.
+
+## Tips and offers to free and paid members
+
+Admin, then Email composer. Under your saved emails, the card "Send now to members" has three buttons: Send to all users,
+Send to paid users, Send to free users. The number in each button is how many members would get it.
+
+- **Who is included:** only members who turned on "Tips and offers by email" on their You page (any plan). It is off by default, the member ticks a box with the exact wording, and the time and wording version are stored in `marketing_consents`. Admins are never included.
+- **One click unsubscribe:** every email has an unsubscribe link and a `List-Unsubscribe` header. Opening the link never unsubscribes by itself, the member presses one button.
+- **Postal address:** set `MAILING_ADDRESS` (re-paste the compose file, then redeploy). It is printed at the bottom of each email. Laws such as US CAN-SPAM require a postal address, so do not send marketing without it. This is not legal advice, check the rules for your members' countries.
+- **No double sends:** `campaign_deliveries` records who got which email, whether sent from this card or by the 7:00 job. Pressing a button again only reaches people who have not got it yet.
+- **Daily limit:** `INTERVIEW_EMAIL_DAILY_CAP` (default 80) now covers interview emails and these sends together. When it is reached the page tells you how many are waiting, press the button again the next day. Sign-in codes share the same Resend 100 a day on the free plan, so a large list needs a paid Resend plan.
+- **Keep it honest:** the consent wording says tips and offers, so keep the content to that. Do not send to people who did not turn it on.

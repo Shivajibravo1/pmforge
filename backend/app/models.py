@@ -114,6 +114,18 @@ class InterviewSubscription(Base):
     failures: Mapped[int] = mapped_column(Integer, default=0)
 
 
+class MarketingConsent(Base):
+    """Opt-in to occasional emails about learning tips, new features and offers (any plan). Opting out keeps the
+    row as the consent record. Separate from the daily interview email: agreeing to one never covers the other."""
+    __tablename__ = "marketing_consents"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    opted_in_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    consent_version: Mapped[str] = mapped_column(String(16))
+    opted_out_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    unsubscribe_token: Mapped[str] = mapped_column(
+        String(48), unique=True, index=True, default=lambda: secrets.token_urlsafe(32))
+
+
 class InterviewQuestion(Base):
     """A question the admin wrote for a specific send date. Dates without a row use the built-in question bank."""
     __tablename__ = "interview_questions"
@@ -151,6 +163,15 @@ class EmailCampaign(Base):
     status: Mapped[str] = mapped_column(String(10), default="draft")  # draft, scheduled, sent, partial
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class CampaignDelivery(Base):
+    """One row per person an email was sent to, so a campaign never reaches the same person twice."""
+    __tablename__ = "campaign_deliveries"
+    campaign_id: Mapped[str] = mapped_column(ForeignKey("email_campaigns.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    source: Mapped[str] = mapped_column(String(10))  # "job" (scheduled daily send) or "broadcast" (send buttons)
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
 class Payment(Base):

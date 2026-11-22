@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import interview
 from app.db import get_db
-from app.models import InterviewSubscription, User
+from app.models import InterviewSubscription, MarketingConsent, User
 from app.security import current_user
 
 router = APIRouter(prefix="/api/v1/interview-email", tags=["interview-email"])
@@ -66,8 +66,11 @@ def unsubscribe(user: User = Depends(current_user), db: Session = Depends(get_db
 @public.post("/unsubscribe/{token}")
 def unsubscribe_by_token(token: str, db: Session = Depends(get_db)):
     """No login: the unguessable token in the email is the proof. Answers the same for unknown tokens."""
-    sub = db.scalar(select(InterviewSubscription).where(InterviewSubscription.unsubscribe_token == token[:64]))
-    if sub and sub.opted_out_at is None:
-        sub.opted_out_at = datetime.now(UTC)
-        db.commit()
+    token = token[:64]
+    now = datetime.now(UTC)
+    for model in (InterviewSubscription, MarketingConsent):  # each email type carries its own token
+        row = db.scalar(select(model).where(model.unsubscribe_token == token))
+        if row and row.opted_out_at is None:
+            row.opted_out_at = now
+    db.commit()
     return {"status": "ok"}

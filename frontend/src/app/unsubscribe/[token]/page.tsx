@@ -23,10 +23,10 @@ export default function Unsubscribe() {
       <h1 className="text-2xl font-bold">PM<span className="text-lime">Forge</span></h1>
       <Card>
         {state === "done" ? (
-          <p className="text-sm">You are unsubscribed. No more daily interview emails. You can turn them on again from the You page.</p>
+          <p className="text-sm">You are unsubscribed. You will not get these emails any more. You can turn them on again from the You page.</p>
         ) : (
           <>
-            <p className="text-sm">Stop the daily interview question emails?</p>
+            <p className="text-sm">Stop these emails from PMForge?</p>
             <div className="mt-3">
               <Button disabled={state === "busy"} onClick={go}>Unsubscribe</Button>
             </div>

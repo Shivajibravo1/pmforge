@@ -5,7 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const m = vi.hoisted(() => ({ api: vi.fn(), upload: vi.fn() }));
 vi.mock("@/lib/api", async (orig) => ({
   ...(await orig<typeof import("@/lib/api")>()),
-  useApi: (path: string) => path.includes("resources")
+  useApi: (path: string) => path.includes("audience")
+    ? { data: { all: 3, paid: 1, free: 2, daily_limit: 80, mailing_address_set: true }, error: null, loading: false, reload: vi.fn() }
+    : path.includes("resources")
     ? { data: { items: [
       { id: "img1", kind: "image", title: "Diagram", size: 1, in_email: true, created_at: "" },
       { id: "pdf1", kind: "pdf", title: "Guide", size: 1, in_email: false, created_at: "" }] }, error: null, loading: false, reload: vi.fn() }
@@ -21,7 +23,7 @@ afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe("EmailComposer", () => {
   it("lists emails with status and hides Delete for a scheduled one", () => {
     render(<EmailComposer />);
-    expect(screen.getByText("Old email")).toBeTruthy();
+    expect(screen.getAllByText("Old email").length).toBeGreaterThan(0);
     expect(screen.getAllByText("scheduled").length).toBeGreaterThan(0);
     expect(screen.queryByText("Delete")).toBeNull();
   });
@@ -52,5 +54,21 @@ describe("EmailComposer", () => {
     expect(init.body.blocks[1].resource_id).toBe("img1");
     expect(init.body.attachment_id).toBe("pdf1");
     expect(init.body.send_on).toBeNull();
+  });
+  it("shows how many agreed members each send button reaches", () => {
+    render(<EmailComposer />);
+    expect(screen.getByText("Send to all users (3)")).toBeTruthy();
+    expect(screen.getByText("Send to paid users (1)")).toBeTruthy();
+    expect(screen.getByText("Send to free users (2)")).toBeTruthy();
+  });
+
+  it("asks first, then sends the chosen email to the chosen plan", async () => {
+    m.api.mockResolvedValue({ sent: 2, failed: 0, remaining: 0, limit_reached: false });
+    render(<EmailComposer />);
+    fireEvent.click(screen.getByText("Send to free users (2)"));
+    expect(m.api).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Yes, send"));
+    await waitFor(() => expect(m.api).toHaveBeenCalledWith("/api/v1/admin/emails/e1/broadcast", { method: "POST", body: { audience: "free" } }));
+    await waitFor(() => expect(screen.getByText("Sent to 2 free members.")).toBeTruthy());
   });
 });

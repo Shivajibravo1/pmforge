@@ -7,7 +7,18 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.config import get_settings
 from app.db import Base, engine
 from app.ratelimit import RateLimit
-from app.routes import admin, campaigns, interview, learning, mentor, payments, portfolio, resources, subscribers
+from app.routes import (
+    admin,
+    campaigns,
+    interview,
+    learning,
+    marketing,
+    mentor,
+    payments,
+    portfolio,
+    resources,
+    subscribers,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -104,7 +115,7 @@ def create_app() -> FastAPI:
 
     for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router, interview.router,
               interview.public, resources.admin, resources.public,
-              campaigns.router, subscribers.router, payments.public, payments.admin):
+              campaigns.router, subscribers.router, marketing.router, payments.public, payments.admin):
         app.include_router(r)
     return app
 

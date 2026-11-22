@@ -127,7 +127,7 @@ export function EmailComposer() {
         </div>
         <Button onClick={() => { setMsg(""); setD(blank()); }}>New email</Button>
       </div>
-      <p className="text-sm text-muted">Emails go to members who turned on the daily email on their You page. A scheduled email replaces that day&apos;s interview question, so nobody gets two emails in a day. Times are India time.</p>
+      <p className="text-sm text-muted">A scheduled email replaces that day&apos;s interview question for paid members who turned on the daily email. Below the list you can also send an email now to members who agreed to tips and offers. Times are India time.</p>
       {msg && <Notice>{msg}</Notice>}
 
       {d && (
@@ -216,6 +216,82 @@ export function EmailComposer() {
           ))}
         </ul>
       </Card>
+      <BroadcastCard emails={list.data?.items ?? []} selected={d?.id ?? null} onDone={() => list.reload()} />
     </div>
+  );
+}
+
+type Audience = "all" | "paid" | "free";
+type Counts = { all: number; paid: number; free: number; daily_limit: number; mailing_address_set: boolean };
+type Result = { sent: number; failed: number; remaining: number; limit_reached: boolean };
+const LABEL: Record<Audience, string> = { all: "Send to all users", paid: "Send to paid users", free: "Send to free users" };
+const WHO: Record<Audience, string> = { all: "all members", paid: "paid members", free: "free members" };
+
+// Sends the chosen email now, to members who agreed to tips and offers. Each request sends a batch, so the page asks again until done.
+function BroadcastCard({ emails, selected, onDone }: { emails: Email[]; selected: string | null; onDone: () => void }) {
+  const counts = useApi<Counts>("/api/v1/admin/emails/audience");
+  const [pick, setPick] = useState("");
+  const [ask, setAsk] = useState<Audience | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const id = pick || selected || emails[0]?.id || "";
+  const email = emails.find((e) => e.id === id);
+  const c = counts.data;
+
+  async function send(a: Audience) {
+    setBusy(true);
+    setMsg("");
+    setAsk(null);
+    let sent = 0;
+    let failed = 0;
+    try {
+      for (let i = 0; i < 20; i++) {
+        const r = await api<Result>(`/api/v1/admin/emails/${id}/broadcast`, { method: "POST", body: { audience: a } });
+        sent += r.sent;
+        failed += r.failed;
+        if (r.limit_reached) { setMsg(`Sent ${sent}. The daily email limit is reached, ${r.remaining} still waiting. Press the button again tomorrow and only those will get it.`); return; }
+        if (r.remaining === 0 || r.sent === 0) break;
+      }
+      setMsg(failed ? `Sent ${sent}. ${failed} could not be sent. Press the button again to retry only those.` : `Sent to ${sent} ${WHO[a]}.`);
+    } catch (e) {
+      setMsg(e instanceof ApiError && e.status === 424 ? "Email sending is not set up on the server." : friendly(e instanceof ApiError ? e : null));
+    } finally {
+      setBusy(false);
+      onDone();
+      await counts.reload();
+    }
+  }
+
+  return (
+    <Card>
+      <h2 className="font-semibold">Send now to members</h2>
+      <p className="mt-1 text-sm text-muted">Reaches only members who turned on tips and offers on their You page. Nobody gets the same email twice.</p>
+      {emails.length === 0 ? <p className="mt-2 text-sm text-muted">Save an email first, then choose it here.</p> : (
+        <>
+          <select value={id} onChange={(e) => { setPick(e.target.value); setAsk(null); }} aria-label="Email to send" className={`${field} mt-3`}>
+            {emails.map((e) => <option key={e.id} value={e.id}>{e.subject}</option>)}
+          </select>
+          {c && !c.mailing_address_set && <Notice>Add MAILING_ADDRESS on the server so every email shows your postal address. Many countries require it.</Notice>}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(["all", "paid", "free"] as Audience[]).map((a) => (
+              <Button key={a} variant={a === "free" ? "primary" : "ghost"} disabled={busy || !c || c[a] === 0} onClick={() => setAsk(a)}>
+                {LABEL[a]}{c ? ` (${c[a]})` : ""}
+              </Button>
+            ))}
+          </div>
+          {ask && email && (
+            <div role="alert" className="mt-3 rounded-xl border border-line p-3 text-sm">
+              <p>Send &quot;{email.subject}&quot; to {c?.[ask]} {WHO[ask]} now? This cannot be undone.</p>
+              <div className="mt-2 flex gap-2">
+                <Button disabled={busy} onClick={() => send(ask)}>Yes, send</Button>
+                <Button variant="ghost" onClick={() => setAsk(null)}>Cancel</Button>
+              </div>
+            </div>
+          )}
+          {busy && <p className="mt-2 text-sm text-muted">Sending. Keep this page open.</p>}
+          {msg && <Notice>{msg}</Notice>}
+        </>
+      )}
+    </Card>
   );
 }
