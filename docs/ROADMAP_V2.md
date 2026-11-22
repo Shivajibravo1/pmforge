@@ -16,14 +16,19 @@ Ready to use status report, escalation email, bad news message, stakeholder upda
 with a good and a weak example and a "what to change" note. Member pastes their own draft and gets AI feedback (same
 security controls as the Mentor: redaction, moderation, strict output, caps).
 
-## Wave 3: Interview mock practice
+## Wave 3: Interview mock practice (done)
 Timed questions by role (Agile PM, Functional PM, AI PM): behavioural, scenario, and technical-in-business-language.
 Member answers, gets a score against a rubric and a model answer. Builds on the existing `answer` blocks and daily email.
 
-## Wave 4: PM templates and tools
-Fill-in RAID log, risk register, charter, RACI, business case, test strategy, with a worked Nimbus example each.
+## Wave 4: PM templates and tools (done)
+Eight fill-in templates (RAID log, risk register, charter, RACI, business case, test strategy, status report, stakeholder register) with a worked Nimbus example, tips and common mistakes. Drafts stay on the device; CSV download protects against spreadsheet formula injection. Three are free.
 
-## Wave 5: Lesson enhancement
+## Wave 5: Lesson enhancement (in progress)
+Status: a new `comm` block (communication exercise) exists. Days 1 to 40 (except buffer day 29) carry one architecture
+diagram and one communication exercise, enforced by `ENHANCED_DAYS` in `test_lesson_blocks.py`. Remaining: days 41 to 120
+except buffer days 59, 89 and 119, in waves of about 20.
+
+Original plan:
 Add an architecture diagram and a "tech in business language" screen to every lesson that touches technology (only 11
 have one today), link each lesson to its Library topic, and add one communication exercise per lesson. Order: free days
 (1 to 10), then AI, cloud and security days.

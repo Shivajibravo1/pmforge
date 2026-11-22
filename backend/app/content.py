@@ -48,3 +48,15 @@ def journal_prompt(day: int) -> str | None:
 def architecture() -> list[dict]:
     """Architecture Library: business-language explainers for project managers (content/architecture.json)."""
     return json.loads((_DIR / "architecture.json").read_text(encoding="utf-8"))["items"]
+
+
+@lru_cache
+def interview_bank() -> dict:
+    """Interview mock practice questions by role (content/interview_bank.json)."""
+    return json.loads((_DIR / "interview_bank.json").read_text(encoding="utf-8"))
+
+
+@lru_cache
+def templates() -> list[dict]:
+    """PM templates with worked examples (content/templates.json)."""
+    return json.loads((_DIR / "templates.json").read_text(encoding="utf-8"))["items"]

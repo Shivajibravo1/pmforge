@@ -1,7 +1,7 @@
 /** Pure parsers for the rich lesson blocks. A block is a fenced code block whose language names the block. */
 
-export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref" | "mindmap" | "flashcards" | "incident" | "answer";
-export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer"];
+export type BlockKind = "chat" | "decision" | "timeline" | "rag" | "arch" | "ai" | "quote" | "flow" | "cards" | "stats" | "checklist" | "quiz" | "accordion" | "tip" | "note" | "warn" | "key" | "ref" | "mindmap" | "flashcards" | "incident" | "answer" | "comm";
+export const BLOCK_KINDS: BlockKind[] = ["chat", "decision", "timeline", "rag", "arch", "ai", "quote", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm"];
 
 const lines = (s: string) => s.split("\n").map((l) => l.trim()).filter(Boolean);
 const cells = (l: string) => l.split("|").map((c) => c.trim());
@@ -79,6 +79,15 @@ export function parseIncident(src: string) {
     return { label, text: rest.join(" | "), tone };
   });
   return { title, rows };
+}
+
+/** Communication exercise. First line `# Title`, then `Audience`, `Situation`, `Task`, `Good looks like` rows. */
+export function parseComm(src: string) {
+  const ls = lines(src);
+  const title = ls[0]?.startsWith("#") ? ls.shift()!.replace(/^#\s*/, "") : "";
+  const rows = ls.map((l) => { const [label, ...rest] = cells(l); return { label, text: rest.join(" | ") }; });
+  const good = rows.find((r) => r.label.toLowerCase().startsWith("good"));
+  return { title, rows: rows.filter((r) => r !== good), good: good?.text ?? "" };
 }
 
 export type LensRow = { label: string; text: string };

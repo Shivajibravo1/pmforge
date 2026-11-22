@@ -1,5 +1,5 @@
 "use client";
-import { Lock } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge, Card, LoadError, Spinner } from "@/components/ui";
@@ -20,6 +20,7 @@ export default function Library() {
   return (
     <div className="space-y-4">
       <div>
+        <Link href="/app/toolkit" aria-label="Back to Toolkit" className="mb-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-line hover:bg-surface2"><ArrowLeft size={20} aria-hidden="true" /></Link>
         <h1 className="text-2xl font-bold">Architecture Library</h1>
         <p className="mt-1 text-sm text-muted">The technology your projects run on, in business language. For each topic: what it is, what it does to your plan, what goes wrong, what to ask the engineers and how to say it in an interview.</p>
       </div>

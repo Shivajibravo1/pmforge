@@ -14,6 +14,8 @@ These requirements apply to every lesson, every day, without being repeated in a
 7. **Modern team lens.** Lessons reflect how AI enabled and digital transformation projects are staffed today: forward deployed engineers (embedded with the customer to deploy, integrate and tune), AI security consultants (prompt injection, data leakage, supply chain; OWASP LLM Top 10, NIST AI RMF, MITRE ATLAS), agentic AI engineers (LLMs that plan and call tools), agent harness engineers (tools, memory, guardrails, evaluations and logging around an agent), Harness CI/CD platform engineers (the vendor platform, a different role from the agent harness), AI engineers (retrieval, prompts, evaluations) and traditional developers. Always say that agent harness engineering is not a standardised term, and tell learners to confirm the scope in their own organisation. Each lesson in the kit has a role lens (`cards` with a what goes wrong column), an `incident`, an `answer`, a `mindmap` and `flashcards`. All 120 days except the buffer days (29, 59, 89 and 119) carry the kit. The free days are the hook for paid users, so they come first in every wave. New lessons must include the kit.
 8. **Incidents are illustrative.** An `incident` is a composite scenario labelled `(illustrative)`: no real client names, no invented statistics, quotes or dates. A real public case needs a verified source and a caveat to check the current record.
 
+9. **Architecture diagram and communication exercise.** Every lesson except the buffer days (29, 59, 89 and 119) carries one `arch` diagram that shows the technology or governance structure behind the topic in business language, and one `comm` exercise (a real workplace message the learner writes, with a model answer to compare). They are appended to existing screens, so the 6 to 12 screen limit holds. The test `ENHANCED_DAYS` in `test_lesson_blocks.py` lists the days that are done; extend it as waves land. Diagrams of real public cases are generic and labelled illustrative.
+
 Also: plain English, no em dashes, no invented statistics or quotes, mark illustrative scenarios as illustrative, verify figures for real cases, and never use real client names.
 
 ## Lesson format
@@ -41,6 +43,7 @@ One `## ` heading is one screen (6 to 12 screens). Blocks are fenced code blocks
 | `mindmap` | `# Centre`, then `Branch \| child, child` | 3 or more branches, each with 2 or more children |
 | `flashcards` | `Front \| Back` | 3 or more cards; tap to flip, review again or got it |
 | `incident` | `# Title (illustrative)`, then `What happened`, `Impact`, `Root cause`, `Resolution`, `PM move` rows | real world scenario with resolution |
+| `comm` | `# Title`, then `Audience`, `Situation`, `Task`, `Good looks like` rows | communication exercise; the model answer is hidden until the learner has written their own |
 | `answer` | `? question`, `- weak answer \| why it fails`, `+ strong answer`, `= tailoring tip` | interview answer; tips repeat; the learner replaces the example with their own real story |
 
 Tables use normal Markdown. Tests in `backend/tests/test_lesson_blocks.py` enforce the format.

@@ -194,6 +194,21 @@ class PushDelivery(Base):
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class MockAttempt(Base):
+    """One timed interview practice answer. The self score comes from the member's own rubric ticks; the AI score and
+    feedback are filled only if the member asks for them (they use the review allowance)."""
+    __tablename__ = "mock_attempts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    question_id: Mapped[str] = mapped_column(String(40), index=True)
+    answer: Mapped[str] = mapped_column(Text)
+    seconds_used: Mapped[int] = mapped_column(Integer, default=0)
+    self_score: Mapped[int] = mapped_column(Integer)
+    ai_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    ai_feedback: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
+
+
 class Payment(Base):
     """One SuperProfile purchase, as relayed by the n8n bridge. transaction_id makes every relay idempotent.
     status: applied (access granted), pending (no account with that email yet), review (amount below the plan

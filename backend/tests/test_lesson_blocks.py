@@ -3,7 +3,7 @@ import re
 
 from app.content import days, get_day, lesson_body
 
-KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer"}
+KINDS = {"chat", "decision", "timeline", "rag", "arch", "ai", "quote", "journal", "flow", "cards", "stats", "checklist", "quiz", "accordion", "tip", "note", "warn", "key", "ref", "mindmap", "flashcards", "incident", "answer", "comm"}
 FENCE = re.compile(r"```(\w+)\n(.*?)```", re.S)
 
 
@@ -193,3 +193,28 @@ def test_every_ai_lens_is_structured_and_substantial():
         assert [r.split("|")[0].strip() for r in rows] == AI_LENS_LABELS, f"day {n}: ai lens rows"
         assert all(len(r.split("|", 1)[1].split()) >= 6 for r in rows), f"day {n}: ai lens row too thin"
         assert len(lens[0].split()) >= 100, f"day {n}: ai lens too short"
+
+
+# Lessons enhanced with an architecture diagram and a communication exercise. Extend as waves land.
+ENHANCED_DAYS: list[int] = list(range(1, 21)) + list(range(21, 29)) + list(range(30, 41))
+COMM_LABELS = ["Audience", "Situation", "Task", "Good looks like"]
+
+
+def test_comm_exercises_are_well_formed():
+    for n in written():
+        for kind, src in blocks(n):
+            if kind == "comm":
+                ls = _lines(src)
+                assert ls[0].startswith("# "), f"day {n}: comm needs a title"
+                assert [r.split("|")[0].strip() for r in ls[1:]] == COMM_LABELS, f"day {n}: comm rows"
+                assert all(len(r.split("|", 1)[1].split()) >= 5 for r in ls[1:]), f"day {n}: comm row too thin"
+                assert "\u2014" not in src, f"day {n}: no em dashes"
+
+
+def test_enhanced_days_carry_an_architecture_diagram_and_a_comm_exercise():
+    for n in ENHANCED_DAYS:
+        kinds = [k for k, _ in blocks(n)]
+        assert "arch" in kinds, f"day {n}: add an arch diagram"
+        assert kinds.count("comm") == 1, f"day {n}: add one comm exercise"
+        screens = len(re.findall(r"^## ", lesson_body(n) or "", re.M))
+        assert 6 <= screens <= 12, f"day {n}: {screens} screens"

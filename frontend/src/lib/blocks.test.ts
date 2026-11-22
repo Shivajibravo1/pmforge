@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseLens } from "./blocks";
+import { parseArch, parseChat, parseDecision, parseRag, parseTimeline, readMinutes, parseCards, parseChecklist, parseFlow, parseQuiz, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseLens } from "./blocks";
 
 describe("lesson block parsers", () => {
   it("parses flow steps", () => {
@@ -21,6 +21,12 @@ describe("lesson block parsers", () => {
     expect(a?.strong).toContain("Least privilege");
     expect(a?.tips).toHaveLength(1);
     expect(parseAnswer("? only a question")).toBeNull();
+  });
+  it("parses a communication exercise and separates the model answer", () => {
+    const c = parseComm("# Tell the sponsor\nAudience | Sponsor\nSituation | Slip\nTask | Write 3 lines\nGood looks like | Plain and specific");
+    expect(c.title).toBe("Tell the sponsor");
+    expect(c.rows.map((r) => r.label)).toEqual(["Audience", "Situation", "Task"]);
+    expect(c.good).toBe("Plain and specific");
   });
   it("parses cards with icon, text and an optional risk", () => {
     expect(parseCards("shield | Security | a | b")[0]).toEqual({ icon: "shield", title: "Security", text: "a", risk: "b" });

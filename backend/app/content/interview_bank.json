@@ -1,0 +1,381 @@
+{
+ "roles": [
+  {
+   "id": "agile-pm",
+   "title": "Agile Project Manager / Scrum Master",
+   "blurb": "Sprints, backlogs, conflict, hybrid delivery."
+  },
+  {
+   "id": "functional-pm",
+   "title": "Functional Project Manager",
+   "blurb": "Requirements, testing, go-live, vendors, stakeholders."
+  },
+  {
+   "id": "ai-pm",
+   "title": "AI Project Manager",
+   "blurb": "AI risk, evaluation, governance, cost, vendors."
+  }
+ ],
+ "questions": [
+  {
+   "role": "agile-pm",
+   "type": "Behavioural",
+   "question": "Tell me about a time the sponsor asked for a major scope change in the middle of a sprint. What did you do?",
+   "time_seconds": 180,
+   "rubric": [
+    "Protects the sprint goal and explains why in business terms",
+    "Brings the request to the product owner and the backlog, not straight to the team",
+    "Offers options with trade-offs (swap, next sprint, new release) rather than a flat no",
+    "States a concrete outcome and what was learned"
+   ],
+   "model_answer": "In one delivery a sponsor wanted a new reporting screen added mid-sprint after a board meeting. I did not say no and I did not slip it in. I met the sponsor and the product owner the same day, showed what the sprint goal protected and what the new request was worth. We agreed three options: swap it for an item of equal size, start it next sprint, or run a short spike to size it. The sponsor chose the spike, and the screen was in the next release with a clear estimate. I set an agreement that urgent changes go through the product owner with a visible trade-off. Use your own real example here.",
+   "free": true,
+   "id": "agile-pm-01"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Behavioural",
+   "question": "Describe a conflict inside your team that was slowing delivery. How did you handle it?",
+   "time_seconds": 180,
+   "rubric": [
+    "Describes the facts and the impact on delivery, not personalities",
+    "Speaks to the people involved separately before a group discussion",
+    "Uses a team agreement or retrospective to fix the cause",
+    "Shows the result and how the team works differently afterwards"
+   ],
+   "model_answer": "Two senior developers disagreed about a design approach, and reviews were stalling for days. I spoke to each one alone and asked what outcome they wanted. Both cared about stability. I then ran a short working session with a timebox: we listed the criteria, compared the two options against them and the team made the call. We wrote down a rule for how design disagreements are decided. Review time dropped and the conflict did not return. Use your own example.",
+   "free": false,
+   "id": "agile-pm-02"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Scenario",
+   "question": "Your team's velocity has dropped for three sprints and leadership is asking why. What do you do?",
+   "time_seconds": 150,
+   "rubric": [
+    "Looks for causes before reacting (interruptions, unclear stories, technical debt, absence)",
+    "Uses the retrospective and data, not blame",
+    "Explains that velocity is a planning aid, not a performance score",
+    "Proposes a small experiment and a follow-up check"
+   ],
+   "model_answer": "First I would look at the data and talk to the team: were stories unclear, were there interruptions, did we take on hidden technical debt, was anyone absent. I would bring the findings to the retrospective and choose one or two experiments, for example tighter refinement and a protected focus period. With leadership I would explain that velocity helps the team plan and is not a performance score, and share the causes and our plan, with a date to review the effect.",
+   "free": false,
+   "id": "agile-pm-03"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Scenario",
+   "question": "A stakeholder says the team should stop doing retrospectives because they waste time. How do you respond?",
+   "time_seconds": 120,
+   "rubric": [
+    "Listens and finds the real concern (time, no visible change)",
+    "Explains the purpose in terms of outcomes the stakeholder values",
+    "Offers a practical change such as shorter, focused retrospectives with tracked actions",
+    "Keeps the improvement habit rather than dropping it"
+   ],
+   "model_answer": "I would ask what is behind it. Often the real issue is that retrospectives produce no visible change. I would explain that the retrospective is how the team removes the things that slow delivery, then show recent actions and their effect. If the format is stale I would shorten it, limit it to two actions and report their results. The habit stays, and the stakeholder sees the value.",
+   "free": false,
+   "id": "agile-pm-04"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Technical in business language",
+   "question": "How do you track progress and risk on an Agile project without relying on a fixed plan?",
+   "time_seconds": 150,
+   "rubric": [
+    "Names useful measures (burndown or burnup, cycle time, release forecast) and how they are used",
+    "Keeps a visible risk and impediment list reviewed regularly",
+    "Reports in terms executives can act on",
+    "Mentions forecasting with ranges rather than false precision"
+   ],
+   "model_answer": "I use a burnup toward the release scope, cycle time and the number of items blocked, and I keep a short risk and impediment list that we review every week. For executives I report a forecast as a range with the main assumption, what changed since last time and the decision I need. I avoid false precision: a range with its assumptions is more honest than a single date.",
+   "free": false,
+   "id": "agile-pm-05"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Behavioural",
+   "question": "Tell me about an impediment you could not remove yourself. How did you escalate?",
+   "time_seconds": 150,
+   "rubric": [
+    "Shows the impediment was clear and its impact quantified in days or cost",
+    "Escalates to the right person with options, not just a complaint",
+    "Follows up until it is resolved",
+    "Reflects on what to do earlier next time"
+   ],
+   "model_answer": "A vendor environment was down and blocked testing for two sprints. I wrote one page: what was blocked, the cost in days, the two options and who could decide. I took it to the programme manager the same day and followed up every morning until the environment was restored. Next time I would raise the dependency earlier, so I now add environment readiness to sprint planning.",
+   "free": false,
+   "id": "agile-pm-06"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Scenario",
+   "question": "How would you run a project that mixes Agile delivery with a fixed contract and a fixed go-live date?",
+   "time_seconds": 180,
+   "rubric": [
+    "Recognises the hybrid reality and fixes what must be fixed (date, budget) while flexing scope",
+    "Uses prioritisation such as must, should, could to protect the date",
+    "Agrees governance and change control with the sponsor in advance",
+    "Gives early and frequent releases to reduce risk"
+   ],
+   "model_answer": "I would be open that date and budget are fixed, so scope is the flexible element. We agree must-have, should-have and could-have items with the sponsor, deliver the must-haves first in short releases and keep the could-haves as the buffer. We agree the change process and reporting before starting. Frequent working increments give early evidence of progress and early warning if the date is at risk.",
+   "free": false,
+   "id": "agile-pm-07"
+  },
+  {
+   "role": "agile-pm",
+   "type": "Behavioural",
+   "question": "How do you keep a distributed or remote team aligned and engaged?",
+   "time_seconds": 150,
+   "rubric": [
+    "Describes concrete practices (working agreements, visible board, overlap hours)",
+    "Covers communication across time zones and written decisions",
+    "Looks after relationships and psychological safety",
+    "Gives evidence that it worked"
+   ],
+   "model_answer": "We agree working hours that overlap, write decisions in one visible place and keep the board as the single source of progress. I run short check-ins that are about blockers rather than status, and I make time for relationships with occasional cameras-on sessions. I measure it by watching cycle time and by asking the team in the retrospective how connected they feel.",
+   "free": false,
+   "id": "agile-pm-08"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Behavioural",
+   "question": "Tell me about a time requirements were unclear or kept changing. How did you bring control?",
+   "time_seconds": 180,
+   "rubric": [
+    "Shows how requirements were clarified with the business (workshops, examples, sign-off)",
+    "Introduces a change control process proportionate to the project",
+    "Manages expectations about cost and date impact",
+    "Gives a clear result"
+   ],
+   "model_answer": "On a claims workflow project the requirements changed weekly because three departments each had their own view. I ran a short workshop with examples, wrote one requirements baseline and had the business owner sign it. After that, changes went through a lightweight change request that showed effort and date impact. Changes did not stop but became visible and decided, and the team could plan again. Use your own real example.",
+   "free": true,
+   "id": "functional-pm-01"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Scenario",
+   "question": "User acceptance testing finds many defects two weeks before go-live. What do you do?",
+   "time_seconds": 180,
+   "rubric": [
+    "Triages defects by severity and business impact",
+    "Agrees a go or no-go criteria with the sponsor",
+    "Presents options (fix, delay, phased go-live, workaround) with risks",
+    "Communicates clearly and early"
+   ],
+   "model_answer": "I would triage with the business and the test lead: which defects block a core process, which have a workaround and which can wait. I would agree exit criteria with the sponsor and present the options: fix and hold the date if feasible, delay, or a phased go-live with workarounds. I would tell stakeholders early with the facts, a recommendation and the decision date. The aim is an informed decision, not a surprise on go-live day.",
+   "free": false,
+   "id": "functional-pm-02"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Behavioural",
+   "question": "Describe how you manage a difficult stakeholder who keeps missing decisions or reviews.",
+   "time_seconds": 150,
+   "rubric": [
+    "Understands the stakeholder's priorities and constraints",
+    "Makes the cost of delay visible",
+    "Offers an easier way to decide (short options, decision meeting)",
+    "Escalates respectfully if needed"
+   ],
+   "model_answer": "I first asked what was getting in the way: she was overloaded. I started sending a one page options summary with my recommendation and the cost of delay, and booked a fifteen minute decision slot each week. Decisions came faster. For one blocked item I used her manager as a sponsor, after telling her I would. Use your own example.",
+   "free": false,
+   "id": "functional-pm-03"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Scenario",
+   "question": "How do you prepare a project for go-live and handover to operations?",
+   "time_seconds": 180,
+   "rubric": [
+    "Covers readiness checks (testing, training, data migration, support model)",
+    "Includes a rollback plan and a go or no-go decision",
+    "Plans hypercare and handover documents",
+    "Gets operations to accept the service before go-live"
+   ],
+   "model_answer": "I use a readiness checklist: testing signed off, training done, data migration rehearsed, support model and contacts agreed, monitoring in place and a rollback plan. A go or no-go meeting with named decision makers happens two or three days before. Operations accept the service in writing, we run hypercare for an agreed period and the handover includes runbooks and known issues.",
+   "free": false,
+   "id": "functional-pm-04"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Behavioural",
+   "question": "Tell me about a vendor that was not delivering. What did you do?",
+   "time_seconds": 150,
+   "rubric": [
+    "Uses facts and contract terms, not frustration",
+    "Escalates through agreed channels and sets a recovery plan",
+    "Protects the project with contingency",
+    "Preserves the relationship where possible"
+   ],
+   "model_answer": "A vendor missed two milestones. I pulled the contract and the evidence, met their delivery lead and agreed a written recovery plan with dated checkpoints. I escalated to their account director with our sponsor in the same meeting, and I prepared a contingency in case it failed. Delivery recovered by the second checkpoint. Use your own example.",
+   "free": false,
+   "id": "functional-pm-05"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Technical in business language",
+   "question": "Explain to a non-technical sponsor why a system integration is taking longer than planned.",
+   "time_seconds": 120,
+   "rubric": [
+    "Uses a plain analogy",
+    "States the specific cause and impact on date and cost",
+    "Offers options and a recommendation",
+    "Avoids jargon and blame"
+   ],
+   "model_answer": "I would say: connecting these two systems is like joining two pipes from different makers. We found the fittings do not match, so we are building an adapter and testing it so nothing leaks. It adds about two weeks. Options are to proceed with the adapter, to simplify the scope of the connection, or to move the date. I recommend the adapter, because it is the safest for customers.",
+   "free": false,
+   "id": "functional-pm-06"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Scenario",
+   "question": "The business case that justified the project no longer looks valid halfway through. What do you do?",
+   "time_seconds": 150,
+   "rubric": [
+    "Reassesses benefits and cost honestly",
+    "Brings it to the sponsor and steering committee promptly",
+    "Presents options (continue, change scope, pause, stop)",
+    "Shows that stopping can be a good decision"
+   ],
+   "model_answer": "I would refresh the numbers with finance and the business owner, then take it to the sponsor and steering committee with options: continue as planned, reduce scope to the part that still pays, pause or stop. Stopping a project whose benefit has gone is good governance and saves money. I would present facts and a recommendation rather than hiding the problem.",
+   "free": false,
+   "id": "functional-pm-07"
+  },
+  {
+   "role": "functional-pm",
+   "type": "Behavioural",
+   "question": "How do you keep status reporting useful and honest, especially when the news is bad?",
+   "time_seconds": 120,
+   "rubric": [
+    "Uses a clear structure (status, risks, decisions needed)",
+    "Reports bad news early with options",
+    "Is consistent and factual",
+    "Shows trust gained by transparency"
+   ],
+   "model_answer": "I report in the same short format every time: status, what changed, top risks, decisions I need. When the news is bad I say it early with the cause and two or three options, because a sponsor can act on options. Over time, sponsors trust a report that never hides a red.",
+   "free": false,
+   "id": "functional-pm-08"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Scenario",
+   "question": "Why do many AI projects fail to reach production, and how would you reduce that risk?",
+   "time_seconds": 180,
+   "rubric": [
+    "Names data readiness, unclear business problem and missing ownership as common causes",
+    "Describes starting with a narrow use case and success measure",
+    "Includes evaluation, governance and change management",
+    "Avoids hype and sets honest expectations"
+   ],
+   "model_answer": "In my experience the causes are usually a vague business problem, poor or inaccessible data, no owner for the content or the outcome, and no way to measure quality. I would start with a narrow use case and a success measure agreed with the business, check data readiness early, build an evaluation set from real cases, agree governance with security and legal, and plan the change for the people who will use it. I would tell the sponsor plainly what the pilot can and cannot prove.",
+   "free": true,
+   "id": "ai-pm-01"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Scenario",
+   "question": "The sponsor wants to launch a customer-facing AI assistant next month. What do you check before agreeing?",
+   "time_seconds": 180,
+   "rubric": [
+    "Checks the data and approved sources, and who owns them",
+    "Asks for evaluation results and a human handover plan",
+    "Covers security and privacy (prompt injection, personal data, access rights)",
+    "Proposes a staged launch with limits and monitoring"
+   ],
+   "model_answer": "I would ask which approved content it answers from and who owns it, how quality was measured on real questions, what happens when it is unsure, and how personal data and access are protected, including manipulation attempts such as prompt injection. I would propose a staged launch: internal first, then a small group of customers, with usage limits, monitoring and a way to switch it off. If those are not ready, I would show the sponsor the date that is realistic.",
+   "free": false,
+   "id": "ai-pm-02"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Behavioural",
+   "question": "Tell me about a time you had to explain a technical risk to executives in plain language.",
+   "time_seconds": 150,
+   "rubric": [
+    "Uses an analogy or simple framing",
+    "States impact on business outcomes",
+    "Gives a recommendation and a decision needed",
+    "Shows the executives acted on it"
+   ],
+   "model_answer": "I explained that our assistant could be tricked by hidden text in a document into revealing information, using the analogy of a helpful new employee who follows any note left on the desk. I showed the business impact, proposed controls and asked for approval of two weeks of testing before launch. They approved, and the testing found two issues we fixed. Use your own example.",
+   "free": false,
+   "id": "ai-pm-03"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Technical in business language",
+   "question": "How do you measure whether an AI feature is good enough to release?",
+   "time_seconds": 150,
+   "rubric": [
+    "Defines an evaluation set of realistic questions with approved answers",
+    "Sets pass thresholds with the business, including safety checks",
+    "Includes human review of samples and monitoring after release",
+    "Treats quality as continuing, not a one-time test"
+   ],
+   "model_answer": "I build an evaluation set from real questions with answers approved by the business, agree thresholds for accuracy and for safety checks, and test against it every time the content or model changes. I add human review of a sample and monitor after release. Quality is tracked continuously, because content and usage change.",
+   "free": false,
+   "id": "ai-pm-04"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Scenario",
+   "question": "How do you control cost on a project that uses a paid AI model?",
+   "time_seconds": 120,
+   "rubric": [
+    "Mentions usage limits and budgets per user and overall",
+    "Describes monitoring and alerts",
+    "Chooses model size to fit the task",
+    "Considers reuse and caching where safe"
+   ],
+   "model_answer": "I set usage limits per user and a monthly budget, put cost monitoring with alerts in place and agree who gets the alert. I choose the smallest model that meets the quality bar and reuse earlier answers where the question is identical. I give the sponsor a forecast based on pilot usage, with a range.",
+   "free": false,
+   "id": "ai-pm-05"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Behavioural",
+   "question": "How would you handle an AI vendor that cannot explain how their product uses your data?",
+   "time_seconds": 150,
+   "rubric": [
+    "Treats it as a risk to resolve before contract",
+    "Asks specific questions (storage, retention, training use, location, subprocessors)",
+    "Involves security, legal and procurement",
+    "Is willing to walk away or limit scope"
+   ],
+   "model_answer": "I would not proceed until it was answered. I would ask where data is stored, how long it is kept, whether it is used for training, who can access it and which subprocessors are involved, and I would involve security, legal and procurement. If the vendor cannot answer in writing, I would recommend limiting the scope to non-sensitive data or choosing another vendor.",
+   "free": false,
+   "id": "ai-pm-06"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Scenario",
+   "question": "An AI assistant gave a customer a wrong answer that caused a complaint. What do you do?",
+   "time_seconds": 150,
+   "rubric": [
+    "Contains the issue and communicates promptly",
+    "Investigates the cause (content, retrieval, model, instructions)",
+    "Fixes and adds the case to the evaluation set",
+    "Reviews the controls and reports lessons learned"
+   ],
+   "model_answer": "I would contain it first, for example by correcting the answer and restricting the topic if needed, and respond to the customer. Then I would find the cause: outdated content, retrieval, or the instructions. I would fix it, add the case to the evaluation set so it cannot return unnoticed, and report to the sponsor and the risk owner what we changed.",
+   "free": false,
+   "id": "ai-pm-07"
+  },
+  {
+   "role": "ai-pm",
+   "type": "Behavioural",
+   "question": "What does responsible AI mean for a project manager in practice?",
+   "time_seconds": 120,
+   "rubric": [
+    "Gives concrete actions rather than slogans",
+    "Mentions ownership, human oversight, transparency and data protection",
+    "References recognised frameworks by name only",
+    "Connects to delivery gates and the plan"
+   ],
+   "model_answer": "For me it is practical: a named owner, human oversight where decisions matter, clear information to users that they are talking to AI, data protection, testing for harm and bias, and records. I put these into the plan as delivery gates, aligned with frameworks such as the NIST AI Risk Management Framework, and I check the current version of any framework before I quote it.",
+   "free": false,
+   "id": "ai-pm-08"
+  }
+ ]
+}

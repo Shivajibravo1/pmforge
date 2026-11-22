@@ -17,9 +17,11 @@ from app.routes import (
     mentor,
     payments,
     portfolio,
+    practice,
     push,
     resources,
     subscribers,
+    templates,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -117,7 +119,8 @@ def create_app() -> FastAPI:
 
     for r in (learning.router, mentor.router, portfolio.router, portfolio.public, admin.router, interview.router,
               interview.public, resources.admin, resources.public,
-              campaigns.router, subscribers.router, marketing.router, push.router, library.router,
+              campaigns.router, subscribers.router, marketing.router, push.router, library.router, practice.router,
+              templates.router,
               payments.public, payments.admin):
         app.include_router(r)
     return app

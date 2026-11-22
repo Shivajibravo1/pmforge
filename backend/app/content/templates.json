@@ -1,0 +1,669 @@
+{
+ "items": [
+  {
+   "id": "raid-log",
+   "title": "RAID log",
+   "tagline": "Risks, Assumptions, Issues, Dependencies in one living list.",
+   "free": true,
+   "layout": "table",
+   "purpose": "One page that holds everything that could, does or might block the project. It stops items living in people's heads and email.",
+   "when": "Start in week one. Review it in every weekly meeting and before every steering committee.",
+   "columns": [
+    {
+     "key": "type",
+     "label": "Type",
+     "hint": "Risk, Assumption, Issue or Dependency",
+     "kind": "text"
+    },
+    {
+     "key": "desc",
+     "label": "Description",
+     "hint": "One clear sentence",
+     "kind": "text"
+    },
+    {
+     "key": "owner",
+     "label": "Owner",
+     "hint": "One named person",
+     "kind": "text"
+    },
+    {
+     "key": "impact",
+     "label": "Impact",
+     "hint": "High, Medium or Low",
+     "kind": "text"
+    },
+    {
+     "key": "action",
+     "label": "Action",
+     "hint": "The next step, not a wish",
+     "kind": "text"
+    },
+    {
+     "key": "due",
+     "label": "Due",
+     "hint": "A date",
+     "kind": "text"
+    },
+    {
+     "key": "status",
+     "label": "Status",
+     "hint": "Open, In progress or Closed",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "type": "Risk",
+     "desc": "The vendor assistant may not meet the response quality target by pilot (illustrative)",
+     "owner": "Rahul",
+     "impact": "High",
+     "action": "Agree an evaluation set and a pass mark with the vendor",
+     "due": "Next Friday",
+     "status": "Open"
+    },
+    {
+     "type": "Assumption",
+     "desc": "Test environment will have realistic data from week 3",
+     "owner": "Marcus",
+     "impact": "Medium",
+     "action": "Confirm with operations in writing",
+     "due": "Next Wednesday",
+     "status": "Open"
+    },
+    {
+     "type": "Issue",
+     "desc": "Penetration test report not yet received, so security approval is blocked",
+     "owner": "Elena",
+     "impact": "High",
+     "action": "Agree a date with the testing firm and tell the sponsor",
+     "due": "Tomorrow",
+     "status": "In progress"
+    },
+    {
+     "type": "Dependency",
+     "desc": "Single sign-on integration needs the identity team's release in week 5",
+     "owner": "Priya",
+     "impact": "Medium",
+     "action": "Book the identity team's slot",
+     "due": "This week",
+     "status": "Open"
+    }
+   ],
+   "tips": [
+    "Give every item one owner, not a team.",
+    "Write actions you can tick off, with a date.",
+    "Close items properly and keep them for lessons learned.",
+    "Review in every weekly meeting or it becomes a graveyard."
+   ],
+   "mistakes": [
+    "Listing risks with no owner or action.",
+    "Mixing issues (already happening) with risks (might happen).",
+    "Updating it only before steering committees."
+   ],
+   "check": null
+  },
+  {
+   "id": "risk-register",
+   "title": "Risk register",
+   "tagline": "Score risks so you can decide what to do first.",
+   "free": true,
+   "layout": "table",
+   "purpose": "Goes deeper than the RAID log: it describes each risk, scores it and records the planned response, so effort goes to the biggest risks.",
+   "when": "Create it at planning, review monthly or at each phase, and whenever something big changes.",
+   "columns": [
+    {
+     "key": "risk",
+     "label": "Risk",
+     "hint": "Because of (cause), (event) may happen, leading to (effect)",
+     "kind": "text"
+    },
+    {
+     "key": "likelihood",
+     "label": "Likelihood (1 to 5)",
+     "hint": "1 rare, 5 almost certain",
+     "kind": "number"
+    },
+    {
+     "key": "impact",
+     "label": "Impact (1 to 5)",
+     "hint": "1 minor, 5 severe",
+     "kind": "number"
+    },
+    {
+     "key": "score",
+     "label": "Score",
+     "hint": "Likelihood x Impact, calculated for you",
+     "kind": "product:likelihood,impact"
+    },
+    {
+     "key": "response",
+     "label": "Response",
+     "hint": "Avoid, Mitigate, Transfer or Accept",
+     "kind": "text"
+    },
+    {
+     "key": "action",
+     "label": "Action and owner",
+     "hint": "What, who, when",
+     "kind": "text"
+    },
+    {
+     "key": "trigger",
+     "label": "Trigger",
+     "hint": "The early sign it is happening",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "risk": "Because test data is not realistic, user testing may miss defects, leading to problems after go-live (illustrative)",
+     "likelihood": "3",
+     "impact": "4",
+     "response": "Mitigate",
+     "action": "Create masked production-like data set, Marcus, by week 3",
+     "trigger": "Testers report data does not match real cases"
+    },
+    {
+     "risk": "Because the vendor depends on one engineer, a resignation may stop delivery (illustrative)",
+     "likelihood": "2",
+     "impact": "4",
+     "response": "Mitigate",
+     "action": "Ask for a named deputy and documented handover, Victoria, this month",
+     "trigger": "Vendor changes the team without notice"
+    },
+    {
+     "risk": "Because the AI assistant may answer from outdated documents, customers may get wrong information (illustrative)",
+     "likelihood": "3",
+     "impact": "5",
+     "response": "Mitigate",
+     "action": "Name content owners and a monthly review, Daniel, before pilot",
+     "trigger": "Evaluation questions fail on policy topics"
+    }
+   ],
+   "tips": [
+    "Write the cause, the event and the effect, not a vague worry.",
+    "Agree what 1 to 5 means so scores are comparable.",
+    "Rank by score and attend to the top five.",
+    "Record the trigger so you notice early."
+   ],
+   "mistakes": [
+    "Scoring everything 3.",
+    "Treating the register as a one-time document.",
+    "No owner for the response."
+   ],
+   "check": null
+  },
+  {
+   "id": "project-charter",
+   "title": "Project charter",
+   "tagline": "A one to two page agreement on why, what, who and how much.",
+   "free": true,
+   "layout": "doc",
+   "purpose": "The charter is the sponsor's authority for the project and the reference everyone returns to when scope is argued.",
+   "when": "Before the project starts, signed by the sponsor. Revisit only through change control.",
+   "columns": [
+    {
+     "key": "section",
+     "label": "Section",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "content",
+     "label": "Your content",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "section": "Purpose and business case",
+     "content": "Let customers track orders online so the contact centre handles fewer routine calls (illustrative)."
+    },
+    {
+     "section": "Objectives and success measures",
+     "content": "Portal live for all customers by the agreed date, with the assistant answering approved order questions and a measurable drop in routine calls."
+    },
+    {
+     "section": "Scope: in",
+     "content": "Customer portal, order tracking, AI assistant for order questions, single sign-on, hypercare."
+    },
+    {
+     "section": "Scope: out",
+     "content": "Changes to the warehouse system, new payment methods, other languages in phase one."
+    },
+    {
+     "section": "Key deliverables and milestones",
+     "content": "Design approved, test environment ready, security review passed, pilot, go-live."
+    },
+    {
+     "section": "Budget and funding",
+     "content": "Approved envelope, contingency held by the sponsor (figures to be agreed)."
+    },
+    {
+     "section": "Stakeholders and roles",
+     "content": "Sponsor Daniel Okafor, PM, business analyst, security lead, operations, vendor."
+    },
+    {
+     "section": "Assumptions and constraints",
+     "content": "Fixed contract date, vendor platform used, security gates mandatory."
+    },
+    {
+     "section": "High level risks",
+     "content": "Vendor quality, data readiness, security approval timing."
+    },
+    {
+     "section": "Approval",
+     "content": "Sponsor name, date, signature."
+    }
+   ],
+   "tips": [
+    "Keep it short enough that people read it.",
+    "Write scope out as clearly as scope in.",
+    "Get a real signature, not a nod in a meeting."
+   ],
+   "mistakes": [
+    "A charter that reads like a plan.",
+    "No scope out, so everything is arguable.",
+    "Written without the sponsor."
+   ],
+   "check": null,
+   "fixed_rows": true
+  },
+  {
+   "id": "raci-matrix",
+   "title": "RACI matrix",
+   "tagline": "Who is Responsible, Accountable, Consulted and Informed.",
+   "free": false,
+   "layout": "table",
+   "purpose": "Makes ownership explicit. R does the work, A answers for the result (one person only), C is asked, I is told.",
+   "when": "When roles are unclear, a new team starts, or decisions stall.",
+   "columns": [
+    {
+     "key": "activity",
+     "label": "Activity",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "sponsor",
+     "label": "Sponsor",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "pm",
+     "label": "PM",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "ba",
+     "label": "Business analyst",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "dev",
+     "label": "Dev lead",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "sec",
+     "label": "Security",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "ops",
+     "label": "Operations",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "activity": "Approve requirements",
+     "sponsor": "A",
+     "pm": "R",
+     "ba": "R",
+     "dev": "C",
+     "sec": "C",
+     "ops": "I"
+    },
+    {
+     "activity": "Build the portal",
+     "sponsor": "I",
+     "pm": "A",
+     "ba": "C",
+     "dev": "R",
+     "sec": "C",
+     "ops": "I"
+    },
+    {
+     "activity": "Security approval for go-live",
+     "sponsor": "I",
+     "pm": "C",
+     "ba": "I",
+     "dev": "C",
+     "sec": "A",
+     "ops": "I"
+    },
+    {
+     "activity": "Run the service after go-live",
+     "sponsor": "I",
+     "pm": "C",
+     "ba": "I",
+     "dev": "C",
+     "sec": "C",
+     "ops": "A"
+    }
+   ],
+   "tips": [
+    "Exactly one A on each row.",
+    "Too many Rs on a row means unclear ownership.",
+    "Use real names in a second version when roles are agreed."
+   ],
+   "mistakes": [
+    "Two As on one activity.",
+    "Everyone is Consulted on everything.",
+    "Never shared with the people in it."
+   ],
+   "check": "raci"
+  },
+  {
+   "id": "business-case",
+   "title": "Business case",
+   "tagline": "The reasons, options and numbers behind the decision to proceed.",
+   "free": false,
+   "layout": "doc",
+   "purpose": "Lets a decision maker compare doing nothing, a cheaper option and the recommended option on cost, benefit and risk.",
+   "when": "Before funding is approved and again at stage gates, because benefits and costs change.",
+   "columns": [
+    {
+     "key": "section",
+     "label": "Section",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "content",
+     "label": "Your content",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "section": "Problem or opportunity",
+     "content": "Customers phone the contact centre for routine order status, which is slow for them and costly for us (illustrative)."
+    },
+    {
+     "section": "Options considered",
+     "content": "1 Do nothing. 2 Improve the existing website. 3 New portal with an AI assistant."
+    },
+    {
+     "section": "Recommended option",
+     "content": "Option 3, delivered in phases with a limited pilot first."
+    },
+    {
+     "section": "Costs",
+     "content": "Build, vendor licences, run costs including AI usage, training, support (figures to be agreed)."
+    },
+    {
+     "section": "Benefits",
+     "content": "Fewer routine calls, faster answers for customers, better data on questions asked. State how each is measured and who owns it."
+    },
+    {
+     "section": "Risks",
+     "content": "Vendor quality, data readiness, adoption."
+    },
+    {
+     "section": "Timeline",
+     "content": "Pilot, staged release, full release."
+    },
+    {
+     "section": "Decision needed",
+     "content": "Approve Option 3 and the phase one budget by the steering committee date."
+    }
+   ],
+   "tips": [
+    "Always include a do nothing option.",
+    "Give every benefit an owner and a way to measure it.",
+    "Show ranges when numbers are uncertain."
+   ],
+   "mistakes": [
+    "Benefits nobody owns.",
+    "Costs that omit running the service.",
+    "A case written to justify a decision already made."
+   ],
+   "check": null,
+   "fixed_rows": true
+  },
+  {
+   "id": "test-strategy",
+   "title": "Test strategy",
+   "tagline": "How you will prove it works before customers find out.",
+   "free": false,
+   "layout": "doc",
+   "purpose": "Agrees what will be tested, by whom, in which environment and what counts as good enough to go live.",
+   "when": "During planning, agreed with the business, security and operations before testing starts.",
+   "columns": [
+    {
+     "key": "section",
+     "label": "Section",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "content",
+     "label": "Your content",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "section": "Objectives",
+     "content": "Show the portal and assistant work for the main customer journeys and are safe to release."
+    },
+    {
+     "section": "Scope",
+     "content": "Order tracking, login, assistant answers on approved topics, security checks. Out: warehouse system internals."
+    },
+    {
+     "section": "Test levels",
+     "content": "Unit and integration by developers, system testing by the test team, user acceptance by the business, security and performance testing."
+    },
+    {
+     "section": "Environments and data",
+     "content": "Dedicated test environment with masked, realistic data. Refresh before each test cycle."
+    },
+    {
+     "section": "Entry and exit criteria",
+     "content": "Entry: build deployed and smoke test passed. Exit: no open critical defects, agreed pass mark on the assistant evaluation set, security sign-off."
+    },
+    {
+     "section": "Defect management",
+     "content": "Severity levels, owners, daily triage, agreed fix times."
+    },
+    {
+     "section": "Roles",
+     "content": "Test lead, business testers, developers, security, product owner."
+    },
+    {
+     "section": "Reporting",
+     "content": "Weekly test progress and defect trend in the status report."
+    }
+   ],
+   "tips": [
+    "Agree exit criteria with the business before testing starts.",
+    "For AI features, include an evaluation set and safety tests.",
+    "Plan test data early. It is usually the bottleneck."
+   ],
+   "mistakes": [
+    "Testing squeezed at the end.",
+    "Exit criteria invented on go-live day.",
+    "No test environment owner."
+   ],
+   "check": null,
+   "fixed_rows": true
+  },
+  {
+   "id": "status-report",
+   "title": "Status report",
+   "tagline": "One page a busy executive reads in ten seconds.",
+   "free": false,
+   "layout": "doc",
+   "purpose": "Shows where the project is, what changed, what is at risk and what you need from the reader.",
+   "when": "Weekly or fortnightly, in the same format each time.",
+   "columns": [
+    {
+     "key": "section",
+     "label": "Section",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "content",
+     "label": "Your content",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "section": "Overall status (RAG)",
+     "content": "Amber: security report is late, other work on track."
+    },
+    {
+     "section": "Progress since last report",
+     "content": "Test environment ready, single sign-on built, vendor demo completed."
+    },
+    {
+     "section": "Next period",
+     "content": "Start user testing, receive penetration test report, agree the pilot group."
+    },
+    {
+     "section": "Risks and issues",
+     "content": "Security approval timing (issue), assistant quality (risk). Each with owner and next step."
+    },
+    {
+     "section": "Decisions needed",
+     "content": "Sponsor to confirm the pilot customers by Friday."
+    },
+    {
+     "section": "Budget and schedule",
+     "content": "Spend on plan. Go-live date holds if the report arrives by next Friday."
+    }
+   ],
+   "tips": [
+    "Put the decision you need at the top, not the bottom.",
+    "Use the same layout every time.",
+    "Say what changed, not everything that happened."
+   ],
+   "mistakes": [
+    "Green until suddenly red.",
+    "A page of activity with no decision requested.",
+    "Hiding bad news until it is bigger."
+   ],
+   "check": null,
+   "fixed_rows": true
+  },
+  {
+   "id": "stakeholder-register",
+   "title": "Stakeholder register",
+   "tagline": "Who matters, what they need and how you will keep them with you.",
+   "free": false,
+   "layout": "table",
+   "purpose": "Lists the people who can affect or are affected by the project, with a plan for how to engage each one.",
+   "when": "At the start, and again whenever the team or the politics change.",
+   "columns": [
+    {
+     "key": "who",
+     "label": "Name and role",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "interest",
+     "label": "Main interest",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "influence",
+     "label": "Influence",
+     "hint": "High, Medium or Low",
+     "kind": "text"
+    },
+    {
+     "key": "support",
+     "label": "Support today",
+     "hint": "Champion, Neutral or Resistant",
+     "kind": "text"
+    },
+    {
+     "key": "need",
+     "label": "What they need from you",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "plan",
+     "label": "How and how often",
+     "hint": "",
+     "kind": "text"
+    },
+    {
+     "key": "owner",
+     "label": "Relationship owner",
+     "hint": "",
+     "kind": "text"
+    }
+   ],
+   "example": [
+    {
+     "who": "Daniel Okafor, Sponsor",
+     "interest": "Customer outcomes and budget",
+     "influence": "High",
+     "support": "Champion",
+     "need": "Short honest status and early warning",
+     "plan": "Weekly one page, monthly call",
+     "owner": "PM"
+    },
+    {
+     "who": "Elena Rossi, Security lead",
+     "interest": "No go-live without evidence of safety",
+     "influence": "High",
+     "support": "Neutral",
+     "need": "Early sight of the test plan and findings",
+     "plan": "Fortnightly review, shared folder",
+     "owner": "PM"
+    },
+    {
+     "who": "Priya Nair, Service desk lead",
+     "interest": "Fewer calls, smooth handover",
+     "influence": "Medium",
+     "support": "Champion",
+     "need": "Training and a clear support route",
+     "plan": "Monthly demo, handover workshops",
+     "owner": "Business analyst"
+    }
+   ],
+   "tips": [
+    "Be honest about support today. Nobody else reads this.",
+    "Plan for the people who can say no, not only your fans.",
+    "Revisit after each phase."
+   ],
+   "mistakes": [
+    "Sharing the register widely.",
+    "Only listing friendly people.",
+    "Never updating it."
+   ],
+   "check": null
+  }
+ ]
+}

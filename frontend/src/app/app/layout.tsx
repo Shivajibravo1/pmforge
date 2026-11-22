@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Briefcase, Flame, Home, Layers, MessageCircle, Shield, UserCircle, Zap } from "lucide-react";
+import { BookOpen, Briefcase, Flame, Home, MessageCircle, Shield, UserCircle, Wrench, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -11,7 +11,7 @@ import { isEnrolled } from "@/lib/enrollment";
 const nav = [
   ["/app", "Today", Home],
   ["/app/course", "Course", BookOpen],
-  ["/app/library", "Library", Layers],
+  ["/app/toolkit", "Toolkit", Wrench],
   ["/app/portfolio", "Portfolio", Briefcase],
   ["/app/mentor", "Mentor", MessageCircle],
   ["/app/you", "You", UserCircle],
@@ -65,7 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <nav aria-label="Primary" className="order-3 w-full md:order-none md:w-auto md:flex-1">
             <ul className="flex justify-between gap-1 md:justify-center">
               {items.map(([href, label, Icon]) => {
-                const active = href === "/app" ? path === href : path.startsWith(href);
+                const active = href === "/app" ? path === href : href === "/app/toolkit" ? /^\/app\/(toolkit|library|practice|templates)/.test(path) : path.startsWith(href);
                 return (
                   <li key={href} className="flex-1 md:flex-none">
                     <Link href={href} aria-current={active ? "page" : undefined}

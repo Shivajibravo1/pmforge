@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseLens,
+  BLOCK_KINDS, type BlockKind, parseAccordion, parseArch, parseCards, parseChat, parseDecision, parseRag, parseTimeline, type Tone, parseChecklist, parseFlow, parseQuiz, parseQuote, parseRef, parseStats, parseMindmap, parseFlashcards, parseIncident, parseAnswer, parseComm, parseLens,
 } from "@/lib/blocks";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -294,6 +294,30 @@ function Incident({ src }: { src: string }) {
   );
 }
 
+function Comm({ src }: { src: string }) {
+  const { title, rows, good } = parseComm(src);
+  return (
+    <section className="my-6 rounded-2xl border border-lime/50 bg-surface2 p-4" aria-label="Communication exercise">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-lime"><MessageCircle aria-hidden className="h-4 w-4" />Communication exercise</p>
+      {title && <p className="mt-1 text-base font-bold text-white">{title}</p>}
+      <dl className="mt-3 space-y-2">
+        {rows.map((r, i) => (
+          <div key={i} className="rounded-xl bg-black/20 p-3">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-lime">{r.label}</dt>
+            <dd className="mt-1 text-sm">{r.text}</dd>
+          </div>
+        ))}
+      </dl>
+      {good && (
+        <details className="mt-3 rounded-xl border border-line p-3">
+          <summary className="min-h-8 cursor-pointer text-sm font-semibold">Write your version first, then open this</summary>
+          <p className="mt-2 text-sm">{good}</p>
+        </details>
+      )}
+    </section>
+  );
+}
+
 function AnswerBlock({ src }: { src: string }) {
   const a = parseAnswer(src);
   if (!a) return null;
@@ -476,6 +500,7 @@ function renderBlock(kind: BlockKind, src: string): ReactNode {
     case "mindmap": return <MindMap src={src} />;
     case "flashcards": return <Flashcards src={src} />;
     case "incident": return <Incident src={src} />;
+    case "comm": return <Comm src={src} />;
     case "answer": return <AnswerBlock src={src} />;
     case "ai": {
       const rows = parseLens(src);
