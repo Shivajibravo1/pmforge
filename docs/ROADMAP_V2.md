@@ -23,10 +23,11 @@ Member answers, gets a score against a rubric and a model answer. Builds on the 
 ## Wave 4: PM templates and tools (done)
 Eight fill-in templates (RAID log, risk register, charter, RACI, business case, test strategy, status report, stakeholder register) with a worked Nimbus example, tips and common mistakes. Drafts stay on the device; CSV download protects against spreadsheet formula injection. Three are free.
 
-## Wave 5: Lesson enhancement (in progress)
-Status: a new `comm` block (communication exercise) exists. Days 1 to 90 (except buffer days 29, 59 and 89) carry one architecture
-diagram and one communication exercise, enforced by `ENHANCED_DAYS` in `test_lesson_blocks.py`. Remaining: days 91 to 120
-except buffer day 119.
+## Wave 5: Lesson enhancement (done)
+Status: a new `comm` block (communication exercise) exists. Days 1 to 120 (except buffer days 29, 59, 89 and 119) carry one architecture
+diagram and one communication exercise, enforced by `ENHANCED_DAYS` in `test_lesson_blocks.py`. Done: all 116 non buffer lessons.
+Not done: the dedicated "tech in business language" screen and the per lesson link to a Library topic (the diagrams
+and communication exercises are in; the Library links are still to do).
 
 Original plan:
 Add an architecture diagram and a "tech in business language" screen to every lesson that touches technology (only 11
