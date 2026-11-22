@@ -68,3 +68,15 @@ Manual before launch: run a prompt injection set (role override, instruction lea
 ## 9. Monitoring strategy
 
 Alert on: spikes in 429 or 502, moderation blocks per user, "possible prompt injection" and "prompt leakage" log lines, daily cost against budget. Review weekly during beta.
+
+## AI call limits (22 Nov 2026)
+
+| Limit | Free member | Paid member and admin |
+| --- | --- | --- |
+| Mentor messages a day | 5 | 10 |
+| Artifact and journal reviews a day | 2 | 3 |
+
+- Monthly budget per member (`monthly_ai_budget_usd`, 3 USD) and the global daily and monthly budgets still apply on top.
+- **Reuse:** pressing Review again on unchanged text, or submitting text identical to one already reviewed for that day, returns the earlier review. No model call, no usage slot, no cost. The reply carries `reused: true`.
+- Change the numbers in `backend/app/config.py` (`max_*_per_day`, `max_free_*_per_day`) and redeploy.
+- Not done: a cooldown between calls (needs a timestamp on `usage_log`) and caching mentor chat replies (answers depend on the question, so a cache would rarely hit).

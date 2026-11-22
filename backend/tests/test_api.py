@@ -121,12 +121,33 @@ def test_lesson_without_journal_or_artifact_type_is_rejected(client, monkeypatch
 
 
 def test_review_daily_cap(client):
+    h = auth()  # a free member
+    cap = get_settings().max_free_reviews_per_day
+    _artifact(client, h)
+    ids = [client.post("/api/v1/lessons/5/artifact", json={"content": LONG + f" Version {i}."}, headers=h).json()["artifact_id"]
+           for i in range(cap + 1)]
+    for aid in ids[:cap]:
+        assert client.post(f"/api/v1/artifacts/{aid}/review", headers=h).status_code == 200
+    r = client.post(f"/api/v1/artifacts/{ids[cap]}/review", headers=h)
+    assert r.status_code == 429 and r.json()["detail"] == "daily_limit_reached"
+
+
+def test_unchanged_text_is_not_reviewed_twice(client, fake_ai):
     h = auth()
     aid = _artifact(client, h)
-    for _ in range(get_settings().max_reviews_per_day):
-        assert client.post(f"/api/v1/artifacts/{aid}/review", headers=h).status_code == 200
-    r = client.post(f"/api/v1/artifacts/{aid}/review", headers=h)
-    assert r.status_code == 429 and r.json()["detail"] == "daily_limit_reached"
+    first = client.post(f"/api/v1/artifacts/{aid}/review", headers=h).json()
+    calls = len(getattr(fake_ai, "calls", [])) if hasattr(fake_ai, "calls") else None
+    again = client.post(f"/api/v1/artifacts/{aid}/review", headers=h).json()
+    assert again["reused"] is True and again["review_id"] == first["review_id"] and again["score"] == first["score"]
+    same_text = client.post("/api/v1/lessons/5/artifact", json={"content": LONG}, headers=h).json()["artifact_id"]
+    assert client.post(f"/api/v1/artifacts/{same_text}/review", headers=h).json()["reused"] is True
+    if calls is not None:
+        assert len(fake_ai.calls) == calls  # the model was not called again
+
+
+def test_free_members_get_a_smaller_ai_allowance_than_paid():
+    s = get_settings()
+    assert s.max_free_messages_per_day < s.max_messages_per_day and s.max_free_reviews_per_day < s.max_reviews_per_day
 
 
 def test_monthly_budget_cap(client, fake_ai):
@@ -134,7 +155,8 @@ def test_monthly_budget_cap(client, fake_ai):
     aid = _artifact(client, h)
     fake_ai.tokens_in, fake_ai.tokens_out = 1_000_000, 500_000  # about 3.5 USD at review prices
     assert client.post(f"/api/v1/artifacts/{aid}/review", headers=h).status_code == 200
-    r = client.post(f"/api/v1/artifacts/{aid}/review", headers=h)
+    other = client.post("/api/v1/lessons/5/artifact", json={"content": LONG + " A different answer."}, headers=h)
+    r = client.post(f"/api/v1/artifacts/{other.json()['artifact_id']}/review", headers=h)
     assert r.status_code == 429 and r.json()["detail"] == "monthly_budget_reached"
 
 
@@ -170,7 +192,7 @@ def test_chat_and_validation(client, fake_ai):
 
 def test_chat_daily_cap(client):
     h = auth()
-    for _ in range(get_settings().max_messages_per_day):
+    for _ in range(get_settings().max_free_messages_per_day):
         assert client.post("/api/v1/mentor/chat", json={"day": 1, "message": "hi"}, headers=h).status_code == 200
     assert client.post("/api/v1/mentor/chat", json={"day": 1, "message": "hi"}, headers=h).status_code == 429
 

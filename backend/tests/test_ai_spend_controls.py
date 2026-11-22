@@ -21,7 +21,7 @@ def _review(client, h, aid):
 
 def test_parallel_request_cannot_slip_past_the_daily_cap(client, fake_ai, monkeypatch):
     """A second request that arrives while the first is still inside the model call must be refused at cap 1."""
-    monkeypatch.setattr(get_settings(), "max_reviews_per_day", 1)
+    monkeypatch.setattr(get_settings(), "max_free_reviews_per_day", 1)
     h = auth()
     aid = _artifact(client, h)
     nested = {}
@@ -51,7 +51,7 @@ def test_repeated_failures_exhaust_the_daily_cap(client, fake_ai):
     h = auth()
     aid = _artifact(client, h)
     fake_ai.text = "not json at all"
-    for _ in range(get_settings().max_reviews_per_day):
+    for _ in range(get_settings().max_free_reviews_per_day):
         assert _review(client, h, aid).status_code == 502
     r = _review(client, h, aid)
     assert r.status_code == 429 and r.json()["detail"] == "daily_limit_reached"

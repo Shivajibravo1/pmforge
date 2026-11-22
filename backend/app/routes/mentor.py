@@ -32,6 +32,13 @@ def estimate_cost(settings: Settings, kind: str) -> float:
     return ai.cost_usd(settings, kind, c)
 
 
+def daily_cap(settings: Settings, user: User, kind: str) -> int:
+    free = user.tier == "free" and user.role != "admin"
+    if kind == "review":
+        return settings.max_free_reviews_per_day if free else settings.max_reviews_per_day
+    return settings.max_free_messages_per_day if free else settings.max_messages_per_day
+
+
 def _too_many(code: str) -> HTTPException:
     return HTTPException(429, code)
 
@@ -50,7 +57,7 @@ def reserve_usage(db: Session, user: User, kind: str, settings: Settings) -> Usa
     try:
         used = db.scalar(select(func.count()).select_from(UsageLog).where(
             UsageLog.user_id == user.id, UsageLog.kind == kind, UsageLog.day == today)) or 0
-        cap = settings.max_reviews_per_day if kind == "review" else settings.max_messages_per_day
+        cap = daily_cap(settings, user, kind)
         if used > cap:
             raise _too_many("daily_limit_reached")
         month_start = today.replace(day=1)
@@ -116,6 +123,13 @@ def review(artifact_id: str, user: User = Depends(current_user), db: Session = D
     art = db.get(Artifact, artifact_id)
     if art is None or art.user_id != user.id:  # ownership check: same answer for missing and foreign
         raise HTTPException(404, "Artifact not found")
+    # Same text already reviewed (this artifact, or an identical submission for the same day): return that review.
+    # No model call, no usage slot, no cost.
+    earlier = db.scalar(select(Review).join(Artifact, Artifact.id == Review.artifact_id).where(
+        Review.user_id == user.id, Artifact.user_id == user.id, Artifact.day == art.day,
+        Artifact.content == art.content).order_by(Review.created_at.desc()).limit(1))
+    if earlier is not None:
+        return {"review_id": earlier.id, **earlier.feedback, "redacted": False, "reused": True}
     meta = content.get_day(art.day) or {}
     prompt = content.journal_prompt(art.day)
     rubric = meta.get("rubric") or JOURNAL_RUBRIC

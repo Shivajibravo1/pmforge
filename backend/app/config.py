@@ -33,8 +33,11 @@ class Settings(BaseSettings):
     review_price_out_per_m: float = 5.00
     chat_price_in_per_m: float = 0.10
     chat_price_out_per_m: float = 0.50
-    max_messages_per_day: int = 20
-    max_reviews_per_day: int = 5
+    # Paid members (and admins). Free members get the smaller allowance, since they have not paid for the AI cost.
+    max_messages_per_day: int = 10
+    max_reviews_per_day: int = 3
+    max_free_messages_per_day: int = 5
+    max_free_reviews_per_day: int = 2
     monthly_ai_budget_usd: float = 3.0
     max_artifact_chars: int = 8000
     max_artifacts_per_day: int = 30  # stored submissions per user in 24 hours, so storage cannot be filled for free
