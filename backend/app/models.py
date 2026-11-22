@@ -174,6 +174,25 @@ class CampaignDelivery(Base):
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
 
+class PushSubscription(Base):
+    """One browser or installed app a member allowed notifications on. The endpoint is the push service address."""
+    __tablename__ = "push_subscriptions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    endpoint: Mapped[str] = mapped_column(String(600), unique=True)
+    p256dh: Mapped[str] = mapped_column(String(200))
+    auth: Mapped[str] = mapped_column(String(100))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class PushDelivery(Base):
+    """A campaign was pushed to this member, so a second press never repeats it."""
+    __tablename__ = "push_deliveries"
+    campaign_id: Mapped[str] = mapped_column(ForeignKey("email_campaigns.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class Payment(Base):
     """One SuperProfile purchase, as relayed by the n8n bridge. transaction_id makes every relay idempotent.
     status: applied (access granted), pending (no account with that email yet), review (amount below the plan

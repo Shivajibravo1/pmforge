@@ -62,6 +62,10 @@ class Settings(BaseSettings):
     public_base_url: str = "http://localhost:3000"
     interview_email_daily_cap: int = 80  # all email sent in a day, interview and broadcast together (Resend free: 100)
     mailing_address: str = ""  # postal address printed in the footer of broadcast emails (required by US CAN-SPAM)
+    # Browser push (Web Push, VAPID). Generate once with: python -m scripts.gen_vapid. Without both keys push is off.
+    vapid_public_key: str = ""
+    vapid_private_key: str = Field(default="", repr=False)
+    vapid_subject: str = ""  # mailto:you@example.com, sent to push services so they can contact you
     interview_email_send_hour_ist: int = 7  # earliest hour (India time) at which the day's emails go out
 
     # Product rules (Requirement Baseline v1.1).

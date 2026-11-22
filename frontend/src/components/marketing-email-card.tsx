@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Button, Card, Notice, Spinner } from "@/components/ui";
+import { PushNotifications } from "@/components/push-notifications";
 import { ApiError, api, friendly, useApi } from "@/lib/api";
 
 type Status = { subscribed: boolean; email: string; consent_version: string; consent_text: string };
@@ -42,6 +43,7 @@ export function MarketingEmailCard() {
           <div className="mt-3">
             <Button variant="ghost" disabled={busy} onClick={() => change("unsubscribe")}>Turn off</Button>
           </div>
+          <PushNotifications />
         </>
       ) : (
         <>

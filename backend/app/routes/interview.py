@@ -2,12 +2,12 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app import interview
 from app.db import get_db
-from app.models import InterviewSubscription, MarketingConsent, User
+from app.models import InterviewSubscription, MarketingConsent, PushSubscription, User
 from app.security import current_user
 
 router = APIRouter(prefix="/api/v1/interview-email", tags=["interview-email"])
@@ -72,5 +72,7 @@ def unsubscribe_by_token(token: str, db: Session = Depends(get_db)):
         row = db.scalar(select(model).where(model.unsubscribe_token == token))
         if row and row.opted_out_at is None:
             row.opted_out_at = now
+            if model is MarketingConsent:  # no tips and offers means no notifications either
+                db.execute(delete(PushSubscription).where(PushSubscription.user_id == row.user_id))
     db.commit()
     return {"status": "ok"}

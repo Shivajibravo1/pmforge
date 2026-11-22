@@ -7,10 +7,19 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, undefer
 
-from app import emailer, interview
+from app import emailer, interview, push
 from app.config import get_settings
 from app.db import get_db
-from app.models import CampaignDelivery, EmailCampaign, InterviewSubscription, MarketingConsent, Resource, User
+from app.models import (
+    CampaignDelivery,
+    EmailCampaign,
+    InterviewSubscription,
+    MarketingConsent,
+    PushDelivery,
+    PushSubscription,
+    Resource,
+    User,
+)
 from app.security import require_admin
 
 log = logging.getLogger("pmforge.campaigns")
@@ -196,9 +205,14 @@ def audience_counts(_: User = Depends(require_admin), db: Session = Depends(get_
     """How many members each send button would reach. Only people who turned on tips and offers are counted."""
     def n(audience: str) -> int:
         return db.scalar(select(func.count()).select_from(_audience_query(audience).subquery())) or 0
+    def devices(audience: str) -> int:  # members of the audience with at least one device that allowed notifications
+        has = select(PushSubscription.user_id)
+        q = select(func.count()).select_from(_audience_query(audience).where(User.id.in_(has)).subquery())
+        return db.scalar(q) or 0
     s = get_settings()
     return {"all": n("all"), "paid": n("paid"), "free": n("free"), "daily_limit": s.interview_email_daily_cap,
-            "mailing_address_set": bool(s.mailing_address.strip())}
+            "mailing_address_set": bool(s.mailing_address.strip()), "push_available": push.enabled(s),
+            "push": {"all": devices("all"), "paid": devices("paid"), "free": devices("free")}}
 
 
 class BroadcastIn(BaseModel):
@@ -245,3 +259,53 @@ def broadcast(cid: str, body: BroadcastIn, admin: User = Depends(require_admin),
     log.info("admin %s broadcast email %s to %s: sent %d, failed %d, remaining %d", admin.id, c.id, body.audience,
              sent, failed, remaining)
     return {"sent": sent, "failed": failed, "remaining": remaining, "limit_reached": room - sent <= 0 and remaining > 0}
+
+
+PUSH_BATCH = 100
+
+
+def _snippet(c: EmailCampaign) -> str:
+    for b in c.blocks:
+        t = " ".join(str(b.get("text", "")).split())
+        if b.get("type") == "text" and t:
+            return t
+    return ""
+
+
+@router.post("/{cid}/push")
+def broadcast_push(cid: str, body: BroadcastIn, admin: User = Depends(require_admin), db: Session = Depends(get_db)):
+    """Sends this email's subject and first lines as a notification to the devices of members on the chosen plan who
+    agreed to tips and offers. Nobody is notified twice for the same email."""
+    s = get_settings()
+    if not push.enabled(s):
+        raise HTTPException(424, "push_not_configured")
+    c = _get(db, cid)
+    done = select(PushDelivery.user_id).where(PushDelivery.campaign_id == c.id)
+    people = (_audience_query(body.audience).where(User.id.in_(select(PushSubscription.user_id)))
+              .where(User.id.not_in(done)).order_by(User.created_at, User.id))
+    todo = db.execute(people.limit(PUSH_BATCH)).all()
+    url = f"{s.public_base_url.rstrip('/')}/app"
+    sent = failed = 0
+    for uid, _email, _token in todo:
+        ok = False
+        for dev in db.scalars(select(PushSubscription).where(PushSubscription.user_id == uid)).all():
+            try:
+                push.send_push(s, endpoint=dev.endpoint, p256dh=dev.p256dh, auth=dev.auth, title=c.subject,
+                               body=_snippet(c), url=url)
+                ok = True
+            except push.PushGone:
+                db.delete(dev)
+            except push.PushError as exc:
+                log.warning("push failed for user %s: %s", uid, exc)
+        if ok:
+            sent += 1
+        else:
+            failed += 1
+        db.add(PushDelivery(campaign_id=c.id, user_id=uid))  # also when every device was gone: do not retry forever
+        db.commit()
+    remaining = db.scalar(select(func.count()).select_from(
+        _audience_query(body.audience).where(User.id.in_(select(PushSubscription.user_id)))
+        .where(User.id.not_in(done)).subquery())) or 0
+    log.info("admin %s pushed email %s to %s: members reached %d, none reachable %d, remaining %d", admin.id, c.id,
+             body.audience, sent, failed, remaining)
+    return {"sent": sent, "failed": failed, "remaining": remaining}

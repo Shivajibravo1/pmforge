@@ -69,6 +69,10 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
       PUBLIC_BASE_URL: https://${DOMAIN:-pmforge.pm}
       MAILING_ADDRESS: ${MAILING_ADDRESS:-}
+      # Browser push. Without all three, push stays off. Generate keys: docs/DEPLOY_VPS.md, section Browser notifications.
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
       # SuperProfile purchases relayed by n8n (docs/PAYMENTS_N8N.md). Without the secret the endpoint refuses all.
       PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:-}
       SUPERPROFILE_MONTHLY_TITLE: ${SUPERPROFILE_MONTHLY_TITLE:-}

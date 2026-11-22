@@ -31,6 +31,7 @@ The landing page picks the price currency from the `cf-ipcountry` header that Cl
 | `OPENAI_API_KEY` | your key |
 | `RESEND_API_KEY` | your key |
 | `EMAIL_FROM` | e.g. `PMForge <login@pmforge.pm>` |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | optional, turn on browser notifications (see Browser notifications below). Subject is like `mailto:you@pmforge.pm` |
 | `MAILING_ADDRESS` | your postal address, printed at the bottom of every composer email (needed before you send tips and offers) |
 | `AUTH_TEST_EMAILS` | optional |
 | `ADMIN_EMAILS` | defaults to `aishivajibravo@gmail.com` |
@@ -138,3 +139,15 @@ Send to paid users, Send to free users. The number in each button is how many me
 - **No double sends:** `campaign_deliveries` records who got which email, whether sent from this card or by the 7:00 job. Pressing a button again only reaches people who have not got it yet.
 - **Daily limit:** `INTERVIEW_EMAIL_DAILY_CAP` (default 80) now covers interview emails and these sends together. When it is reached the page tells you how many are waiting, press the button again the next day. Sign-in codes share the same Resend 100 a day on the free plan, so a large list needs a paid Resend plan.
 - **Keep it honest:** the consent wording says tips and offers, so keep the content to that. Do not send to people who did not turn it on.
+
+## Browser notifications
+
+Members who turned on "Tips and offers by email" also see "Allow notifications" on their You page. It is per device: the
+browser asks its own permission, and only that device is stored (`push_subscriptions`, up to 5 per member). Turning tips
+and offers off, or using the unsubscribe link, removes all their devices.
+
+- **One time setup:** on the server run `docker exec <project>-backend-1 python -m scripts.gen_vapid`. Put the two values in the compose environment as `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY`, and set `VAPID_SUBJECT` to `mailto:` plus your email. Re-paste the compose file and redeploy. Keep the private key secret. If you change the keys later, every member must allow notifications again.
+- **Sending:** Admin, Email composer, card "Send now to members", row "Also as a notification on their devices": Notify all, paid or free users. The notification shows the email's subject and its first lines, and opens PMForge. Nobody is notified twice for the same email (`push_deliveries`). Devices that removed permission are deleted automatically.
+- **Where it works:** Chrome, Edge, Firefox and Android. On iPhone it works only after Share, Add to Home Screen, then opening PMForge from the home screen (iOS 16.4 or later). Needs https, which pmforge.pm has.
+- **Safety:** the stored address must belong to a known push service (Google, Mozilla, Apple, Windows). Any other address is refused, so a member cannot make the server call arbitrary sites.
+- **Not verified here:** I could not send a real notification to a real browser from this sandbox. Test on your own phone first: turn on tips and offers, press Allow notifications, then use Notify on a test email.

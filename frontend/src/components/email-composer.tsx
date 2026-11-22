@@ -222,7 +222,8 @@ export function EmailComposer() {
 }
 
 type Audience = "all" | "paid" | "free";
-type Counts = { all: number; paid: number; free: number; daily_limit: number; mailing_address_set: boolean };
+type Counts = { all: number; paid: number; free: number; daily_limit: number; mailing_address_set: boolean; push_available: boolean; push: Record<Audience, number> };
+type Kind = "email" | "push";
 type Result = { sent: number; failed: number; remaining: number; limit_reached: boolean };
 const LABEL: Record<Audience, string> = { all: "Send to all users", paid: "Send to paid users", free: "Send to free users" };
 const WHO: Record<Audience, string> = { all: "all members", paid: "paid members", free: "free members" };
@@ -231,12 +232,32 @@ const WHO: Record<Audience, string> = { all: "all members", paid: "paid members"
 function BroadcastCard({ emails, selected, onDone }: { emails: Email[]; selected: string | null; onDone: () => void }) {
   const counts = useApi<Counts>("/api/v1/admin/emails/audience");
   const [pick, setPick] = useState("");
-  const [ask, setAsk] = useState<Audience | null>(null);
+  const [ask, setAsk] = useState<{ kind: Kind; audience: Audience } | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const id = pick || selected || emails[0]?.id || "";
   const email = emails.find((e) => e.id === id);
   const c = counts.data;
+
+  async function sendPush(a: Audience) {
+    setBusy(true);
+    setMsg("");
+    setAsk(null);
+    let sent = 0;
+    try {
+      for (let i = 0; i < 20; i++) {
+        const r = await api<Result>(`/api/v1/admin/emails/${id}/push`, { method: "POST", body: { audience: a } });
+        sent += r.sent;
+        if (r.remaining === 0 || r.sent + r.failed === 0) break;
+      }
+      setMsg(`Notification sent to ${sent} ${WHO[a]}.`);
+    } catch (e) {
+      setMsg(e instanceof ApiError && e.status === 424 ? "Notifications are not set up on the server." : friendly(e instanceof ApiError ? e : null));
+    } finally {
+      setBusy(false);
+      await counts.reload();
+    }
+  }
 
   async function send(a: Audience) {
     setBusy(true);
@@ -274,16 +295,28 @@ function BroadcastCard({ emails, selected, onDone }: { emails: Email[]; selected
           {c && !c.mailing_address_set && <Notice>Add MAILING_ADDRESS on the server so every email shows your postal address. Many countries require it.</Notice>}
           <div className="mt-3 flex flex-wrap gap-2">
             {(["all", "paid", "free"] as Audience[]).map((a) => (
-              <Button key={a} variant={a === "free" ? "primary" : "ghost"} disabled={busy || !c || c[a] === 0} onClick={() => setAsk(a)}>
+              <Button key={a} variant={a === "free" ? "primary" : "ghost"} disabled={busy || !c || c[a] === 0} onClick={() => setAsk({ kind: "email", audience: a })}>
                 {LABEL[a]}{c ? ` (${c[a]})` : ""}
               </Button>
             ))}
           </div>
+          {c?.push_available && (
+            <>
+              <p className="mt-4 text-sm font-medium">Also as a notification on their devices</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(["all", "paid", "free"] as Audience[]).map((a) => (
+                  <Button key={a} variant="ghost" disabled={busy || c.push[a] === 0} onClick={() => setAsk({ kind: "push", audience: a })}>
+                    {`Notify ${a === "all" ? "all users" : `${a} users`} (${c.push[a]})`}
+                  </Button>
+                ))}
+              </div>
+            </>
+          )}
           {ask && email && (
             <div role="alert" className="mt-3 rounded-xl border border-line p-3 text-sm">
-              <p>Send &quot;{email.subject}&quot; to {c?.[ask]} {WHO[ask]} now? This cannot be undone.</p>
+              <p>{ask.kind === "email" ? "Send" : "Notify"} &quot;{email.subject}&quot; to {ask.kind === "email" ? c?.[ask.audience] : c?.push[ask.audience]} {WHO[ask.audience]} now? This cannot be undone.</p>
               <div className="mt-2 flex gap-2">
-                <Button disabled={busy} onClick={() => send(ask)}>Yes, send</Button>
+                <Button disabled={busy} onClick={() => (ask.kind === "email" ? send(ask.audience) : sendPush(ask.audience))}>Yes, send</Button>
                 <Button variant="ghost" onClick={() => setAsk(null)}>Cancel</Button>
               </div>
             </div>

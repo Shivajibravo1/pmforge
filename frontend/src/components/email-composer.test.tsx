@@ -6,7 +6,7 @@ const m = vi.hoisted(() => ({ api: vi.fn(), upload: vi.fn() }));
 vi.mock("@/lib/api", async (orig) => ({
   ...(await orig<typeof import("@/lib/api")>()),
   useApi: (path: string) => path.includes("audience")
-    ? { data: { all: 3, paid: 1, free: 2, daily_limit: 80, mailing_address_set: true }, error: null, loading: false, reload: vi.fn() }
+    ? { data: { all: 3, paid: 1, free: 2, daily_limit: 80, mailing_address_set: true, push_available: true, push: { all: 1, paid: 0, free: 1 } }, error: null, loading: false, reload: vi.fn() }
     : path.includes("resources")
     ? { data: { items: [
       { id: "img1", kind: "image", title: "Diagram", size: 1, in_email: true, created_at: "" },
@@ -70,5 +70,15 @@ describe("EmailComposer", () => {
     fireEvent.click(screen.getByText("Yes, send"));
     await waitFor(() => expect(m.api).toHaveBeenCalledWith("/api/v1/admin/emails/e1/broadcast", { method: "POST", body: { audience: "free" } }));
     await waitFor(() => expect(screen.getByText("Sent to 2 free members.")).toBeTruthy());
+  });
+  it("offers notification buttons with device counts and sends them after a confirm", async () => {
+    m.api.mockResolvedValue({ sent: 1, failed: 0, remaining: 0 });
+    render(<EmailComposer />);
+    expect((screen.getByText("Notify paid users (0)") as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByText("Notify free users (1)"));
+    expect(m.api).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Yes, send"));
+    await waitFor(() => expect(m.api).toHaveBeenCalledWith("/api/v1/admin/emails/e1/push", { method: "POST", body: { audience: "free" } }));
+    await waitFor(() => expect(screen.getByText("Notification sent to 1 free members.")).toBeTruthy());
   });
 });

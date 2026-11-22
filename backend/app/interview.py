@@ -9,7 +9,7 @@ from app import content
 
 _BLOCK = re.compile(r"```answer\n(.*?)```", re.S)
 
-MARKETING_CONSENT_VERSION = "2026-11-22"
+MARKETING_CONSENT_VERSION = "2026-11-23"
 CONSENT_VERSION = "2026-11-18"
 IST = timezone(timedelta(hours=5, minutes=30))  # send dates are India dates
 
@@ -132,4 +132,5 @@ def compose_campaign(subject: str, blocks: list[dict], *, images: dict[str, tupl
 
 def marketing_consent_text(email: str) -> str:
     return (f"Yes, email me at {email or 'my sign-in address'} now and then about learning tips, new features and "
-            "offers from PMForge. I can turn this off any time from my You page or the link in each email.")
+            "offers from PMForge, and send notifications to the devices where I choose to allow them. "
+            "I can turn this off any time from my You page or the link in each email.")
