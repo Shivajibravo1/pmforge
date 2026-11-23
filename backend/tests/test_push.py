@@ -54,7 +54,8 @@ def test_endpoint_allowlist():
 
 def test_device_signup_needs_consent_and_an_allowed_service(client):
     client.get("/api/v1/me", headers=FREE)
-    assert device(client, FREE).status_code == 422  # no consent yet
+    client.post("/api/v1/marketing-email/unsubscribe", headers=FREE)  # members start subscribed
+    assert device(client, FREE).status_code == 422  # no consent now
     agree(client, FREE)
     assert device(client, FREE, "https://evil.example.com/" + "a" * 30).status_code == 422
     assert device(client, FREE).json() == {"subscribed": True}

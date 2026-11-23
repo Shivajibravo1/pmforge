@@ -18,6 +18,7 @@ def status(user: User = Depends(current_user), db: Session = Depends(get_db)):
     row = db.get(MarketingConsent, user.id)
     return {
         "subscribed": bool(row and row.opted_out_at is None),
+        "default_on": bool(row and row.opted_out_at is None and row.consent_version == interview.DEFAULT_ON_VERSION),
         "email": user.email,
         "consent_version": interview.MARKETING_CONSENT_VERSION,
         "consent_text": interview.marketing_consent_text(user.email),

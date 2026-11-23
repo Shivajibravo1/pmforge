@@ -28,6 +28,10 @@ def configure(monkeypatch, cap=80):
 
 def test_consent_needs_a_clear_yes_and_the_current_wording(client):
     client.get("/api/v1/me", headers=FREE)
+    first = client.get(MURL, headers=FREE).json()
+    assert first["subscribed"] is True and first["default_on"] is True  # on by default at first sign-in
+    assert client.post(f"{MURL}/unsubscribe", headers=FREE).json() == {"subscribed": False}
+    client.get("/api/v1/me", headers=FREE)  # signing in again does not switch it back on
     assert client.get(MURL, headers=FREE).json()["subscribed"] is False
     bad = client.post(f"{MURL}/subscribe", headers=FREE, json={"agree": False, "consent_version": "x"})
     assert bad.status_code == 422
@@ -39,16 +43,15 @@ def test_consent_needs_a_clear_yes_and_the_current_wording(client):
     assert client.get(MURL, headers=FREE).json()["subscribed"] is False
 
 
-def test_audience_counts_only_agreed_members_and_never_admins(client):
+def test_audience_counts_only_subscribed_members_and_never_admins(client):
     client.get("/api/v1/me", headers=ADMIN)
     client.get("/api/v1/me", headers=FREE)
     client.get("/api/v1/me", headers=USER)
     make_paid(client)
-    agree(client, FREE)
-    agree(client, PAID)
+    client.post(f"{MURL}/unsubscribe", headers=USER)
     agree(client, ADMIN)
     r = client.get(f"{URL}/audience", headers=ADMIN).json()
-    assert r["paid"] == 1 and r["free"] == 1 and r["all"] == 2  # USER did not agree, admin is excluded
+    assert r["paid"] == 1 and r["free"] == 1 and r["all"] == 2  # USER unsubscribed, admin is excluded
     assert client.get(f"{URL}/audience", headers=USER).status_code == 403
 
 

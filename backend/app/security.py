@@ -107,6 +107,7 @@ def current_user(
         db.add(user)
         db.flush()
         interview.ensure_subscription(db, user.id)  # daily interview email is on by default, off in one click
+        interview.ensure_marketing(db, user.id)  # so are tips and offers, which the admin Send buttons reach
     if email:
         user.email = email
     if email.lower() in settings.admin_list:

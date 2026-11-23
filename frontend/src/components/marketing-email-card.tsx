@@ -4,7 +4,7 @@ import { Button, Card, Notice, Spinner } from "@/components/ui";
 import { PushNotifications } from "@/components/push-notifications";
 import { ApiError, api, friendly, useApi } from "@/lib/api";
 
-type Status = { subscribed: boolean; email: string; consent_version: string; consent_text: string };
+type Status = { subscribed: boolean; default_on?: boolean; email: string; consent_version: string; consent_text: string };
 
 export function MarketingEmailCard() {
   const s = useApi<Status>("/api/v1/marketing-email");
@@ -39,7 +39,7 @@ export function MarketingEmailCard() {
       <h2 className="font-semibold">Tips and offers by email</h2>
       {d.subscribed ? (
         <>
-          <p className="mt-1 text-sm text-muted">On. We send occasional tips and offers to {d.email}. Every email has an unsubscribe link.</p>
+          <p className="mt-1 text-sm text-muted">On. We send occasional tips and offers to {d.email}.{d.default_on ? " We turned this on for you when you joined." : ""} Every email has an unsubscribe link.</p>
           <div className="mt-3">
             <Button variant="ghost" disabled={busy} onClick={() => change("unsubscribe")}>Turn off</Button>
           </div>

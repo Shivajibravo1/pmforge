@@ -29,6 +29,15 @@ def ensure_subscription(db, user_id: str) -> bool:
     return True
 
 
+def ensure_marketing(db, user_id: str) -> bool:
+    """Subscribes a member to tips and offers email by default. A member who opted out stays opted out."""
+    from app.models import MarketingConsent
+    if db.get(MarketingConsent, user_id) is not None:
+        return False
+    db.add(MarketingConsent(user_id=user_id, consent_version=DEFAULT_ON_VERSION))
+    return True
+
+
 def consent_text(email: str) -> str:
     return (f"Send me one interview question a day by email at {email}. "
             "I can unsubscribe at any time from any email or from this page.")

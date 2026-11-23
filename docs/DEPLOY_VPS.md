@@ -94,6 +94,13 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 - Request bodies: Caddy rejects API bodies over 64 KiB and the backend enforces the same cap (`MAX_BODY_BYTES`).
 - AI spend: each mentor call reserves its worst-case cost and one daily slot before the model runs. Failed calls that reached the model still count. Global ceilings `GLOBAL_DAILY_AI_BUDGET_USD` (default 5) and `GLOBAL_MONTHLY_AI_BUDGET_USD` (default 50) stop all users with `ai_capacity_reached`. Set them in hPanel to match the OpenAI billing limit.
 
+## Tips and offers email (the admin Send buttons)
+
+Subscribed by default since 23 Nov 2026, like the daily interview email below: new members at first sign-in, existing
+members with an email through migration 0012. Members who had unsubscribed stay unsubscribed. Consent version
+`default-2026-11` marks these rows. Same legal caution applies (opt-out model). The Send buttons show how many
+members each plan reaches, and stay disabled while that count is 0.
+
 ## Daily interview question email
 
 - **Who gets it:** paid members, subscribed by default (decision of 23 Nov 2026). New members are subscribed at first sign-in and migration 0011 subscribed every existing member with an email address. Members who had unsubscribed stay unsubscribed. Rows created this way carry consent version `default-2026-11` in `interview_subscriptions`, so they can be told apart from ticked-box consent. Every email has a one-click unsubscribe link and the You page has a Turn off button. This is an opt-out model: it can breach consent rules for EU and UK members and India's data protection law expects consent, so take local legal advice.
