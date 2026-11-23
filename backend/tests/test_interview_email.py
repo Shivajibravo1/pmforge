@@ -171,3 +171,20 @@ def test_emailer_requires_config():
     with pytest.raises(emailer.EmailError):
         emailer.send_email(get_settings(), to="a@b.c", subject="s", text="t", html="h", unsubscribe_url="u",
                            idempotency_key="k")
+
+
+def test_new_members_are_subscribed_by_default_and_can_turn_it_off(client):
+    me = auth("newbie", "newbie@example.com")
+    client.get("/api/v1/me", headers=me)
+    st = client.get("/api/v1/interview-email", headers=me).json()
+    assert st["subscribed"] is True and st["default_on"] is True
+    client.post("/api/v1/interview-email/unsubscribe", headers=me)
+    client.get("/api/v1/me", headers=me)  # signing in again must not switch it back on
+    assert client.get("/api/v1/interview-email", headers=me).json()["subscribed"] is False
+
+
+def test_job_emails_paid_members_who_never_ticked_a_box(client):
+    make_paid(client)  # signs the paid member in, which subscribes them by default
+    s = Sender()
+    stats = run(s)
+    assert stats["sent"] == 1 and s.calls[0]["to"] == "p1@example.com"

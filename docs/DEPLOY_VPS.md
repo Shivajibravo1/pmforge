@@ -96,7 +96,7 @@ Set `IMAGE_TAG` to a previous commit SHA in the project environment and redeploy
 
 ## Daily interview question email
 
-- **Who gets it:** paid members who tick the consent box on the You page. The opt-in time and consent text version are stored in `interview_subscriptions`; turning it off keeps the row as the record.
+- **Who gets it:** paid members, subscribed by default (decision of 23 Nov 2026). New members are subscribed at first sign-in and migration 0011 subscribed every existing member with an email address. Members who had unsubscribed stay unsubscribed. Rows created this way carry consent version `default-2026-11` in `interview_subscriptions`, so they can be told apart from ticked-box consent. Every email has a one-click unsubscribe link and the You page has a Turn off button. This is an opt-out model: it can breach consent rules for EU and UK members and India's data protection law expects consent, so take local legal advice.
 - **How emails are captured:** the account email is saved at sign-in. Nothing else is collected and no list is uploaded anywhere. The sender reads the member's email from the database at send time.
 - **What is sent:** at most one email per member per day, from 7:00 India time, by the `interview-mailer` service (Docker Manager shows it as a separate container). A question you wrote for that date (admin API `/api/v1/admin/interview-questions/{YYYY-MM-DD}`) is used first. A date with no question uses the built-in bank of lesson interview questions in rotation.
 - **Limit:** `INTERVIEW_EMAIL_DAILY_CAP` (default 80). The free Resend plan allows 100 emails a day in total and sign-in codes count against the same 100, so keep this below it.

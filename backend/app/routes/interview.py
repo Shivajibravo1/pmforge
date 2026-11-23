@@ -24,6 +24,7 @@ def status(user: User = Depends(current_user), db: Session = Depends(get_db)):
     return {
         "eligible": user.tier == "paid",
         "subscribed": bool(sub and sub.opted_out_at is None),
+        "default_on": bool(sub and sub.consent_version == interview.DEFAULT_ON_VERSION and sub.opted_out_at is None),
         "email": user.email,
         "consent_version": interview.CONSENT_VERSION,
         "consent_text": interview.consent_text(user.email),

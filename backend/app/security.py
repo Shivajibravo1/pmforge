@@ -15,7 +15,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app import billing
+from app import billing, interview
 from app.config import Settings, get_settings
 from app.db import get_db
 from app.models import User
@@ -105,6 +105,8 @@ def current_user(
     if user is None:
         user = User(id=uid, email=email)
         db.add(user)
+        db.flush()
+        interview.ensure_subscription(db, user.id)  # daily interview email is on by default, off in one click
     if email:
         user.email = email
     if email.lower() in settings.admin_list:

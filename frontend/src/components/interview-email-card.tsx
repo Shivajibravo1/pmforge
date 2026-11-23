@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Card, Notice, Spinner } from "@/components/ui";
 import { ApiError, api, friendly, useApi } from "@/lib/api";
 
-type Status = { eligible: boolean; subscribed: boolean; email: string; consent_version: string; consent_text: string };
+type Status = { eligible: boolean; subscribed: boolean; default_on?: boolean; email: string; consent_version: string; consent_text: string };
 
 export function InterviewEmailCard() {
   const s = useApi<Status>("/api/v1/interview-email");
@@ -43,7 +43,9 @@ export function InterviewEmailCard() {
       )}
       {d.eligible && d.subscribed && (
         <>
-          <p className="mt-1 text-sm text-muted">On. We send one question a day to {d.email}.</p>
+          <p className="mt-1 text-sm text-muted">
+            On. We send one question a day to {d.email}.{d.default_on ? " We turned this on for you when you joined. Turn it off any time here or with the link in any email." : ""}
+          </p>
           <div className="mt-3">
             <Button variant="ghost" disabled={busy} onClick={() => change("unsubscribe")}>Turn off</Button>
           </div>

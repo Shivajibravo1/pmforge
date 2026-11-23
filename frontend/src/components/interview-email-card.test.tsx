@@ -32,6 +32,11 @@ describe("InterviewEmailCard", () => {
     await waitFor(() => expect(state.post).toHaveBeenCalledWith("/api/v1/interview-email/subscribe", { method: "POST", body: { agree: true, consent_version: "v1" } }));
   });
 
+  it("says when the email was switched on automatically", () => {
+    state.data = { ...base, eligible: true, subscribed: true, default_on: true };
+    render(<InterviewEmailCard />);
+    expect(screen.getByText(/turned this on for you/)).toBeTruthy();
+  });
   it("shows Turn off when subscribed", () => {
     state.data = { ...base, eligible: true, subscribed: true };
     render(<InterviewEmailCard />);

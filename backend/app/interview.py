@@ -11,11 +11,22 @@ _BLOCK = re.compile(r"```answer\n(.*?)```", re.S)
 
 MARKETING_CONSENT_VERSION = "2026-11-23"
 CONSENT_VERSION = "2026-11-18"
+DEFAULT_ON_VERSION = "default-2026-11"  # members who were subscribed automatically rather than by ticking a box
 IST = timezone(timedelta(hours=5, minutes=30))  # send dates are India dates
 
 
 def today_ist() -> date:
     return datetime.now(IST).date()
+
+
+def ensure_subscription(db, user_id: str) -> bool:
+    """Subscribes a member by default. Does nothing if a row exists, so a member who opted out stays opted out.
+    Every email still carries a one-click unsubscribe link. Returns True when a row was added."""
+    from app.models import InterviewSubscription  # local import: models do not import this module
+    if db.get(InterviewSubscription, user_id) is not None:
+        return False
+    db.add(InterviewSubscription(user_id=user_id, consent_version=DEFAULT_ON_VERSION, next_index=0, failures=0))
+    return True
 
 
 def consent_text(email: str) -> str:
